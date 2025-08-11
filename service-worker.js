@@ -1,5 +1,5 @@
 // Offline cache (bump version to force updates)
-const CACHE_NAME = 'conga-pwa-clean-v1';
+const CACHE_NAME = 'conga-stage-v13';
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(ASSETS)));
+  e.waitUntil(caches.open('conga-stage-v13').then((c) => c.addAll(ASSETS)));
   self.skipWaiting();
 });
 
