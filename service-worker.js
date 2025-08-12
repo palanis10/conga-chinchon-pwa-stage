@@ -1,33 +1,36 @@
-// Offline cache (bump version to force updates)
+/* STAGE service worker — unique cache so it never collides with LIVE */
 const CACHE_NAME = 'conga-stage-v13';
-const ASSETS = [
+const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icons/icon-512.png'
+  './icon-512.png'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open('conga-stage-v13').then((c) => c.addAll(ASSETS)));
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (e) => {
+self.addEventListener('install', e => {
   e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k === CACHE_NAME ? null : caches.delete(k)))))
+    caches.open(CACHE_NAME).then(c => c.addAll(CORE)).then(()=>self.skipWaiting())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', (e) => {
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => (k===CACHE_NAME ? null : caches.delete(k))))
+    ).then(()=>self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', e => {
+  const req = e.request;
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      const network = fetch(e.request).then((res) => {
-        caches.open(CACHE_NAME).then((c) => c.put(e.request, res.clone()));
+    caches.match(req).then(cached => {
+      if (cached) return cached;
+      return fetch(req).then(res => {
+        const resClone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(req, resClone));
         return res;
-      }).catch(() => cached);
-      return cached || network;
+      }).catch(()=>cached);
     })
   );
 });
