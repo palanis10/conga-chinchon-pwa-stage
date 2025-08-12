@@ -19,15 +19,23 @@
     --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
   }
   *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
+  body{
+    margin:0;
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
     background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
-    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;}
+    color:var(--text);
+    -webkit-font-smoothing:antialiased; line-height:1.35;
+  }
   .app{max-width:980px; margin:0 auto; padding:8px 12px 120px;}
 
   /* Buttons */
-  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 14px; border-radius:12px;
-    background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
-    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s;}
+  .btn{
+    appearance:none; border:0; cursor:pointer; user-select:none;
+    padding:10px 14px; border-radius:12px;
+    background: linear-gradient(135deg, #1a2344, #121a34);
+    border:1px solid rgba(255,255,255,.08);
+    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s;
+  }
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
@@ -36,15 +44,16 @@
   .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
   .iconbtn.xl{ width:56px; height:56px; font-size:22px; }
 
-  /* Top bar (compact) */
-  .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 0 6px;}
+  /* Top bar (more compact) */
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 0 2px;}
   .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:10px 16px; border-radius:999px; font-weight:900; font-size:14px; letter-spacing:.2px; white-space:nowrap;}
 
   /* Action bar under top */
-  .actionsbar{display:flex; gap:10px; justify-content:flex-end; align-items:center; margin:2px 0 8px;}
+  .actionsbar{display:flex; gap:10px; justify-content:flex-end; align-items:center; margin:2px 0 6px;}
 
   /* Players */
-  .players header{ margin:8px 0 6px 2px; color:var(--sub); font-size:12px; display:flex; justify-content:space-between; align-items:center;}
+  .players{ margin-top:2px; }
+  .players header{ margin:4px 0 6px 2px; color:var(--sub); font-size:12px; display:flex; justify-content:space-between; align-items:center;}
   .row{
     display:grid;
     grid-template-columns: 56px 1fr auto; /* avatar | name | score */
@@ -143,18 +152,16 @@
     <button id="openSettings" class="iconbtn xl" aria-label="Settings">⚙️</button>
   </div>
 
-  <!-- Actions under top, right aligned -->
+  <!-- Actions under top, right aligned (Reorder first) -->
   <div class="actionsbar">
+    <button id="reorderToggle" class="btn ghost">🔒 Reorder</button>
     <button id="historyBtn" class="btn ghost">History</button>
     <button id="newRoundBtn" class="btn primary">New round</button>
   </div>
 
   <!-- Players -->
   <section class="players">
-    <header>
-      <div>Players</div>
-      <button id="reorderToggle" class="btn ghost">🔒 Reorder</button>
-    </header>
+    <header><div>Players</div></header>
     <div id="playersList" aria-live="polite"></div>
     <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px">+ Add player</button>
   </section>
@@ -480,7 +487,7 @@
     editDlg.close(); render();
   });
 
-  /* Round dialog + logic (unchanged core) */
+  /* Round dialog + logic */
   const roundDlg=document.getElementById("roundDialog"), rows=document.getElementById("roundRows"), cutters=document.getElementById("cuttersGroup"), rErr=document.getElementById("roundError"), applyBtn=document.getElementById("applyRoundBtn");
   const openRound=()=>{ rows.innerHTML=""; cutters.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
