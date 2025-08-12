@@ -2,13 +2,13 @@
   "name": "Alanis Scorekeeper (STAGE)",
   "short_name": "Scorekeeper STG",
   "start_url": "/conga-chinchon-pwa-stage/",
-  "scope": "/conga-chinchon-pwa-stage/"
+  "scope": "/conga-chinchon-pwa-stage/",
   "display": "standalone",
   "background_color": "#0f1220",
   "theme_color": "#0f1220",
   "icons": [
     {
-      "src": "icons/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
