@@ -63,6 +63,15 @@
     background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
 
+  /* Next-dealer row layout */
+.nd-grid{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+.nd-title{min-width:0;white-space:normal}
+.nd-actions{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+@media (max-width:420px){
+  .nd-grid{grid-template-columns:1fr}
+  .nd-actions{justify-content:flex-start;flex-wrap:wrap}
+}
+
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
@@ -388,19 +397,13 @@
 
     const nd=$("#nextDealerName"); if(nd){ const p=players.find(p=>p.id===nextDealerId); nd.textContent=p?(p.name||"—"):"—"; }
     const banner=$("#banner"); if(banner) banner.style.display=gameOver?"":"none";
-    const lockBtn=$("#reorderToggle");
-    if(lockBtn){
-      if(lockOrder){
-        lockBtn.className="btn ghost";
-        lockBtn.textContent="🔒 Reorder";
-        lockBtn.setAttribute("aria-pressed","true");
-        lockBtn.title="Unlock to reorder";
-      }else{
-        lockBtn.className="btn primary";
-        lockBtn.textContent="🔓 Reorder";
-        lockBtn.setAttribute("aria-pressed","false");
-        lockBtn.title="Reordering active (long-press Edit is disabled)";
-      }
+    const lockBtn=$("#lockToggle");
+if(lockBtn){
+  lockBtn.innerHTML = (lockOrder ? "🔒" : "🔓") + ' <span class="reorderText">Reorder</span>';
+  lockBtn.title = lockOrder ? "Unlock to enable reordering" : "Lock to finish reordering";
+  lockBtn.setAttribute("aria-label", lockBtn.title);
+}
+
     }
 
     if(list) list.innerHTML="";
@@ -408,7 +411,8 @@
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
       n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
       if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      attachLongPress(n, ()=>openEdit(p.id));
+      // OLD: attachLongPress(n, ()=>openEdit(p.id));
+      if(lockOrder) attachLongPress(n, ()=>openEdit(p.id)); // only allow Edit when order is locked
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
