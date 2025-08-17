@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Conga by Alanis — STAGE v3.5.8</title>
+  <title>Conga by Alanis — STAGE v3.5.9</title>
 
   <!-- Prevent accidental zooming on mobile -->
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 
   <meta name="theme-color" content="#0b1222" />
 
   <style>
     :root{
       --bg:#0b1222;
+      --grad1:#0f1a2e;
+      --grad2:#0b1222;
       --panel:#121c30;
       --panel2:#101a2b;
       --chip:#1b2944;
@@ -23,7 +24,6 @@
       --brand2:#c49bff;
       --ok:#64efb2;
       --warn:#ff8c8c;
-      --teal:#3ff3c0;
       --ring:#2bd8a8;
       --shadow:0 12px 30px rgba(0,0,0,.35);
       --radius:16px;
@@ -34,10 +34,9 @@
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
       color:var(--text);
-      background: radial-gradient(1200px 800px at 20% -10%, #0f1a2e 60%, var(--bg));
+      background: radial-gradient(1200px 800px at 20% -10%, var(--grad1) 60%, var(--grad2));
     }
-
-    .container{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+    .container{max-width:980px;margin:0 auto;padding:20px 16px 64px}
 
     /* ===== Header (v3.5.5 look) ===== */
     .header{
@@ -45,20 +44,18 @@
       grid-template-columns:minmax(0,1fr) auto auto;
       align-items:center;
       gap:12px;
-      margin-top:6px;
+      margin-top:4px;
     }
     .title-wrap{min-width:0}
     .title{
-      font-weight:800;
+      font-weight:900;
       font-size:clamp(22px,6vw,32px);
       line-height:1.1;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
     .stage{
       margin-top:6px;
-      font-weight:700;
+      font-weight:800;
       color:var(--sub);
       letter-spacing:.5px;
       font-size:clamp(12px,3.4vw,14px);
@@ -72,7 +69,7 @@
     }
     .lang button{
       border:0;background:transparent;color:var(--sub);
-      font-weight:800;letter-spacing:.5px;
+      font-weight:900;letter-spacing:.5px;
       padding:8px 12px;border-radius:10px;cursor:pointer
     }
     .lang button.active{background:#1e2a44;color:var(--text)}
@@ -88,22 +85,20 @@
       border-radius:20px;padding:16px;box-shadow:var(--shadow)
     }
     .chip-row{
-      display:flex;gap:12px;align-items:center;justify-content:flex-start;
-      flex-wrap:nowrap;
+      display:flex;gap:12px;align-items:center;flex-wrap:nowrap;
     }
     .chip{
       display:flex;align-items:center;gap:10px;
-      padding:12px 16px;border-radius:16px;
+      padding:12px 14px;border-radius:16px;
       background:rgba(255,255,255,.06);
       border:2px dashed rgba(255,255,255,.18);
-      color:var(--text);font-weight:800;white-space:nowrap;
-      min-width:0;flex:1 1 0; /* forces one row even on iPhone */
-      justify-content:center;
+      color:var(--text);font-weight:900;white-space:nowrap;min-width:0;
+      flex:1 1 0;justify-content:center;font-size:clamp(14px,3.8vw,18px)
     }
     .chip .lock{
       width:18px;height:18px;border-radius:4px;
       background: linear-gradient(#f9e48a, #caa12e);
-      display:inline-block;position:relative
+      display:inline-block;position:relative;flex:0 0 auto
     }
     .chip .lock:before{
       content:"";position:absolute;left:50%;top:-6px;transform:translateX(-50%);
@@ -112,11 +107,10 @@
     .chip.solid{
       background:linear-gradient(135deg, #8aa8ff, #c49bff);
       border:0;color:#0b1222;box-shadow:0 8px 18px rgba(69,105,255,.35);
-      font-weight:900;
+      font-weight:1000;
     }
 
-    /* ===== Section titles ===== */
-    .section-title{margin:18px 6px 10px;color:var(--sub);font-weight:700}
+    .section-title{margin:18px 6px 10px;color:var(--sub);font-weight:800}
 
     /* ===== Players ===== */
     .players{display:flex;flex-direction:column;gap:14px}
@@ -127,40 +121,58 @@
       box-shadow:var(--shadow)
     }
     .row.active{outline-color:rgba(47,255,205,.45)}
+    .row.drag-hint{outline-color:#8aa8ff}
     .row-body{display:grid;grid-template-columns:28px 72px 1fr auto;align-items:center;gap:14px}
-    .handle{font-size:20px;color:var(--sub);opacity:.9}
+    .handle{font-size:20px;color:var(--sub);opacity:.9;cursor:grab}
     .badge{
       width:60px;height:60px;border-radius:50%;display:grid;place-items:center;
-      color:var(--text);font-weight:900;background:#15223b;position:relative
+      color:var(--text);font-weight:1000;background:#15223b;position:relative;user-select:none
     }
     .badge:before{
       content:"";position:absolute;inset:-6px;border-radius:50%;
       border:6px solid var(--ring);opacity:.9
     }
-    .pname{font-size:clamp(16px,5.2vw,28px);font-weight:900}
-    .score{font-size:clamp(16px,5.2vw,28px);font-weight:900;opacity:.95}
+    .pname{font-size:clamp(16px,5.2vw,28px);font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .score{font-size:clamp(16px,5.2vw,28px);font-weight:1000;opacity:.95;text-align:right;min-width:2ch}
 
     .add-player{
       border:2px dashed rgba(255,255,255,.25);
       border-radius:18px;padding:18px;text-align:center;color:var(--text);
-      font-weight:800;background:transparent;cursor:pointer
+      font-weight:900;background:transparent;cursor:pointer
     }
 
-    /* Utility */
+    /* ===== Modal ===== */
     dialog{border:0;background:transparent}
     .modal{
       background:linear-gradient(180deg, var(--panel), var(--panel2));
-      border-radius:18px;padding:18px;min-width:min(520px,90vw);color:var(--text);
-      box-shadow:var(--shadow)
+      border-radius:18px;padding:18px;min-width:min(560px,94vw);color:var(--text);
+      box-shadow:var(--shadow);max-height:80vh;overflow:auto
     }
-    .modal .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer}
+    .modal .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
     .btn.ghost{background:rgba(255,255,255,.08);color:var(--text)}
     .btn.primary{background:var(--ok);color:#0b1222}
+    .grid{display:grid;gap:10px}
+    .rowInput{
+      display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
+      background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.15);
+      border-radius:12px;padding:10px
+    }
+    .rowInput .nm{font-weight:900}
+    .rowInput input[type="number"]{
+      width:120px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
+      background:#0f1a2a;color:var(--text);font-weight:800
+    }
+    .minus10{
+      display:flex;align-items:center;gap:8px;border-radius:10px;padding:8px 10px;
+      background:#16243f;border:1px dashed rgba(255,255,255,.18);cursor:pointer
+    }
+    .footerRow{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
 
-    /* Make sure the three chips stay on the same row even in ES text */
+    /* Make sure the three chips stay on the same row even in ES */
     @media (max-width:420px){
-      .chip{padding:12px 10px;font-size:15px}
+      .chip{padding:12px 10px;font-size:14px}
+      .rowInput input[type="number"]{width:100px}
     }
   </style>
 </head>
@@ -170,7 +182,7 @@
     <header class="header" id="hdr">
       <div class="title-wrap">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="stage" id="appStage">STAGE v3.5.8</div>
+        <div class="stage" id="appStage">STAGE v3.5.9</div>
       </div>
 
       <div class="lang" id="langWrap" role="group" aria-label="Language">
@@ -207,19 +219,39 @@
 
     <!-- Players -->
     <h3 class="section-title" id="playersLabel">Players</h3>
-    <div id="players" class="players"></div>
+    <div id="players" class="players" aria-live="polite"></div>
 
     <button id="addPlayer" class="add-player" type="button">
       <span id="addPlayerLbl">+ Add player</span>
     </button>
   </div>
 
-  <!-- Settings (placeholder) -->
+  <!-- ===== New round modal ===== -->
+  <dialog id="roundDlg">
+    <div class="modal" role="dialog" aria-labelledby="roundTitle">
+      <div class="hd">
+        <strong id="roundTitle">New Round</strong>
+        <button class="btn ghost" id="roundClose">Close</button>
+      </div>
+      <p style="margin:0 0 10px;color:var(--sub)" id="roundHint">
+        Enter points (negatives OK). “−10” selects exactly one player and sets that input to −10.
+      </p>
+
+      <div id="roundForm" class="grid"></div>
+
+      <div class="footerRow">
+        <button class="btn ghost" id="roundCancel">Cancel</button>
+        <button class="btn primary" id="roundApply">Apply</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ===== Settings (only language passthrough) ===== -->
   <dialog id="settings">
     <div class="modal" role="dialog" aria-labelledby="sH">
       <div class="hd">
         <strong id="sH">Settings</strong>
-        <button class="btn ghost" onclick="settings.close()">Close</button>
+        <button class="btn ghost" id="sClose">Close</button>
       </div>
       <p style="margin:0 0 6px;color:var(--sub)">Language</p>
       <div class="lang">
@@ -228,7 +260,7 @@
         <button id="setES" type="button">ES</button>
       </div>
       <div style="height:10px"></div>
-      <button class="btn primary" onclick="settings.close()">Done</button>
+      <button class="btn primary" id="sDone">Done</button>
     </div>
   </dialog>
 
@@ -239,98 +271,117 @@
     const STRINGS = {
       en:{
         title:"Conga by Alanis",
-        stage:"STAGE v3.5.8",
+        stage:"STAGE v3.5.9",
         players:"Players",
         reorder:"Reorder",
         history:"History",
         newRound:"New round",
         addPlayer:"+ Add player",
-        P:"P"
+        newRoundT:"New Round",
+        newRoundHint:"Enter points (negatives OK). “−10” selects exactly one player and sets that input to −10.",
+        current:"Current",
+        close:"Close", cancel:"Cancel", apply:"Apply",
+        p:"P"
       },
       es:{
         title:"Conga por Alanis",
-        stage:"ETAPA v3.5.8",
+        stage:"ETAPA v3.5.9",
         players:"Jugadores",
         reorder:"Reordenar",
         history:"Historial",
         newRound:"Nueva ronda",
         addPlayer:"+ Agregar jugador",
-        P:"J"
+        newRoundT:"Nueva ronda",
+        newRoundHint:"Ingresa puntos (se permiten negativos). “−10” selecciona exactamente un jugador y fija ese valor en −10.",
+        current:"Actual",
+        close:"Cerrar", cancel:"Cancelar", apply:"Aplicar",
+        p:"J"
       }
     };
 
     /**********************
      * State & storage
      *********************/
-    const STORAGE_KEY = "conga_state_v1";
+    const STORAGE_KEY = "conga_state_v2";
     const LANG_KEY = "conga_lang";
-
     const defaultState = () => ({
       players: [],
       nextDealer: 0
     });
 
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
     function loadState(){
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
         if(!raw) return defaultState();
-        return JSON.parse(raw);
-      }catch(e){
-        return defaultState();
-      }
+        const s = JSON.parse(raw);
+        if(!Array.isArray(s.players)) s.players = [];
+        return s;
+      }catch(e){ return defaultState(); }
     }
     function saveState(s){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
     }
 
-    function ensureMinimumPlayers(state){
-      const MIN = 2;
-      const defaults = ["Player 1", "Player 2"];
-      if(!Array.isArray(state.players)) state.players = [];
-      while(state.players.length < MIN){
-        const i = state.players.length;
-        state.players.push({
+    function ensureTwoPlayers(s){
+      const baseNames = ["Player 1","Player 2"];
+      if(currentLang()==="es") baseNames.splice(0,2,"Jugador 1","Jugador 2");
+      while(s.players.length<2){
+        const i = s.players.length;
+        s.players.push({
           id: crypto?.randomUUID?.() || `${Date.now()}_${Math.random()}`,
-          name: defaults[i] || `Player ${i+1}`,
+          name: baseNames[i] || (currentLang()==="es" ? `Jugador ${i+1}` : `Player ${i+1}`),
           score: 0,
-          avatar: null,
-          eliminated: false
+          avatar:null, eliminated:false
         });
       }
     }
 
     /**********************
-     * Render
+     * Language helpers
      *********************/
-    const $ = sel => document.querySelector(sel);
-    const elPlayers = $("#players");
+    function currentLang(){ return localStorage.getItem(LANG_KEY) || "en"; }
+    function setLang(l){ localStorage.setItem(LANG_KEY,l); render(); }
 
-    function render(){
-      // i18n
-      const dict = STRINGS[currentLang()];
-      $("#appTitle").textContent = dict.title;
-      $("#appStage").textContent = dict.stage;
-      $("#playersLabel").textContent = dict.players;
-      document.querySelectorAll("[data-i18n='reorder']").forEach(n => n.textContent = dict.reorder);
-      document.querySelectorAll("[data-i18n='history']").forEach(n => n.textContent = dict.history);
-      document.querySelectorAll("[data-i18n='newRound']").forEach(n => n.textContent = dict.newRound);
-      $("#addPlayerLbl").textContent = dict.addPlayer;
+    function applyI18n(){
+      const d = STRINGS[currentLang()];
+      $("#appTitle").textContent = d.title;
+      $("#appStage").textContent = d.stage;
+      $("#playersLabel").textContent = d.players;
+      $("[data-i18n='reorder']").textContent = d.reorder;
+      $("[data-i18n='history']").textContent = d.history;
+      $("[data-i18n='newRound']").textContent = d.newRound;
+      $("#addPlayerLbl").textContent = d.addPlayer;
 
-      // header lang pills active state
+      // modal text
+      $("#roundTitle").textContent = d.newRoundT;
+      $("#roundHint").textContent = d.newRoundHint;
+
+      // lang pill active
       $("#langEN").classList.toggle("active", currentLang()==="en");
       $("#langES").classList.toggle("active", currentLang()==="es");
       $("#setEN").classList.toggle("active", currentLang()==="en");
       $("#setES").classList.toggle("active", currentLang()==="es");
+    }
 
-      // players
+    /**********************
+     * Render players
+     *********************/
+    const playersEl = $("#players");
+    let reorderUnlocked = false;
+
+    function renderPlayers(){
       const s = loadState();
-      ensureMinimumPlayers(s);
+      ensureTwoPlayers(s);
       saveState(s);
 
-      elPlayers.innerHTML = "";
-      s.players.forEach((p, idx) => {
+      playersEl.innerHTML = "";
+      s.players.forEach((p, idx)=>{
         const row = document.createElement("div");
-        row.className = "row" + (idx===s.nextDealer ? " active":"");
+        row.className = "row" + (idx===s.nextDealer ? " active" : "");
+        row.draggable = reorderUnlocked;
         row.dataset.id = p.id;
 
         const body = document.createElement("div");
@@ -339,82 +390,200 @@
         const handle = document.createElement("div");
         handle.className = "handle";
         handle.textContent = "≡";
+        handle.title = "Drag";
         body.appendChild(handle);
 
         const badge = document.createElement("div");
         badge.className = "badge";
-        badge.textContent = (STRINGS[currentLang()].P) + (idx+1);
+        badge.textContent = (STRINGS[currentLang()].p) + (idx+1);
         body.appendChild(badge);
 
-        const name = document.createElement("div");
-        name.className = "pname";
-        name.textContent = p.name;
-        body.appendChild(name);
+        const nm = document.createElement("div");
+        nm.className = "pname";
+        nm.textContent = p.name;
+        body.appendChild(nm);
 
-        const score = document.createElement("div");
-        score.className = "score";
-        score.textContent = p.score;
-        body.appendChild(score);
+        const sc = document.createElement("div");
+        sc.className = "score";
+        sc.textContent = p.score;
+        body.appendChild(sc);
 
         row.appendChild(body);
-        elPlayers.appendChild(row);
+        playersEl.appendChild(row);
+
+        if(reorderUnlocked){
+          row.addEventListener("dragstart", onDragStart);
+          row.addEventListener("dragover", onDragOver);
+          row.addEventListener("dragleave", onDragLeave);
+          row.addEventListener("drop", onDrop);
+        }
       });
     }
 
+    function render(){ applyI18n(); renderPlayers(); }
+
     /**********************
-     * Language
+     * Drag reorder (when unlocked)
      *********************/
-    function currentLang(){
-      return localStorage.getItem(LANG_KEY) || "en";
+    let dragId = null;
+    function onDragStart(e){
+      dragId = e.currentTarget.dataset.id;
+      e.dataTransfer.effectAllowed = "move";
     }
-    function setLang(l){
-      localStorage.setItem(LANG_KEY, l);
+    function onDragOver(e){
+      e.preventDefault();
+      e.currentTarget.classList.add("drag-hint");
+    }
+    function onDragLeave(e){
+      e.currentTarget.classList.remove("drag-hint");
+    }
+    function onDrop(e){
+      e.preventDefault();
+      const targetId = e.currentTarget.dataset.id;
+      e.currentTarget.classList.remove("drag-hint");
+      if(!dragId || dragId===targetId) return;
+      const s = loadState();
+      const from = s.players.findIndex(p=>p.id===dragId);
+      const to = s.players.findIndex(p=>p.id===targetId);
+      if(from<0||to<0) return;
+      const [moved] = s.players.splice(from,1);
+      s.players.splice(to,0,moved);
+      saveState(s);
+      renderPlayers();
+    }
+
+    /**********************
+     * New round dialog
+     *********************/
+    const roundDlg = $("#roundDlg");
+    const roundForm = $("#roundForm");
+    $("#btnNewRound").addEventListener("click", openRound);
+    $("#roundClose").addEventListener("click", ()=>roundDlg.close());
+    $("#roundCancel").addEventListener("click", ()=>roundDlg.close());
+    $("#roundApply").addEventListener("click", applyRound);
+
+    function openRound(){
+      const d = STRINGS[currentLang()];
+      const s = loadState();
+      ensureTwoPlayers(s);
+      saveState(s);
+
+      roundForm.innerHTML = "";
+      const radioName = "minusTen";
+      s.players.forEach((p, idx)=>{
+        const row = document.createElement("div");
+        row.className = "rowInput";
+
+        const nm = document.createElement("div");
+        nm.className = "nm";
+        nm.textContent = `${p.name}  ·  ${d.current}: ${p.score}`;
+        row.appendChild(nm);
+
+        const input = document.createElement("input");
+        input.type="number";
+        input.inputMode="numeric";
+        input.placeholder="0";
+        input.dataset.pid = p.id;
+        row.appendChild(input);
+
+        const m10 = document.createElement("label");
+        m10.className="minus10";
+        const r = document.createElement("input");
+        r.type="radio"; r.name=radioName; r.value=p.id; r.style.accentColor="#64efb2";
+        const span = document.createElement("span");
+        span.textContent="−10";
+        m10.appendChild(r); m10.appendChild(span);
+        row.appendChild(m10);
+
+        roundForm.appendChild(row);
+      });
+
+      roundDlg.showModal();
+    }
+
+    function applyRound(){
+      const s = loadState();
+      const chosen = roundForm.querySelector('input[type="radio"][name="minusTen"]:checked');
+      if(!chosen){
+        alert(currentLang()==="es" ? "Debes elegir exactamente un −10." : "You must choose exactly one −10.");
+        return;
+      }
+      const minusId = chosen.value;
+
+      // collect points
+      const inputs = roundForm.querySelectorAll('input[type="number"]');
+      const points = {};
+      inputs.forEach(inp=>{
+        const id = inp.dataset.pid;
+        let val = inp.value.trim()==="" ? 0 : Number(inp.value);
+        if(id===minusId) val = -10;
+        if(Number.isNaN(val)) val = 0;
+        points[id] = Math.trunc(val);
+      });
+
+      // apply
+      s.players = s.players.map(p => ({...p, score: p.score + (points[p.id] ?? 0)}));
+      // advance dealer
+      s.nextDealer = (s.nextDealer + 1) % s.players.length;
+      saveState(s);
+      roundDlg.close();
       render();
     }
 
-    $("#langEN").addEventListener("click", () => setLang("en"));
-    $("#langES").addEventListener("click", () => setLang("es"));
-    $("#setEN").addEventListener("click", () => setLang("en"));
-    $("#setES").addEventListener("click", () => setLang("es"));
-
     /**********************
-     * Actions
+     * Add player
      *********************/
-    $("#btnSettings").addEventListener("click", () => settings.showModal());
-
-    $("#addPlayer").addEventListener("click", () => {
+    $("#addPlayer").addEventListener("click", ()=>{
       const s = loadState();
-      ensureMinimumPlayers(s);
-      const n = s.players.length + 1;
+      ensureTwoPlayers(s);
+      const idx = s.players.length + 1;
       s.players.push({
         id: crypto?.randomUUID?.() || `${Date.now()}_${Math.random()}`,
-        name: currentLang()==="es" ? `Jugador ${n}` : `Player ${n}`,
+        name: currentLang()==="es" ? `Jugador ${idx}` : `Player ${idx}`,
         score: 0,
-        avatar: null,
-        eliminated:false
+        avatar:null, eliminated:false
       });
       saveState(s);
-      render();
+      renderPlayers();
     });
 
-    // Placeholder actions
-    $("#btnReorder").addEventListener("click", () => {
-      alert(currentLang()==="es" ? "Modo reordenar (placeholder)" : "Reorder mode (placeholder)");
+    /**********************
+     * Reorder lock/unlock
+     *********************/
+    $("#btnReorder").addEventListener("click", ()=>{
+      reorderUnlocked = !reorderUnlocked;
+      // subtle visual change: when unlocked, change border to solid highlight
+      $("#btnReorder").style.borderStyle = reorderUnlocked ? "solid" : "dashed";
+      renderPlayers();
     });
-    $("#btnHistory").addEventListener("click", () => {
-      alert(currentLang()==="es" ? "Historial (placeholder)" : "History (placeholder)");
+
+    /**********************
+     * History/Settings (stubs)
+     *********************/
+    $("#btnHistory").addEventListener("click", ()=>{
+      alert(currentLang()==="es" ? "Historial (pendiente)" : "History (todo)");
     });
-    $("#btnNewRound").addEventListener("click", () => {
-      alert(currentLang()==="es" ? "Nueva ronda (placeholder)" : "New round (placeholder)");
-    });
+
+    const settingsDlg = $("#settings");
+    $("#btnSettings").addEventListener("click", ()=>settingsDlg.showModal());
+    $("#sClose").addEventListener("click", ()=>settingsDlg.close());
+    $("#sDone").addEventListener("click", ()=>settingsDlg.close());
+    $("#setEN").addEventListener("click", ()=>setLang("en"));
+    $("#setES").addEventListener("click", ()=>setLang("es"));
+
+    /**********************
+     * Header language
+     *********************/
+    $("#langEN").addEventListener("click", ()=>setLang("en"));
+    $("#langES").addEventListener("click", ()=>setLang("es"));
 
     /**********************
      * Boot
      *********************/
-    // Initialize state once and ensure we always start with 2 players
     (function init(){
+      // Make sure there are always 2 players at minimum
       const s = loadState();
-      ensureMinimumPlayers(s);
+      ensureTwoPlayers(s);
       saveState(s);
       render();
     })();
