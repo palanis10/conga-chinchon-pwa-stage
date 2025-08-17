@@ -38,6 +38,11 @@
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
 
+  /* Cropper: keep page from scrolling/bouncing while dialog is open */
+body.no-scroll { overflow: hidden; }
+#cropDialog { overscroll-behavior: contain; }
+#cropDialog .modal-body { overflow: visible; } /* canvas area shouldn’t scroll */
+
   /* Three controls MUST stay on one line */
   .controls{
     display:grid;
@@ -510,103 +515,119 @@
   // Confetti
   function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:200},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
 
-   // ===== Image Cropper (smooth + accurate save) =====
+     // ===== Image Cropper (smooth pan/pinch, exact save, outside dimmed) =====
   function openCropper(dataUrl, targetId){
-    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
+    const dlg = $('#cropDialog');
+    const cvs = $('#cropCanvas');
+    const zoom = $('#cropZoom');
+    const resetBtn = $('#cropReset');
+    const saveBtn = $('#cropSave');
     if(!dlg || !cvs || !zoom || !saveBtn) return;
 
-    const ctx = cvs.getContext('2d');
+    // lock page scroll while the modal is open (iOS)
+    document.body.classList.add('no-scroll');
+
+    const ctx = cvs.getContext('2d', { alpha: true });
     let img = new Image();
 
-    // state in CSS px (not device px)
-    let cssSize = 0, DPR = window.devicePixelRatio || 1;
-    let circleR = 0;                // crop circle radius in CSS px
-    let scale = 1, minScale = 1;    // zoom
-    let offX = 0, offY = 0;         // pan
+    // canvas state (measured in CSS px; we draw with DPR transform)
+    let DPR = window.devicePixelRatio || 1;
+    let cssSize = 0;     // canvas side in CSS px
+    let circleR = 0;     // crop circle radius in CSS px
+    let scale = 1;       // current zoom
+    let minScale = 1;    // min zoom so the circle is fully covered
+    let offX = 0, offY = 0; // pan offsets (CSS px from canvas center)
+
+    // gesture state
     let dragging = false, pinching = false;
     let startX = 0, startY = 0;
     let pinchStartDist = 0, pinchStartScale = 1;
 
     // RAF renderer
-    let rafId = 0, dirty = true;
-    function requestDraw(){ if(!rafId){ rafId = requestAnimationFrame(()=>{ rafId = 0; if(dirty){ dirty=false; draw(); } }); } }
+    let rafId = 0, needsDraw = true;
+    const requestDraw = () => { if(!rafId) rafId = requestAnimationFrame(tick); };
+    const tick = () => { rafId = 0; if(needsDraw){ needsDraw=false; draw(); } };
 
     function sizeCanvas(){
-      // square canvas that follows available width in the dialog
       const rect = cvs.getBoundingClientRect();
-      cssSize = Math.max(260, Math.floor(rect.width || 600));
-      cvs.width  = Math.floor(cssSize * DPR);
+      cssSize = Math.max(280, Math.floor(rect.width || 600)); // responsive square
+      cvs.width = Math.floor(cssSize * DPR);
       cvs.height = Math.floor(cssSize * DPR);
-      ctx.setTransform(DPR,0,0,DPR,0,0); // draw in CSS px
-      circleR = cssSize/2 - 24;          // leave room for ring stroke
-    }
-
-    function draw(){
-      // image
-      ctx.clearRect(0,0,cssSize,cssSize);
-      ctx.save();
-      ctx.translate(cssSize/2 + offX, cssSize/2 + offY);
-      ctx.scale(scale, scale);
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, -img.width/2, -img.height/2);
-      ctx.restore();
-
-      // dim outside circle
-      ctx.fillStyle='rgba(0,0,0,.45)';
-      ctx.fillRect(0,0,cssSize,cssSize);
-      ctx.globalCompositeOperation='destination-out';
-      ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.fill();
-      ctx.globalCompositeOperation='source-over';
-
-      // white ring
-      ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=3;
-      ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.stroke();
+      ctx.setTransform(DPR,0,0,DPR,0,0); // draw in CSS px regardless of DPR
+      circleR = cssSize/2 - 24;          // leave room for the white ring
     }
 
     function clampPan(){
-      const w = img.width  * scale;
+      const w = img.width * scale;
       const h = img.height * scale;
-      const maxX = Math.max(0, (w/2 - circleR));
-      const maxY = Math.max(0, (h/2 - circleR));
+      const maxX = Math.max(0, w/2 - circleR);
+      const maxY = Math.max(0, h/2 - circleR);
       offX = Math.min(maxX, Math.max(-maxX, offX));
       offY = Math.min(maxY, Math.max(-maxY, offY));
     }
 
-    // Init after image loads
+    function draw(){
+      // draw image
+      ctx.clearRect(0,0,cssSize,cssSize);
+      ctx.save();
+      ctx.translate(cssSize/2 + offX, cssSize/2 + offY);
+      ctx.scale(scale, scale);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, -img.width/2, -img.height/2);
+      ctx.restore();
+
+      // dim outside the circle
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,.50)';
+      ctx.fillRect(0,0,cssSize,cssSize);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+
+      // white circle ring
+      ctx.strokeStyle = 'rgba(255,255,255,.98)';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.stroke();
+    }
+
+    // init once image is ready
     img.onload = ()=>{
       sizeCanvas();
+      // Fit by the circle (not by canvas edge): min scale must cover circle diameter
       minScale = Math.max((2*circleR)/img.width, (2*circleR)/img.height);
       scale = minScale;
       offX = 0; offY = 0;
 
-      // slider follows min/max zoom
       zoom.min = String(minScale.toFixed(2));
       zoom.max = String((minScale*3).toFixed(2));
       zoom.value = String(scale.toFixed(2));
 
-      clampPan(); dirty=true; requestDraw();
+      clampPan(); needsDraw = true; requestDraw();
     };
     img.src = dataUrl;
 
-    // Handlers
-    const onPointerDown = e => {
-      if(pinching) return; // ignore pan while pinching
+    // Controls
+    const onPointerDown = (e) => {
+      e.preventDefault();
+      if(pinching) return;
       dragging = true; startX = e.clientX; startY = e.clientY;
       cvs.setPointerCapture?.(e.pointerId);
     };
-    const onPointerMove = e => {
+    const onPointerMove = (e) => {
       if(!dragging || pinching) return;
+      e.preventDefault();
       offX += (e.clientX - startX);
       offY += (e.clientY - startY);
       startX = e.clientX; startY = e.clientY;
-      clampPan(); dirty=true; requestDraw();
+      clampPan(); needsDraw=true; requestDraw();
     };
-    const onPointerUp = e => { dragging = false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} };
-    const onPointerCancel = ()=>{ dragging = false; };
+    const onPointerUp = (e) => { dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} };
+    const onPointerCancel = () => { dragging=false; };
 
-    const onTouchStart = e=>{
+    const onTouchStart = (e) => {
       if(e.touches.length===2){
-        pinching = true; dragging = false; // stop pan immediately
+        pinching = true; dragging = false;
         pinchStartDist = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
@@ -614,57 +635,60 @@
         pinchStartScale = scale;
       }
     };
-    const onTouchMove = e=>{
+    const onTouchMove = (e) => {
       if(pinching && e.touches.length===2){
-        e.preventDefault();
+        e.preventDefault(); // stop page scroll
         const d = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        const next = pinchStartScale * (d / pinchStartDist);
-        scale = Math.min(minScale*3, Math.max(minScale, next));
+        scale = Math.min(minScale*3, Math.max(minScale, pinchStartScale * (d/pinchStartDist)));
         zoom.value = String(scale.toFixed(2));
-        clampPan(); dirty=true; requestDraw();
+        clampPan(); needsDraw=true; requestDraw();
       }
     };
-    const onTouchEnd = ()=>{ pinching = false; };
+    const onTouchEnd = () => { pinching = false; };
 
-    const onWheel = e=>{
+    const onWheel = (e) => {
       e.preventDefault();
       const next = scale * (e.deltaY > 0 ? 0.95 : 1.05);
       scale = Math.min(minScale*3, Math.max(minScale, next));
       zoom.value = String(scale.toFixed(2));
-      clampPan(); dirty=true; requestDraw();
+      clampPan(); needsDraw=true; requestDraw();
     };
 
-    const onZoom = ()=>{
+    const onZoom = () => {
       const v = parseFloat(zoom.value || String(scale));
       scale = Math.min(minScale*3, Math.max(minScale, v));
-      clampPan(); dirty=true; requestDraw();
+      clampPan(); needsDraw=true; requestDraw();
     };
 
-    const onReset = ()=>{
+    const onReset = () => {
       scale = minScale; offX = 0; offY = 0;
       zoom.value = String(scale.toFixed(2));
-      clampPan(); dirty=true; requestDraw();
+      clampPan(); needsDraw=true; requestDraw();
     };
 
-    const onSave = ()=>{
-      // Export exact view to a circular PNG that matches the preview
+    const onSave = () => {
+      // Export exactly what you see, to a circular PNG avatar
       const out = document.createElement('canvas');
       out.width = 512; out.height = 512;
       const octx = out.getContext('2d');
-      const ratio = out.width / cssSize; // CSS px -> output px
 
-      // circular clip
+      // clip to a circle
       octx.save();
-      octx.beginPath();
-      octx.arc(out.width/2, out.height/2, out.width/2, 0, Math.PI*2);
-      octx.clip();
+      octx.beginPath(); octx.arc(out.width/2, out.height/2, out.width/2, 0, Math.PI*2); octx.clip();
 
-      // draw with same transform mapping
-      octx.translate(out.width/2 + offX*ratio, out.height/2 + offY*ratio);
-      octx.scale(scale, scale);
+      // map CSS px -> output px
+      const ratio = out.width / cssSize;
+
+      // use the SAME transform as preview
+      octx.setTransform(
+        scale, 0, 0, scale,
+        out.width/2 + offX*ratio,
+        out.height/2 + offY*ratio
+      );
+      octx.imageSmoothingEnabled = true;
       octx.imageSmoothingQuality = 'high';
       octx.drawImage(img, -img.width/2, -img.height/2);
       octx.restore();
@@ -688,15 +712,20 @@
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
       window.removeEventListener('resize', onResize, {passive:true});
+
+      // unlock page scroll
+      document.body.classList.remove('no-scroll');
     }
 
-    function onResize(){ sizeCanvas(); clampPan(); dirty=true; requestDraw(); }
+    function onResize(){
+      sizeCanvas(); clampPan(); needsDraw=true; requestDraw();
+    }
 
-    // wire up
-    cvs.addEventListener('pointerdown', onPointerDown);
-    cvs.addEventListener('pointermove', onPointerMove);
-    cvs.addEventListener('pointerup', onPointerUp);
-    cvs.addEventListener('pointercancel', onPointerCancel);
+    // listeners (non-passive where we call preventDefault)
+    cvs.addEventListener('pointerdown', onPointerDown, {passive:false});
+    cvs.addEventListener('pointermove', onPointerMove, {passive:false});
+    cvs.addEventListener('pointerup', onPointerUp, {passive:false});
+    cvs.addEventListener('pointercancel', onPointerCancel, {passive:false});
     cvs.addEventListener('touchstart', onTouchStart, {passive:true});
     cvs.addEventListener('touchmove', onTouchMove, {passive:false});
     cvs.addEventListener('touchend', onTouchEnd, {passive:true});
@@ -710,6 +739,7 @@
     dlg.showModal(); pulseNoZoom();
   }
   // ===== end cropper =====
+
 
 
   // Init
