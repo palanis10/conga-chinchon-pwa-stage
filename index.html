@@ -1,3 +1,6 @@
+Here you go — full file you can paste into GitHub:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -557,7 +560,7 @@
     cvs.addEventListener('pointerup', e=>{ dragging=false; cvs.releasePointerCapture(e.pointerId); });
     cvs.addEventListener('pointercancel', ()=> dragging=false);
 
-// Touch pinch zoom
+    // Touch pinch zoom
     cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:false});
     cvs.addEventListener('touchmove', (e)=>{
       if(pinch && e.touches.length===2){
@@ -565,14 +568,14 @@
         const dist = Math.hypot(
           e.touches[0].clientX-e.touches[1].clientX,
           e.touches[0].clientY-e.touches[1].clientY
-    );
-    const next = pinchStartScale * (dist / pinchStartDist);
-    scale = Math.min(3, Math.max(minScale, next));
-    zoom.value = String(scale);
-    clamp(); draw();
-  }
-}, {passive:false});
-cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
+        );
+        const next = pinchStartScale * (dist / pinchStartDist);
+        scale = Math.min(3, Math.max(minScale, next));
+        zoom.value = String(scale);
+        clamp(); draw();
+      }
+    }, {passive:false});
+    cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
 
     // Wheel zoom (desktop)
     const onWheel = (e)=>{
@@ -669,10 +672,10 @@ cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
   // ===== end cropper =====
 
   // Init
-load();
-render();
+  load();
+  render();
 })();
 </script>
 </body>
 </html>
-
+```
