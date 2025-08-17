@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.4</title>
+<title>Conga by Alanis — STAGE v3.5.5</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,7 +12,7 @@
 <style>
   :root{
     --bg:#0f1220; --card:#171a2b; --muted:#2a2f4a; --text:#e8ecff; --sub:#b8c0ff;
-    --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b; --warn:#ffb020;
+    --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b;
     --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
   }
   *{box-sizing:border-box}
@@ -25,42 +25,46 @@
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
   }
-  .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
+  .app{max-width:980px; margin:0 auto; padding:8px 12px 120px;}
 
-  /* ===== Header (compact) ===== */
+  /* ===== Header (taller title, version underneath) ===== */
   header{
     display:grid;
     grid-template-columns: 1fr auto auto;
     align-items:center;
-    gap:10px;
+    column-gap:10px;
+    row-gap:4px;
     padding:6px 0 2px 0;
     margin-bottom:8px;
   }
-  .brand-wrap{min-width:0}
   .brand{
-    display:flex; align-items:baseline; gap:10px; min-width:0;
+    display:flex; flex-direction:column; min-width:0;
   }
   .title{
-    font-weight:900; letter-spacing:.2px;
-    font-size: clamp(18px, 5vw, 26px);
+    font-weight:1000; letter-spacing:.2px;
+    font-size: clamp(22px, 6.2vw, 34px);   /* bigger */
+    line-height:1.05;
     color:var(--text);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .ver{
-    font-weight:800; font-size:12px; color:var(--sub); opacity:.9;
+    margin-top:2px;
+    font-weight:900; font-size:13px; color:var(--sub); opacity:.95;
   }
+
   .lang-pill{
-    display:inline-flex; gap:8px; align-items:center;
+    display:inline-flex; gap:6px; align-items:center;
     border:1px dashed rgba(255,255,255,.18);
-    border-radius:999px; padding:6px 10px; height:36px;
-    color:var(--text); font-weight:800; letter-spacing:.2px;
-    user-select:none;
+    border-radius:999px; padding:5px 9px; height:34px;
+    color:var(--text); font-weight:900; letter-spacing:.2px;
+    user-select:none; white-space:nowrap;
   }
   .lang-pill button{
     appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer;
-    opacity:.85;
+    opacity:.85; padding:0;
   }
   .lang-pill .active{ opacity:1; text-decoration:underline; }
+  @media (max-width:390px){ .lang-pill{ padding:4px 8px; height:32px; font-size:13px } }
 
   .iconbtn{
     width:40px; height:40px; display:grid; place-items:center; border-radius:12px;
@@ -73,7 +77,6 @@
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
     padding:10px;
   }
-
   .tools{
     display:flex; gap:8px; align-items:center; white-space:nowrap;
   }
@@ -87,8 +90,6 @@
     flex:1 1 0; min-width:0; white-space:nowrap;
     font-size: clamp(12px, 3.4vw, 16px);
   }
-  .btn:hover{ filter:brightness(1.07)}
-  .btn:active{ transform:translateY(1px)}
   .btn.primary{ background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid; }
   .btn.success{ background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid; }
 
@@ -110,11 +111,11 @@
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:22px; font-weight:900; }
   .scorewrap{ display:flex; align-items:center; gap:8px; min-width:86px; justify-content:flex-end; }
-  .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
+  .stars{ color:#ffb020; font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  /* ===== Dialogs (only styles that matter for layout in this rev) ===== */
+  /* ===== Dialogs (layout essentials) ===== */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
@@ -135,9 +136,8 @@
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
-  .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* Win overlay (compact) */
+  /* Win overlay (kept minimal) */
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
   .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
@@ -146,26 +146,19 @@
   .win-photo img{ width:100%; height:100%; object-fit:cover}
   .win-name{ font-size:20px; font-weight:900}
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
-
-  /* Responsive: hide pill if it would crowd the header; tools must remain 1 row */
-  @media (max-width: 410px){
-    .lang-pill{ display:none; }
-  }
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <header>
-    <div class="brand-wrap">
-      <div class="brand">
-        <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.5.4</div>
-      </div>
+    <div class="brand">
+      <div class="title" id="appTitle">Conga by Alanis</div>
+      <div class="ver" id="verLine">STAGE v3.5.5</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
       <button data-lang="en" id="pillEn" class="active">EN</button>
-      <span>/</span>
+      <span>|</span>
       <button data-lang="es" id="pillEs">ES</button>
     </div>
 
@@ -175,7 +168,7 @@
   <section class="card" style="padding:10px; margin-bottom:8px">
     <div class="tools">
       <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
-      <button id="historyBtn" class="btn"> <span data-i18n="history">History</span></button>
+      <button id="historyBtn" class="btn"><span data-i18n="history">History</span></button>
       <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
     </div>
   </section>
@@ -318,10 +311,8 @@
     src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAQAAABgAABcAAABWAAACAAACAQAAAC4AAABfAAAAdwAAAIQAAACkAAAAvwAAAN4AAAD///8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAAAgP8AAP//AP//AP8AAP//AAAAAP8AAP//AP//AP//AP//AP//AP//AAAAAAA="/>
 </audio>
 
-<!-- Hidden inputs -->
 <input id="photoInput" type="file" accept="image/*" hidden>
 
-<!-- Player row template -->
 <template id="playerRowTpl">
   <div class="row" draggable="true" aria-grabbed="false" title="Long-press to Edit">
     <div class="drag" aria-hidden="true">≡</div>
@@ -337,7 +328,6 @@
 <script>
 (() => {
   "use strict";
-  /* ===== utils ===== */
   const $ = s => document.querySelector(s);
   const bind = (sel, prop, fn) => { const el = $(sel); if (el) el[prop] = fn; };
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
@@ -345,32 +335,23 @@
   const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
   const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const csv=s=>(/[",\n]/.test(s)?'"'+String(s).replace(/"/g,'""')+'"':String(s));
-  const todayStr=()=> new Date().toISOString().slice(0,10);
 
-  const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
-    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
-    document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
-
-  /* ===== i18n ===== */
+  /* i18n */
   const STR = {
-    en:{
-      reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
+    en:{ reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
       settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
       lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
       done:"Done", roundHint:"Enter points (negatives OK). “−10” changes the input.",
       cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
       photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
-      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
-    },
-    es:{
-      reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
+      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game" },
+    es:{ reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
       settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
       lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
       done:"Listo", roundHint:"Ingresa puntos (negativos ok). “−10” cambia el campo.",
       cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
       photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
-      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
-    }
+      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego" }
   };
   const storageLangKey = "conga_lang";
   let LANG = localStorage.getItem(storageLangKey) || "en";
@@ -382,53 +363,67 @@
     const sel=$("#langSelect"); if(sel) sel.value=LANG;
   }
 
-  /* ===== state ===== */
-  const storageKey="conga_state_stage_v354";
+  /* state */
+  const storageKey="conga_state_stage_v355";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
+  let rounds=[]; let roundCounter=0; let winsLog=[]; let lockOrder=false;
 
-  const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
-  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
-  const load=()=>{ try{
+  function pruneWins(){ const cutoff=Date.now()-7*24*3600*1000; winsLog=(winsLog||[]).filter(w=>w.timestamp>=cutoff); }
+  function save(){ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,winsLog,lockOrder})); }
+  function load(){
+    try{
       const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
-      // Always start with at least two players if empty
-      if(!players.length){ players=[{id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},{id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}]; }
+      /* guarantee 2 defaults on launch if empty */
+      if(!players.length){
+        players=[
+          {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+          {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+        ];
+      }
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
       nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
       gameOver = !!s.gameOver;
-      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
       lockOrder = !!s.lockOrder; pruneWins();
-    }catch(e){ players=[]; } };
+    }catch(e){ /* fallback to two fresh players */
+      players=[
+        {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+        {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+      ];
+      nextDealerId=players[0].id;
+    }
+  }
 
-  /* ===== render ===== */
+  /* render */
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
   function render(){
-    $("#limitInput").value=limit;
-    $("#autoAdvance").checked=autoAdvanceDealer;
-    $("#lockOrderSwitch").checked=lockOrder;
+    $("#limitInput") && ($("#limitInput").value=limit);
+    $("#autoAdvance") && ($("#autoAdvance").checked=autoAdvanceDealer);
+    $("#lockOrderSwitch") && ($("#lockOrderSwitch").checked=lockOrder);
     $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
     $("#lockToggle").title = t("reorder");
+
     if(list) list.innerHTML="";
-    for(let i=0;i<players.length;i++){
-      const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
+    players.forEach((p,i)=>{
+      const n=rowTpl.content.firstElementChild.cloneNode(true);
       n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
       if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
       attachLongPress(n, ()=>openEdit(p.id));
       if(p.id===nextDealerId) n.classList.add("dealer");
+
       const avatarBox=n.querySelector(".avatar");
-      if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
+      avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`;
       n.querySelector(".playerName").textContent=p.name||"—";
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
-      const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
-      const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
-      list && list.appendChild(n);
-    }
+      n.querySelector(".scoreVal").textContent=clampInt(p.score||0);
+      const sc=n.querySelector(".score"); (p.score||0)>=limit+1 ? sc.classList.add("over") : sc.classList.remove("over");
+      const handle=n.querySelector(".drag"); lockOrder?handle.classList.add("locked"):handle.classList.remove("locked");
+      list.appendChild(n);
+    });
     $("#newRoundBtn").disabled=gameOver || players.length===0;
     applyI18n();
     save();
@@ -466,14 +461,13 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* photo -> simple square cropper (existing behavior preserved) */
+  /* photo: center square letterbox (fast & stable) */
   if(photoInput){
     photoInput.removeAttribute('capture');
     photoInput.addEventListener("change", async()=>{
       if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
       const file=photoInput.files[0];
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-      // use offscreen canvas to letterbox to square using center crop (stable + fast)
       const img=new Image(); img.onload=()=>{
         const side=Math.min(img.width,img.height);
         const sx=(img.width-side)/2, sy=(img.height-side)/2;
@@ -487,7 +481,7 @@
   }
 
   /* round dialog */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows");
   const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
@@ -495,22 +489,15 @@
       const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
       r.append(name,inp,minus); rows.appendChild(r);
     });
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal();
+    roundDlg.showModal();
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
-
-  function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
+  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   function applyRound(inputs){
-    const snapshotInputs = JSON.parse(JSON.stringify(inputs));
-    const roundNo = roundCounter + 1;
     const proj=new Map(); players.forEach(p=>proj.set(p.id, clampInt(p.score||0)+clampInt(inputs[p.id]||0)));
-    roundCounter += 1;
-
     const under = players.filter(p => (proj.get(p.id) <= limit));
     const over  = players.filter(p => (proj.get(p.id) >= (limit+1)));
-
-    // Reenganche ONLY at == limit+1 => set to max≤limit
     if (under.length >= 2 && over.length){
       const maxUnderVal = Math.max.apply(null, under.map(p => proj.get(p.id)));
       players.forEach(p=>{
@@ -521,29 +508,25 @@
         }
       });
     }
-
     players.forEach(p=>{ p.score=proj.get(p.id); });
-
-    // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
-
-    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
-    gameOver=false;
-
-    // Winner check (lowest score, everyone else >= limit+1 OR someone exactly lowest <= limit when others > limit ?)
+    // winner = only one at/under limit
     const alive = players.filter(p=>p.score<=limit);
-    if(alive.length===1){
-      gameOver=true;
-      const winner=alive[0];
-      winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
-      showWinOverlay(winner);
-    }
+    if(alive.length===1){ showWinOverlay(alive[0]); }
     render();
   }
 
-  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
+  function showWinOverlay(winner){
+    const ov=$("#winOverlay"); if(!ov) return;
+    $("#winName").textContent = winner?.name || 'Winner';
+    $("#winPhoto").src = winner?.avatar || '';
+    ov.style.display='flex';
+    try{ $("#winSound").play().catch(()=>{});}catch{}
+  }
+  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; });
+  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
 
-  /* history modal */
+  /* history (simple) */
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
     dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
@@ -551,61 +534,38 @@
     const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
     trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name}</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
     const tbody=document.createElement('tbody');
-    rounds.forEach(r=>{
+    rounds.forEach((r,i)=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:""}</td>`).join("");
+      tr.innerHTML=`<th>${i+1}</th>`+players.map(p=>`<td>${r[p.id]??""}</td>`).join("");
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); twrap.appendChild(table);
     dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); dlg.showModal();
   }
 
-  /* wire-up */
+  /* controls */
   bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
-  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
+  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); render(); } });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; rounds=[]; roundCounter=0; render(); } });
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
   on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
 
-  const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
+  const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* win overlay */
-  function showWinOverlay(winner){
-    const ov=$("#winOverlay"); if(!ov) return;
-    $("#winName").textContent = winner?.name || 'Winner';
-    $("#winPhoto").src = winner?.avatar || '';
-    ov.style.display='flex';
-    try{ $("#winSound").play().catch(()=>{});}catch{}
-    startConfetti();
-  }
-  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; });
-  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
-
-  function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
-    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
-    const N=120; const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2}));
-    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H);
-      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
-      raf=requestAnimationFrame(tick);
-    }; cancelAnimationFrame(raf); tick();
-  }
-
-  /* CSV */
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
 
-  /* language controls (header pill + settings) */
+  /* language in header + settings */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
   $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
   $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
 
-  // init
   load();
   applyI18n();
   render();
