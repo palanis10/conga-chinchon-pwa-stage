@@ -15,44 +15,47 @@
     --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b; --warn:#ffb020;
     --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
     background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
-    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;}
+    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;
+  }
   .app{max-width:980px; margin:0 auto; padding:10px 12px 120px;}
   header{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:2px 0 8px 0;}
   .top-left{display:flex; align-items:center; gap:10px}
-  .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:6px 12px; border-radius:999px; font-weight:900; font-size:12px; letter-spacing:.6px;}
+  .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:3px 10px; border-radius:999px; font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.6px;}
   .brand{opacity:.95; font-weight:900; letter-spacing:.2px; font-size: clamp(16px, 4vw, 22px);} 
   .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:4px}
   .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
-  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 14px; border-radius:12px;
-    background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.10);
-    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; display:inline-flex; align-items:center; gap:10px; white-space:nowrap}
+  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:9px 12px; border-radius:12px;
+    background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
+    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; display:inline-flex; align-items:center; gap:8px}
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
-  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.25);} 
-  .btn .ico{font-size:18px}
+  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
+  .btn .label{white-space:nowrap}
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
 
-  /* Header controls row */
-  .controls{display:flex; align-items:center; gap:12px; flex-wrap:nowrap}
-  .controls .btn{padding:10px 16px}
-  .controls .btn .label{font-size:16px}
-  .controls .spacer{flex:1 1 auto}
+  /* header controls block */
+  .controls{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap:10px;
+    align-items:stretch;
+  }
+  .controls .spacer{ display:none } /* keep HTML safe if left in DOM */
 
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
   .row{
-    display:grid;
-    grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
-    align-items:center; gap:10px;
-    padding:10px; border-radius:14px;
-    border:1px solid rgba(255,255,255,.06);
-    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-    margin-bottom:8px;
+    display:grid; grid-template-columns: 28px 64px 1fr auto; align-items:center; gap:10px;
+    padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,.06);
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)); margin-bottom:8px;
   }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
@@ -68,21 +71,20 @@
   .score.over{ color:var(--danger) }
 
   .banner{ margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
-    background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:none; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+    background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
 
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
-    box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text); box-shadow: 0 24px 64px rgba(0,0,0,.55); }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px } 
+  .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
-  /* Prevent iOS auto-zoom on focus */
-  input, select, textarea, button { font-size:16px; }
+  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
   .switch{display:flex; align-items:center; gap:10px; background:#0f1428; border:1px solid var(--muted); padding:8px 10px; border-radius:12px; height:38px;}
   .grid-rows{ display:grid; gap:6px }
   .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
@@ -91,9 +93,8 @@
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
-  .error{ color:var(--danger); font-weight:800; margin-right:auto }
+  .error{ color:var(--danger); font-weight:700; margin-right:auto }
   .hint{ color:var(--sub); font-size:12px }
-
   .table-wrap{ overflow:auto; max-height:60vh; border:1px solid rgba(255,255,255,.12); border-radius:12px;}
   table{ width:max(520px,100%); border-collapse:separate; border-spacing:0; }
   thead th{ position:sticky; top:0; background:#121633; border-bottom:1px solid rgba(255,255,255,.12); padding:10px; text-align:center; font-weight:800;}
@@ -112,17 +113,18 @@
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
   .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
 
-  /* Crop dialog layout + responsive canvas */
+  /* Crop dialog layout */
   #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
-  #cropCanvas{width:100%;height:auto;display:block;touch-action:none;background:#0b1225;border:1px solid rgba(255,255,255,.12);border-radius:12px}
-  .crop-frame-hint{margin-bottom:6px;color:var(--sub)}
+  #cropStage{ position:relative; width:100%; aspect-ratio:1 / 1; border-radius:12px; background:#0b1225; border:1px solid rgba(255,255,255,.12); overflow:hidden; touch-action:none }
+  #cropCanvas, #cropOverlay{ position:absolute; inset:0; width:100%; height:100% }
+  #cropZoom{ width:100%}
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <header>
     <div class="top-left">
-      <span class="chip">CONGA / CHINCHÓN</span>
+      <span class="chip">Conga / Chinchón</span>
       <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.5.1</span></span>
     </div>
     <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
@@ -130,11 +132,10 @@
 
   <section class="card" style="padding:10px; margin-bottom:8px">
     <div class="controls">
-      <button id="lockToggle" class="btn ghost" title="Reorder" aria-label="Reorder">
-        <span class="ico" id="lockIco">🔒</span><span class="label">Reorder</span>
+      <button id="lockToggle" class="btn ghost" title="Toggle reorder mode" aria-label="Toggle reorder">
+        <span id="lockIcon">🔒</span><span class="label">Reorder</span>
       </button>
       <button id="historyBtn" class="btn ghost"><span class="label">History</span></button>
-      <span class="spacer"></span>
       <button id="newRoundBtn" class="btn primary"><span class="label">New round</span></button>
     </div>
   </section>
@@ -145,9 +146,9 @@
     <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px">+ Add player</button>
   </section>
 
-  <section id="banner" class="banner" aria-live="polite">
-    <div><strong id="bannerText">—</strong></div>
-    <div class="tag" id="bannerTag">—</div>
+  <section id="banner" class="banner" style="display:none" aria-live="polite">
+    <div><strong id="bannerText">Game over</strong></div>
+    <div class="tag" id="bannerTag">Game over</div>
     <div style="margin-left:auto; display:flex; gap:8px">
       <button class="btn success" id="newGameBtn">New game</button>
     </div>
@@ -187,15 +188,13 @@
 <!-- Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
-    <div>
-      <div id="roundTitle" style="font-weight:800">New Round</div>
-      <div class="hint">Enter points (negatives OK). Only one “−10” allowed per round.</div>
-    </div>
+    <div class="hint" id="roundTitle" style="font-weight:800; color:var(--text)">New Round</div>
     <button class="btn ghost" onclick="roundDialog.close()">Close</button>
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
       <div class="grid-rows" id="roundRows"></div>
+      <div class="hint">Rule: at most one player may use “−10” each round.</div>
     </div>
     <div class="modal-foot">
       <div id="roundError" class="error" style="display:none"></div>
@@ -268,8 +267,8 @@
       </div>
     </div>
     <div class="win-actions">
+      <button class="btn success" id="winNewBtn">New game</button>
       <button class="btn ghost" id="winCloseBtn">Close</button>
-      <button class="btn success" id="winNewGameBtn">New game</button>
     </div>
   </div>
 </div>
@@ -286,13 +285,17 @@
     <button class="btn ghost" onclick="cropDialog.close()">Close</button>
   </div>
   <div class="modal-body">
-    <div class="crop-frame-hint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <canvas id="cropCanvas" width="600" height="600"></canvas>
-    <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1">
+    <div class="hint" style="color:#cfe0ff">Drag to position. Pinch to zoom (on phone) or use slider.</div>
+    <div id="cropStage">
+      <canvas id="cropCanvas" width="600" height="600"></canvas>
+      <canvas id="cropOverlay" width="600" height="600"></canvas>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; justify-content:space-between;">
+      <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1" style="flex:1">
+      <button class="btn" id="cropReset">Reset</button>
+    </div>
   </div>
   <div class="modal-foot">
-    <button class="btn ghost" id="cropReset">Reset</button>
-    <div style="flex:1"></div>
     <button class="btn ghost" onclick="cropDialog.close()">Cancel</button>
     <button class="btn success" id="cropSave">Save</button>
   </div>
@@ -337,7 +340,7 @@
 <input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
-/* === STAGE v3.5.1 === */
+/* === STAGE v3.5.1 (header buttons row; crop viewport lock; smoother crop; correct save; smaller confetti; default 2 players) === */
 (() => {
   "use strict";
   const $ = s => document.querySelector(s);
@@ -345,28 +348,31 @@
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
   const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
   const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
-  const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const csv=s=>(/[",\n]/.test(s)?'"'+String(s).replace(/"/g,'""')+'"':String(s));
   const todayStr=()=> new Date().toISOString().slice(0,10);
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // Viewport zoom control (prevents iOS auto zoom when dialogs open)
+  // Viewport control: only lock during the crop dialog
   const vp = document.querySelector('meta[name="viewport"]');
   const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5';
-  function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
-  function restoreZoom(){ try{ if(!vp) return; vp.setAttribute('content', VP_BASE); }catch{} }
-  const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
+  function lockViewport(lock){
+    if (!vp) return;
+    if (lock){
+      vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1');
+    } else {
+      vp.setAttribute('content', VP_BASE);
+    }
+  }
 
   // Storage
   const storageKey="conga_state_stage_v351";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=true;
+
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
   const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
-      // default two players on first load
-      if(players.length===0){ players=[{id:uid(),name:"Player 1",score:0,reenganches:0,avatar:null},{id:uid(),name:"Player 2",score:0,reenganches:0,avatar:null}]; }
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
       nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
@@ -375,8 +381,16 @@
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = (typeof s.lockOrder==="boolean") ? s.lockOrder : true; pruneWins();
-    }catch(e){ players=[]; } };
+      lockOrder = (typeof s.lockOrder === "boolean") ? s.lockOrder : true;
+      pruneWins();
+    }catch(e){ players=[]; } 
+    // default two players if none
+    if (!players.length){
+      players = [{id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+                 {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}];
+      nextDealerId = players[0].id;
+    }
+  };
 
   // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
@@ -384,37 +398,22 @@
     const limitInput=$("#limitInput"); if(limitInput) limitInput.value=limit;
     const autoAdv=$("#autoAdvance"); if(autoAdv) autoAdv.checked=autoAdvanceDealer;
     const lockSwitch=$("#lockOrderSwitch"); if(lockSwitch) lockSwitch.checked=lockOrder;
-    const lockIco=$("#lockIco"); if(lockIco) lockIco.textContent = lockOrder ? "🔒" : "🔓";
 
-    // Banner (used when the whole game is over)
-    const banner=$("#banner"); const bannerText=$("#bannerText"); const bannerTag=$("#bannerTag");
-    if(banner){
-      banner.style.display = gameOver ? "flex" : "none";
-      if(gameOver){
-        const alive = players.filter(p=> (p.score||0) <= limit);
-        const winner = alive[0] || players[0];
-        bannerText.textContent = `${winner.name} won`;
-        bannerTag.textContent = "Game over";
-      }
-    }
+    // header lock button label/icon
+    const lockIcon=$("#lockIcon");
+    if (lockIcon){ lockIcon.textContent = lockOrder ? "🔒" : "🔓"; }
 
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
-      n.dataset.index=i; n.dataset.id=p.id;
-
-      // Only allow drag when unlocked; only allow long-press edit when locked
-      const handle=n.querySelector(".drag");
+      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
+      // drag handlers only when unlocked
       if(!lockOrder){
-        n.draggable=true; handle.classList.remove("locked");
-        n.removeAttribute("title");
         n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd);
+        n.title="Drag to reorder (Edit disabled in reorder mode)";
       }else{
-        n.draggable=false; handle.classList.add("locked");
-        n.setAttribute("title","Long-press to Edit");
         attachLongPress(n, ()=>openEdit(p.id));
       }
-
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -422,11 +421,14 @@
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
       const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
       const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
+      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Reorder is locked"); } else { handle.classList.remove("locked"); handle.onclick=null; }
       list && list.appendChild(n);
     }
-    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0;
+    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0||gameOver;
     save();
   }
+
+  function initials(n){ return (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase(); }
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
@@ -439,7 +441,8 @@
   }
 
   // Drag & drop
-  let dragIdx=null; const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
+  let dragIdx=null; 
+  const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
   const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
   const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; arr.splice(to,0,m); const keep=nextDealerId; players=arr; nextDealerId=keep; render(); }};
   const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
@@ -453,7 +456,7 @@
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
     bind("#viewHistoryBtn","onclick", ()=> openHistory(p.id));
     bind("#deletePlayerBtn","onclick", ()=>{ if(confirm("Delete this player? This cannot be undone.")){ editDlg.close(); removePlayer(p.id); }});
-    editDlg && editDlg.showModal(); pulseNoZoom();
+    editDlg && editDlg.showModal();
   }
   if(editForm) editForm.addEventListener("submit", (e)=>{
     e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
@@ -462,44 +465,56 @@
   });
 
   // Photo input -> cropper
-  if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
+  if(photoInput){
+    photoInput.removeAttribute('capture');
+    photoInput.addEventListener("change", async()=>{
+      if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
+      const file=photoInput.files[0];
+      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+      openCropper(dataUrl, window._photoTarget);
+      window._photoTarget=null;
+    });
+  }
 
   // Round dialog
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
+  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
+    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
+      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">Current: ${p.score||0}</div>`;
+      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
+      r.append(name,inp,minus); rows.appendChild(r);
+    });
+    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal();
+  };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
+
   function validateRound(){
     const inputs=roundInputs();
-    // only one -10 allowed
-    const minus10 = Object.values(inputs).filter(v=>v===-10).length;
-    if(minus10>1){
-      if(rErr){ rErr.textContent="Only one player can have −10 per round."; rErr.style.display=""; }
+    const minus10Count = Object.values(inputs).filter(v => +v === -10).length;
+    if (minus10Count > 1){
+      if(rErr){ rErr.textContent="Only one player can use −10 per round."; rErr.style.display=""; }
       if(applyBtn) applyBtn.disabled=true;
       return false;
     }
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
+    if(rErr) rErr.style.display="none";
+    if(applyBtn) applyBtn.disabled=false;
+    return true;
   }
-  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
-    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
-      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">Current: ${p.score||0}</div>`;
-      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=-10; validateRound(); };
-      r.append(name,inp,minus); rows.appendChild(r);
-    });
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
-  };
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
+
   function applyRound(inputs){
     const snapshotInputs = JSON.parse(JSON.stringify(inputs));
     const roundNo = roundCounter + 1;
     const proj=new Map(); players.forEach(p=>proj.set(p.id, clampInt(p.score||0)+clampInt(inputs[p.id]||0)));
     roundCounter += 1;
 
+    // Reenganche: if some go over, clamp them to maximum <= limit among under-limit players
     const under = players.filter(p => (proj.get(p.id) <= limit));
     const over  = players.filter(p => (proj.get(p.id) >= (limit+1)));
 
-    // Reenganche ONLY at == limit+1 => set to max≤limit
-    if (under.length >= 2 && over.length){
+    if (under.length >= 1 && over.length){
       const maxUnderVal = Math.max.apply(null, under.map(p => proj.get(p.id)));
       players.forEach(p=>{
         let val = proj.get(p.id);
@@ -512,24 +527,24 @@
 
     players.forEach(p=>{ p.score=proj.get(p.id); });
 
-    // Dealer auto-advance (kept by id if reordered)
+    // Dealer auto-advance
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
 
-    // Winner detection: exactly one <= limit
-    const alive = players.filter(p => (p.score||0) <= limit);
-    if(alive.length===1){
+    // Game over when ANYONE >= limit+1 after reenganche pass
+    const losers = players.filter(p=> (p.score >= (limit+1)));
+    if (losers.length){
+      const contenders = players.filter(p=> p.score <= limit);
+      let winner = contenders.length ? contenders.reduce((a,b)=> (a.score<=b.score?a:b)) : players.reduce((a,b)=> (a.score<=b.score?a:b));
       gameOver = true;
-      const winner = alive[0];
       winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
       rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
-      roundDlg && roundDlg.close(); showWinOverlay(winner); save(); render(); return;
+      roundDlg && roundDlg.close(); save(); render(); showWinOverlay(winner); return;
     }
 
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
     gameOver=false; render();
   }
 
-  // Dialog submit
   if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); if(!validateRound()) return; applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
@@ -539,7 +554,7 @@
   function openRoundsTable(){ const wrap=$("#roundsTableWrap"); if(!wrap) return; wrap.innerHTML=""; if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; $("#roundsDialog") && $("#roundsDialog").showModal(); return; } const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px"; const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead); const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); const showTotals = r.totals && typeof r.totals === 'object'; players.forEach(p=>{ const td=document.createElement('td'); const v=showTotals ? r.totals[p.id] : r.inputs[p.id]; td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table); $("#roundsDialog") && $("#roundsDialog").showModal(); }
 
   // Wire-up
-  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); pulseNoZoom(); });
+  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt("Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
@@ -548,6 +563,7 @@
   bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
   bind("#newGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; render(); window.scrollTo({top:0,behavior:"smooth"}); });
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
+
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
   on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
@@ -556,147 +572,150 @@
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  // Winner overlay
-  function avatarFallback(name){
-    const i=(name||' ').trim().split(/\s+/).map(s=>s[0]).join('').slice(0,2).toUpperCase();
-    const s=120, c=document.createElement('canvas'); c.width=c.height=s;
-    const x=c.getContext('2d');
-    x.fillStyle='#0b1225'; x.fillRect(0,0,s,s);
-    x.fillStyle='#e8ecff'; x.font='700 56px ui-sans-serif,system-ui'; x.textAlign='center'; x.textBaseline='middle';
-    x.fillText(i, s/2, s/2+2);
-    return c.toDataURL('image/png');
-  }
+  // Win overlay
   function showWinOverlay(winner){
-    const ov=document.getElementById('winOverlay'); if(!ov) return;
-    document.getElementById('winName').textContent = winner?.name || 'Winner';
-    document.getElementById('winSubtitle').textContent = 'won';
-    const img=document.getElementById('winPhoto'); if(img) img.src = winner?.avatar || avatarFallback(winner?.name);
+    const ov=$('#winOverlay'); if(!ov) return;
+    $('#winName').textContent = (winner?.name || 'Winner');
+    $('#winSubtitle').textContent = 'won';
+    const photo=$('#winPhoto'); if (photo){ photo.src = winner?.avatar || ''; photo.style.display = winner?.avatar ? 'block':'none'; }
     ov.style.display='flex';
-    try{ document.getElementById('winSound').play().catch(()=>{});}catch{}
-    startConfetti(document.getElementById('confettiCanvas'), 70);
+    try{ $('#winSound').play().catch(()=>{});}catch{}
+    startConfetti(80); // smaller confetti
   }
-  document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
-  document.getElementById('winNewGameBtn')?.addEventListener('click', ()=>{
+  $('#winCloseBtn')?.addEventListener('click', ()=>{ $('#winOverlay').style.display='none'; });
+  $('#winNewBtn')?.addEventListener('click', ()=>{
+    $('#winOverlay').style.display='none';
     players.forEach(p=>{p.score=0;p.reenganches=0;});
-    rounds=[]; roundCounter=0; gameOver=false;
-    document.getElementById('winOverlay').style.display='none';
-    render(); window.scrollTo({top:0,behavior:'smooth'});
+    gameOver=false; rounds=[]; roundCounter=0; render();
   });
 
-  // Smaller/lighter confetti
-  function startConfetti(c, count=70){
-    if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
-    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
-    const pieces=Array.from({length:count},()=>({x:Math.random()*W, y:-10-Math.random()*H, s:4+Math.random()*8, vy:1.6+Math.random()*2.2, vx:-0.7+Math.random()*1.4, r:Math.random()*Math.PI*2, dr:-0.05+Math.random()*0.1, hue:(Math.random()*360)|0}));
-    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.r+=p.dr; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=`hsl(${p.hue},90%,60%)`; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick();
+  // Confetti
+  function startConfetti(count=80){
+    const c=$('#confettiCanvas'); if(!c) return;
+    const ctx=c.getContext('2d');
+    const DPR=window.devicePixelRatio||1;
+    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight;
+    c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
+    const pieces=Array.from({length:count},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*3, vy:2+Math.random()*2.4, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2}));
+    let raf;
+    const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.08; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); };
+    cancelAnimationFrame(raf); tick();
   }
 
   // ===== Image Cropper =====
   function openCropper(dataUrl, targetId){
-    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
-    if(!dlg || !cvs || !zoom || !saveBtn) return;
-    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1, pinchCx=0, pinchCy=0;
+    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const overlay=$('#cropOverlay'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
+    if(!dlg || !cvs || !zoom || !saveBtn || !overlay) return;
+    lockViewport(true);
+    const ctx = cvs.getContext('2d'); const ox = overlay.getContext('2d');
+    let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1, pinchCx=0, pinchCy=0;
+
+    const stageRect = ()=> cvs.getBoundingClientRect();
 
     function draw(){
-      ctx.clearRect(0,0,cvs.width,cvs.height);
-      // image
+      const W=cvs.width, H=cvs.height;
+      ctx.clearRect(0,0,W,H);
       ctx.save();
-      ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY);
+      ctx.translate(W/2 + offX, H/2 + offY);
       ctx.scale(scale, scale);
       ctx.drawImage(img, -img.width/2, -img.height/2);
       ctx.restore();
 
-      // circular mask overlay: dark outside, clear inside
-      const r = Math.min(cvs.width, cvs.height) * 0.37; // inner circle radius
-      const cx = cvs.width/2, cy = cvs.height/2;
-
-      // darken whole canvas
-      ctx.save();
-      ctx.fillStyle = 'rgba(0,0,0,.55)';
-      ctx.fillRect(0,0,cvs.width,cvs.height);
-      // punch a hole
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
-      // white ring
-      ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.9)';
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
-      ctx.restore();
+      // overlay (outside dimmed, inside clear circle)
+      ox.clearRect(0,0,W,H);
+      ox.fillStyle='rgba(0,0,0,.55)';
+      ox.fillRect(0,0,W,H);
+      const r = Math.min(W,H)*0.36;
+      ox.globalCompositeOperation='destination-out';
+      ox.beginPath();
+      ox.arc(W/2, H/2, r, 0, Math.PI*2);
+      ox.fill();
+      ox.globalCompositeOperation='source-over';
+      ox.lineWidth=4; ox.strokeStyle='rgba(255,255,255,.95)';
+      ox.beginPath(); ox.arc(W/2, H/2, r, 0, Math.PI*2); ox.stroke();
     }
 
-    function clamp(){
+    function clamp(){ // keep image covering canvas
+      const W=cvs.width, H=cvs.height;
       const w = img.width*scale, h = img.height*scale;
-      const maxX = Math.max(0,(w-cvs.width)/2), maxY = Math.max(0,(h-cvs.height)/2);
+      const maxX = Math.max(0,(w-W)/2), maxY = Math.max(0,(h-H)/2);
       offX = Math.min(maxX, Math.max(-maxX, offX));
       offY = Math.min(maxY, Math.max(-maxY, offY));
     }
 
     img.onload = ()=>{
-      const sx = cvs.width / img.width;
-      const sy = cvs.height / img.height;
-      minScale = Math.max(sx, sy) * 0.95; // show more of the image by default
-      scale = minScale;
-      zoom.min = String(Math.max(0.4, Math.round(minScale*100)/100));
-      zoom.max = "3";
-      zoom.value = String(scale);
+      // canvas device size equals CSS size thanks to attributes; nothing to change here
+      const W=cvs.width, H=cvs.height;
+      const sx = W / img.width; const sy = H / img.height;
+      minScale = Math.max(sx, sy);
+      scale = minScale; zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100)); zoom.value = String(scale);
       offX=0; offY=0; clamp(); draw();
     };
     img.src = dataUrl;
 
-    // Pointer pan
+    // Pointer pan (mouse/pen)
     cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); });
     cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); });
     cvs.addEventListener('pointerup', e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} });
     cvs.addEventListener('pointercancel', ()=> dragging=false);
 
-    // Touch pinch zoom (stabilized)
-    cvs.addEventListener('touchstart', (e)=>{
+    // Touch pinch zoom with anchoring to gesture center
+    const onTouchStart=(e)=>{
       if(e.touches.length===2){
         pinch=true;
-        const [a,b]=e.touches; pinchCx=(a.clientX+b.clientX)/2; pinchCy=(a.clientY+b.clientY)/2;
-        pinchStartDist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+        const [t0,t1]=e.touches;
+        pinchStartDist = Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY);
         pinchStartScale = scale;
+        const rect=stageRect(); pinchCx=(t0.clientX+t1.clientX)/2 - rect.left - rect.width/2; pinchCy=(t0.clientY+t1.clientY)/2 - rect.top - rect.height/2;
       }
-    }, {passive:true});
-
-    cvs.addEventListener('touchmove', (e)=>{
+    };
+    const onTouchMove=(e)=>{
       if(pinch && e.touches.length===2){
         e.preventDefault();
-        const [a,b]=e.touches; const dist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-        const next = Math.min(3, Math.max(minScale, pinchStartScale * (dist / pinchStartDist)));
-        // zoom around pinch center by adjusting offsets proportionally
-        const dx = (pinchCx - cvs.width/2 - offX);
-        const dy = (pinchCy - cvs.height/2 - offY);
-        offX -= dx * (next/scale - 1);
-        offY -= dy * (next/scale - 1);
-        scale = next; zoom.value = String(scale); clamp(); draw();
+        const [t0,t1]=e.touches;
+        const dist = Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY);
+        const next = pinchStartScale * (dist / pinchStartDist);
+        const W=cvs.width, H=cvs.height;
+        // anchor: keep the content under pinch center stable
+        const newScale = Math.min(3, Math.max(minScale, next));
+        const k = newScale/scale;
+        offX = pinchCx - (pinchCx - offX) * k;
+        offY = pinchCy - (pinchCy - offY) * k;
+        scale = newScale;
+        clamp(); draw();
       }
-    }, {passive:false});
+    };
+    const onTouchEnd=()=>{ pinch=false; };
 
-    cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
+    cvs.addEventListener('touchstart', onTouchStart, {passive:false});
+    cvs.addEventListener('touchmove', onTouchMove, {passive:false});
+    cvs.addEventListener('touchend', onTouchEnd, {passive:true});
 
     // Wheel zoom (desktop)
     const onWheel = (e)=>{
       e.preventDefault();
+      const rect=stageRect(); const cx=e.clientX-rect.left-rect.width/2, cy=e.clientY-rect.top-rect.height/2;
       const factor = e.deltaY > 0 ? 0.95 : 1.05;
-      const next = Math.min(3, Math.max(minScale, scale * factor));
-      const rect=cvs.getBoundingClientRect(); const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
-      const dx = (cx - cvs.width/2 - offX);
-      const dy = (cy - cvs.height/2 - offY);
-      offX -= dx * (next/scale - 1);
-      offY -= dy * (next/scale - 1);
-      scale = next; zoom.value = String(scale); clamp(); draw();
+      const next = scale * factor;
+      const newScale = Math.min(3, Math.max(minScale, next));
+      const k = newScale/scale;
+      offX = cx - (cx - offX) * k;
+      offY = cy - (cy - offY) * k;
+      scale = newScale;
+      clamp(); draw();
     };
     cvs.addEventListener('wheel', onWheel, {passive:false});
 
     // Slider zoom
     const onZoom = ()=>{
-      const next = Math.min(3, Math.max(minScale, parseFloat(zoom.value || String(scale))));
-      const dx = (cvs.width/2 - cvs.width/2 - offX); // center-based
-      const dy = (cvs.height/2 - cvs.height/2 - offY);
-      offX -= dx * (next/scale - 1);
-      offY -= dy * (next/scale - 1);
-      scale = next; clamp(); draw();
+      const val = parseFloat(zoom.value || String(scale));
+      const rect=stageRect(); const cx=0, cy=0; // center
+      const newScale = Math.min(3, Math.max(minScale, val));
+      const k = newScale/scale;
+      offX = cx - (cx - offX) * k;
+      offY = cy - (cy - offY) * k;
+      scale = newScale;
+      clamp(); draw();
     };
     zoom.addEventListener('input', onZoom);
 
@@ -706,42 +725,45 @@
     };
     resetBtn?.addEventListener('click', onReset);
 
-    // Save -> write avatar (square 512x512 of what you see inside the circle area)
+    // Save -> write avatar
     const onSave = ()=>{
-      const out = document.createElement('canvas'); out.width = 512; out.height = 512;
+      const out = document.createElement('canvas');
+      out.width = 512; out.height = 512;
       const octx = out.getContext('2d');
       octx.fillStyle = '#0b1225'; octx.fillRect(0,0,out.width,out.height);
-
-      // replicate the transform (scale & offset) into output space
+      // map offsets to output canvas (same transform pipeline)
       const k = out.width / cvs.width;
       octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
       octx.scale(scale, scale);
       octx.drawImage(img, -img.width/2, -img.height/2);
-
       const dataOut = out.toDataURL('image/png', 0.92);
+
       const p = players.find(x=>x.id===targetId);
       if (p){ p.avatar = dataOut; render(); save(); }
-      cleanup(); dlg.close();
+      cleanup();
+      dlg.close();
     };
     saveBtn.addEventListener('click', onSave);
 
-    // Cleanup listeners when dialog closes
+    // Cleanup
     function cleanup(){
       cvs.removeEventListener('pointerdown', ()=>{});
       cvs.removeEventListener('pointermove', ()=>{});
       cvs.removeEventListener('pointerup', ()=>{});
       cvs.removeEventListener('pointercancel', ()=>{});
-      cvs.removeEventListener('touchstart', ()=>{});
-      cvs.removeEventListener('touchmove', ()=>{});
-      cvs.removeEventListener('touchend', ()=>{});
+      cvs.removeEventListener('touchstart', onTouchStart);
+      cvs.removeEventListener('touchmove', onTouchMove);
+      cvs.removeEventListener('touchend', onTouchEnd);
       cvs.removeEventListener('wheel', onWheel);
       zoom.removeEventListener('input', onZoom);
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
+      lockViewport(false);
     }
 
     dlg.addEventListener('close', cleanup, {once:true});
-    dlg.showModal(); pulseNoZoom();
+    dlg.showModal();
+    draw();
   }
   // ===== end cropper =====
 
