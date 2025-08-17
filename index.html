@@ -34,9 +34,6 @@
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
   .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
   .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
-  /* Reorder button shows icon + label; unlocked state noticeable */
-  .iconbtn.reorder{display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 12px; font-weight:800; letter-spacing:.2px;}
-  .iconbtn.reorder.unlocked{border-color:rgba(122,162,255,.9); box-shadow:0 0 0 2px rgba(122,162,255,.35) inset; background:linear-gradient(135deg,#1e2a5a,#15224a);}
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
@@ -63,7 +60,6 @@
   .score.over{ color:var(--danger) }
   .banner{ margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
     background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
-  .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
@@ -78,7 +74,6 @@
   input, select, textarea, button { font-size:16px; }
   .switch{display:flex; align-items:center; gap:10px; background:#0f1428; border:1px solid var(--muted); padding:8px 10px; border-radius:12px; height:38px;}
   .grid-rows{ display:grid; gap:6px }
-  /* Round rows: name | input | -10 button (no cutter column) */
   .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
     padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
@@ -105,6 +100,9 @@
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
   .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
   .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
+
+  /* Reorder button (word + icon, no overlap) */
+  #lockToggle.btn{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -120,9 +118,8 @@
   <section class="card" style="padding:10px; margin-bottom:8px">
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
       <div><strong>Next dealer:</strong> <span id="nextDealerName">—</span></div>
-      <!-- Hint moved to Settings -->
       <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
-        <button id="lockToggle" class="iconbtn reorder" title="Toggle reorder mode" aria-label="Toggle reorder">🔒 <span>Reorder</span></button>
+        <button id="lockToggle" class="btn ghost" title="Reorder" aria-label="Reorder">🔒 Reorder</button>
         <button id="historyBtn" class="btn ghost">History</button>
         <button id="newRoundBtn" class="btn primary">New round</button>
       </div>
@@ -136,8 +133,7 @@
   </section>
 
   <section id="banner" class="banner" style="display:none" aria-live="polite">
-    <div><strong id="bannerText">Game over</strong></div>
-    <div class="tag">Game over</div>
+    <div><strong id="bannerText"></strong></div>
     <div style="margin-left:auto; display:flex; gap:8px">
       <button class="btn success" id="newGameBtn">New game</button>
     </div>
@@ -163,12 +159,12 @@
       <input id="lockOrderSwitch" type="checkbox" />
       <span>Lock player reordering</span>
     </label>
+    <div class="hint">Long-press a player row to edit and set dealer (only when Reorder is locked).</div>
     <div style="display:flex; gap:8px; flex-wrap:wrap">
       <button class="btn" id="exportBtn">Export CSV</button>
       <button class="btn ghost" id="resetScoresBtn">Reset scores</button>
       <button class="btn warn" id="clearAllBtn">Clear all</button>
     </div>
-    <div class="hint">Tip: Lock <strong>Reorder</strong>, then long-press a player to Edit and set the next dealer.</div>
   </div>
   <div class="modal-foot">
     <button class="btn success" onclick="settingsDialog.close()">Done</button>
@@ -187,7 +183,6 @@
   <form id="roundForm" method="dialog">
     <div class="modal-body">
       <div class="grid-rows" id="roundRows"></div>
-      <!-- Cutter section removed -->
     </div>
     <div class="modal-foot">
       <div id="roundError" class="error" style="display:none"></div>
@@ -256,7 +251,7 @@
       <div class="win-photo"><img id="winPhoto" alt=""></div>
       <div>
         <div class="win-name" id="winName">Winner</div>
-        <div class="win-sub" id="winSubtitle">WINNER</div>
+        <div class="win-sub" id="winSubtitle">Winner</div>
       </div>
     </div>
     <div class="win-actions">
@@ -329,7 +324,7 @@
 <input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
-/* === STAGE v3.4 (with requested UI/rules tweaks) === */
+/* === STAGE v3.4 (UI fixes + iOS zoom guard + clean cropper) === */
 (() => {
   "use strict";
   const $ = s => document.querySelector(s);
@@ -352,22 +347,10 @@
   // Storage
   const storageKey="conga_state_stage_v34";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=true; // start locked
-
+  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
-
-  const seedAtLeastTwo=()=>{
-    if (!Array.isArray(players)) players=[];
-    const need = Math.max(0, 2 - players.length);
-    for(let i=0;i<need;i++){
-      players.push({id:uid(), name:`Player ${players.length+1}`, score:0, reenganches:0, avatar:null});
-    }
-    if(!nextDealerId && players[0]) nextDealerId=players[0].id;
-  };
-
-  const load=()=>{ try{
-      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
@@ -377,12 +360,21 @@
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = typeof s.lockOrder === "boolean" ? s.lockOrder : true;
-      pruneWins();
-    }catch(e){ players=[]; }
-    // Always ensure at least two players
-    seedAtLeastTwo();
-  };
+      lockOrder = !!s.lockOrder; pruneWins();
+    }catch(e){ players=[]; } };
+
+  // Ensure at least 2 players always
+  function ensureMinPlayers(){
+    if (players.length < 2){
+      const need = 2 - players.length;
+      for (let i=0;i<need;i++){
+        const idx = players.length+1;
+        players.push({id:uid(), name:`Player ${idx}`, score:0, reenganches:0, avatar:null});
+      }
+      if (!nextDealerId && players[0]) nextDealerId = players[0].id;
+      save();
+    }
+  }
 
   // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
@@ -393,34 +385,19 @@
 
     const nd=$("#nextDealerName"); if(nd){ const p=players.find(p=>p.id===nextDealerId); nd.textContent=p?(p.name||"—"):"—"; }
     const banner=$("#banner"); if(banner) banner.style.display=gameOver?"":"none";
-    const lockBtn=$("#lockToggle");
-    if(lockBtn){
-      lockBtn.textContent=""; // rebuild contents
-      lockBtn.classList.toggle('unlocked', !lockOrder);
-      lockBtn.setAttribute("aria-pressed", String(!lockOrder));
-      lockBtn.title = !lockOrder ? "Reorder is unlocked (drag rows)" : "Reorder is locked (long-press to Edit)";
+    const lockBtn=$("#lockToggle"); if(lockBtn){
+      lockBtn.innerHTML = lockOrder ? "🔒 Reorder" : "🔓 Reorder";
+      lockBtn.title = lockOrder ? "Unlock to enable reordering" : "Reordering enabled";
       lockBtn.setAttribute("aria-label", lockBtn.title);
-      const ico=document.createElement('span'); ico.textContent = !lockOrder ? "🔓" : "🔒";
-      const lbl=document.createElement('span'); lbl.textContent = "Reorder";
-      lockBtn.appendChild(ico); lockBtn.appendChild(lbl);
+      lockBtn.classList.toggle("primary", !lockOrder); // unlocked = bright
     }
 
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
       n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-      // Dragging only when unlocked
-      if(!lockOrder){
-        n.addEventListener("dragstart",dragStart);
-        n.addEventListener("dragover",dragOver);
-        n.addEventListener("drop",drop);
-        n.addEventListener("dragend",dragEnd);
-        n.title="Drag to reorder";
-      }else{
-        // Editing only when locked
-        attachLongPress(n, ()=>openEdit(p.id));
-        n.title="Long-press to Edit";
-      }
+      if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
+      if(lockOrder){ attachLongPress(n, ()=>openEdit(p.id)); } // Edit only when locked
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -428,10 +405,10 @@
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
       const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
       const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Reorder locked"); } else { handle.classList.remove("locked"); handle.onclick=null; }
+      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Order locked (hold to edit)"); } else { handle.classList.remove("locked"); handle.onclick=null; }
       list && list.appendChild(n);
     }
-    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length<2||gameOver;
+    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0||gameOver;
     save();
   }
 
@@ -486,53 +463,27 @@
 
   function validateRound(){
     const inputs=roundInputs();
-    const minusTens = Object.entries(inputs).filter(([_,v])=>+v===-10);
-    if(minusTens.length>1){
-      if(rErr){ rErr.textContent="Only one player may have −10 per round."; rErr.style.display=""; }
-      if(applyBtn) applyBtn.disabled=true; return false;
+    // Only one -10 allowed
+    let minus10Count = 0; for(const id in inputs){ if(inputs[id]===-10) minus10Count++; }
+    if(minus10Count>1){
+      if(rErr){ rErr.textContent="Only one player can be −10 this round."; rErr.style.display=""; }
+      if(applyBtn) applyBtn.disabled=true;
+      return false;
     }
-    if(minusTens.length===1){
-      const cid = minusTens[0][0];
-      const c=players.find(p=>p.id===cid);
-      const proj=clampInt(c?.score||0)+clampInt(inputs[cid]||0);
-      if(proj>limit){
-        if(rErr){ rErr.textContent=`The −10 player cannot exceed ${limit}. (Projected: ${proj})`; rErr.style.display=""; }
-        if(applyBtn) applyBtn.disabled=true; return false;
-      }
-    }
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
+    if(rErr) rErr.style.display="none";
+    if(applyBtn) applyBtn.disabled=false;
+    return true;
   }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
-
   function applyRound(inputs){
-    // derive cutter id: exactly one −10
-    const mt = Object.entries(inputs).filter(([_,v])=>+v===-10);
-    const cid = mt.length===1 ? mt[0][0] : null;
-
     const snapshotInputs = JSON.parse(JSON.stringify(inputs));
     const roundNo = roundCounter + 1;
     const proj=new Map(); players.forEach(p=>proj.set(p.id, clampInt(p.score||0)+clampInt(inputs[p.id]||0)));
     roundCounter += 1;
 
-    if (cid){ const cutter = players.find(p=>p.id===cid); cutsHistory.push({ id: cid, name: cutter? (cutter.name||"—") : "—", round: roundCounter, timestamp: Date.now(), result: "played" }); }
-
     const under = players.filter(p => (proj.get(p.id) <= limit));
     const over  = players.filter(p => (proj.get(p.id) >= (limit+1)));
-
-    // Instant-win: cutter ≤ limit and everyone else > limit
-    if (cid){
-      const cutterVal = proj.get(cid);
-      const othersOk = players.filter(p=>p.id!==cid).every(p=> proj.get(p.id) > limit);
-      if (cutterVal <= limit && othersOk){
-        players.forEach(p=>{ p.score = proj.get(p.id); });
-        gameOver = true; const winner = players.find(p=>p.id===cid);
-        winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
-        const last = cutsHistory.slice().reverse().find(h => h.round===roundCounter && h.id===cid); if (last) last.result = "cut_win";
-        rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:cid, timestamp:Date.now()});
-        roundDlg && roundDlg.close(); showWinOverlay(winner); save(); render(); return;
-      }
-    }
 
     // Reenganche ONLY at == limit+1 => set to max≤limit
     if (under.length >= 2 && over.length){
@@ -551,8 +502,7 @@
     // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
 
-    if (cid){ const last = cutsHistory.slice().reverse().find(h => h.round===roundCounter && h.id===cid); if (last && last.result==="played") last.result="normal"; }
-    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:cid, timestamp:Date.now()});
+    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
     gameOver=false; render();
   }
 
@@ -572,8 +522,8 @@
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt("Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
   bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm("Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; seedAtLeastTwo(); render(); } });
-  bind("#newGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; ensureMinPlayers(); render(); } });
+  bind("#newGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; const btxt=$("#bannerText"); if(btxt) btxt.textContent=""; render(); window.scrollTo({top:0,behavior:"smooth"}); });
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
@@ -581,78 +531,113 @@
 
   // helpers
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
-  const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(players.length<1) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
+  const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; ensureMinPlayers(); render(); };
 
   // Win overlay (simple)
-  function showWinOverlay(winner){ const ov=document.getElementById('winOverlay'); if(!ov) return; document.getElementById('winName').textContent = winner?.name || 'Winner'; document.getElementById('winSubtitle').textContent = 'Instant win'; ov.style.display='flex'; try{ document.getElementById('winSound').play().catch(()=>{});}catch{} startConfetti(); }
+  function showWinOverlay(winner){ const ov=document.getElementById('winOverlay'); if(!ov) return; document.getElementById('winName').textContent = winner?.name || 'Winner'; document.getElementById('winSubtitle').textContent = 'Winner';
+    const btxt = document.getElementById('bannerText'); const bsec = document.getElementById('banner');
+    if (btxt){ btxt.textContent = `${winner?.name || 'Player'} won`; }
+    if (bsec){ bsec.style.display = ''; }
+    document.getElementById('winPhoto').src = winner?.avatar || '';
+    ov.style.display='flex'; try{ document.getElementById('winSound').play().catch(()=>{});}catch{} startConfetti();
+  }
   document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
 
   // Confetti
   function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:200},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
 
-  // ===== Image Cropper =====
+  // ===== Image Cropper (clean) =====
   function openCropper(dataUrl, targetId){
     const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
     if(!dlg || !cvs || !zoom || !saveBtn) return;
-    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
 
-    function draw(){ ctx.clearRect(0,0,cvs.width,cvs.height);
-      ctx.save(); ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY); ctx.scale(scale, scale); ctx.drawImage(img, -img.width/2, -img.height/2); ctx.restore();
+    const ctx = cvs.getContext('2d');
+    let img = new Image();
+    let scale=1, minScale=1;
+    let offX=0, offY=0;
+    let dragging=false, startX=0, startY=0;
+    let pinch=false, pinchStartDist=0, pinchStartScale=1;
+
+    const guideRadius = Math.min(cvs.width, cvs.height) * 0.42;
+
+    function draw(){
+      ctx.clearRect(0,0,cvs.width,cvs.height);
+
+      // Image
+      ctx.save();
+      ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, -img.width/2, -img.height/2);
+      ctx.restore();
+
+      // Dim overlay with circle hole
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,.35)';
+      ctx.fillRect(0,0,cvs.width,cvs.height);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(cvs.width/2, cvs.height/2, guideRadius, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      // Circle stroke
+      ctx.beginPath();
+      ctx.arc(cvs.width/2, cvs.height/2, guideRadius, 0, Math.PI*2);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(255,255,255,.8)';
+      ctx.stroke();
     }
-    function clamp(){ const w = img.width*scale, h = img.height*scale; const maxX = Math.max(0,(w-cvs.width)/2); const maxY = Math.max(0,(h-cvs.height)/2); offX = Math.min(maxX, Math.max(-maxX, offX)); offY = Math.min(maxY, Math.max(-maxY, offY)); }
+    function clamp(){
+      const w = img.width*scale, h = img.height*scale;
+      const maxX = Math.max(0,(w-cvs.width)/2);
+      const maxY = Math.max(0,(h-cvs.height)/2);
+      offX = Math.min(maxX, Math.max(-maxX, offX));
+      offY = Math.min(maxY, Math.max(-maxY, offY));
+    }
 
-    img.onload = ()=>{ const sx = cvs.width / img.width; const sy = cvs.height / img.height; const ms = Math.max(sx, sy); minScale = ms; scale = ms; zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100)); zoom.value = String(scale); offX=0; offY=0; clamp(); draw(); };
+    img.onload = ()=>{
+      const sx = cvs.width / img.width;
+      const sy = cvs.height / img.height;
+      minScale = Math.max(sx, sy);
+      scale = minScale;
+      zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100));
+      zoom.value = String(scale);
+      offX=0; offY=0; clamp(); draw();
+    };
     img.src = dataUrl;
 
-    // Pointer pan
-    cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); });
-    cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); });
-    cvs.addEventListener('pointerup', e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} });
-    cvs.addEventListener('pointercancel', ()=> dragging=false);
+    function pointerDown(e){ dragging=true; startX=e.clientX; startY=e.clientY; try{ cvs.setPointerCapture(e.pointerId); }catch{} }
+    function pointerMove(e){ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); }
+    function pointerUp(e){ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} }
+    function pointerCancel(){ dragging=false; }
 
-    // Touch pinch zoom
-    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:false});
-    cvs.addEventListener('touchmove', (e)=>{
+    function tstart(e){ if(e.touches.length===2){ pinch=true; pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale=scale; } }
+    function tmove(e){
       if(pinch && e.touches.length===2){
         e.preventDefault();
-        const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-        const next = pinchStartScale * (dist / pinchStartDist);
+        const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+        const next = pinchStartScale * (dist/pinchStartDist);
         scale = Math.min(3, Math.max(minScale, next));
         zoom.value = String(scale);
         clamp(); draw();
       }
-    }, {passive:false});
-    cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
+    }
+    function tend(){ pinch=false; }
 
-    // Wheel zoom (desktop)
-    const onWheel = (e)=>{
+    function onWheel(e){
       e.preventDefault();
       const factor = e.deltaY > 0 ? 0.95 : 1.05;
-      const next = scale * factor;
-      scale = Math.min(3, Math.max(minScale, next));
+      scale = Math.min(3, Math.max(minScale, scale * factor));
       zoom.value = String(scale);
       clamp(); draw();
-    };
-    cvs.addEventListener('wheel', onWheel, {passive:false});
-
-    // Slider zoom
-    const onZoom = ()=>{
+    }
+    function onZoom(){
       const val = parseFloat(zoom.value || String(scale));
       scale = Math.min(3, Math.max(minScale, val));
       clamp(); draw();
-    };
-    zoom.addEventListener('input', onZoom);
-
-    // Reset
-    const onReset = ()=>{
-      scale = minScale; offX = 0; offY = 0;
-      zoom.value = String(scale);
-      clamp(); draw();
-    };
-    resetBtn?.addEventListener('click', onReset);
-
-    // Save -> write avatar
-    const onSave = ()=>{
+    }
+    function onReset(){ scale=minScale; offX=0; offY=0; zoom.value=String(scale); clamp(); draw(); }
+    function onSave(){
       const out = document.createElement('canvas');
       out.width = 512; out.height = 512;
       const k = out.width / cvs.width;
@@ -663,15 +648,10 @@
       octx.scale(scale, scale);
       octx.drawImage(img, -img.width/2, -img.height/2);
       const dataOut = out.toDataURL('image/png', 0.92);
-
       const p = players.find(x=>x.id===targetId);
       if (p){ p.avatar = dataOut; render(); save(); }
-      cleanup();
       dlg.close();
-    };
-    saveBtn.addEventListener('click', onSave);
-
-    // Cleanup listeners when dialog closes
+    }
     function cleanup(){
       cvs.removeEventListener('pointerdown', pointerDown);
       cvs.removeEventListener('pointermove', pointerMove);
@@ -686,25 +666,6 @@
       saveBtn.removeEventListener('click', onSave);
     }
 
-    // Keep named refs for cleanup
-    function pointerDown(e){ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); }
-    function pointerMove(e){ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); }
-    function pointerUp(e){ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} }
-    function pointerCancel(){ dragging=false; }
-    function tstart(e){ if(e.touches.length===2){ pinch=true; pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale=scale; } }
-    function tmove(e){
-      if(pinch && e.touches.length===2){
-        e.preventDefault();
-        const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-        const next = pinchStartScale * (dist/pinchStartDist);
-        scale = Math.min(3, Math.max(minScale, next));
-        zoom.value = String(scale);
-        clamp(); draw();
-      }
-    }
-    function tend(){ pinch=false; }
-
-    // Attach pointer handlers
     cvs.addEventListener('pointerdown', pointerDown);
     cvs.addEventListener('pointermove', pointerMove);
     cvs.addEventListener('pointerup', pointerUp);
@@ -712,6 +673,10 @@
     cvs.addEventListener('touchstart', tstart, {passive:false});
     cvs.addEventListener('touchmove', tmove, {passive:false});
     cvs.addEventListener('touchend', tend, {passive:true});
+    cvs.addEventListener('wheel', onWheel, {passive:false});
+    zoom.addEventListener('input', onZoom);
+    resetBtn?.addEventListener('click', onReset);
+    saveBtn.addEventListener('click', onSave);
 
     dlg.addEventListener('close', cleanup, {once:true});
     dlg.showModal(); pulseNoZoom();
@@ -720,6 +685,7 @@
 
   // Init
   load();
+  ensureMinPlayers();
   render();
 })();
 </script>
