@@ -38,8 +38,12 @@
   }
   .brand-wrap{min-width:0}
   .brand{
-    display:flex; align-items:baseline; gap:10px; min-width:0;
-  }
+  display:flex;
+  flex-direction:column;       /* NEW: stack */
+  align-items:flex-start;      /* NEW: left align */
+  gap:2px;                     /* tighter gap */
+  min-width:0;
+}
   .title{
     font-weight:900; letter-spacing:.2px;
     font-size: clamp(18px, 5vw, 26px);
@@ -47,8 +51,13 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .ver{
-    font-weight:800; font-size:12px; color:var(--sub); opacity:.9;
-  }
+  display:block;               /* NEW: own line */
+  font-weight:800;
+  font-size:12px;
+  color:var(--sub);
+  opacity:.9;
+  line-height:1.1;
+}
   .lang-pill{
     display:inline-flex; gap:8px; align-items:center;
     border:1px dashed rgba(255,255,255,.18);
@@ -389,21 +398,41 @@
 
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
-  const load=()=>{ try{
-      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
-      players = Array.isArray(s.players)? s.players : [];
-      // Always start with at least two players if empty
-      if(!players.length){ players=[{id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},{id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}]; }
-      limit = Number.isFinite(s.limit)? s.limit : 100;
-      autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
-      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
-      gameOver = !!s.gameOver;
-      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
-      roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
-      rounds = Array.isArray(s.rounds)? s.rounds : [];
-      winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = !!s.lockOrder; pruneWins();
-    }catch(e){ players=[]; } };
+  const load=()=>{ 
+  try{
+    const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+
+    const makeDefaults=()=>[
+      {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+      {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+    ];
+
+    // Be robust to empty/malformed saved state
+    if (Array.isArray(s.players) && s.players.length >= 1){
+      players = s.players;
+    } else {
+      players = makeDefaults();             // <- ensure players exist
+    }
+
+    limit = Number.isFinite(s.limit)? s.limit : 100;
+    autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
+    nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
+    gameOver = !!s.gameOver;
+    cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
+    roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
+    rounds = Array.isArray(s.rounds)? s.rounds : [];
+    winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
+    lockOrder = !!s.lockOrder;
+    pruneWins();
+  }catch(e){
+    // If anything goes wrong parsing storage, start fresh with defaults
+    players = [
+      {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+      {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+    ];
+  }
+};
+
 
   /* ===== render ===== */
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
