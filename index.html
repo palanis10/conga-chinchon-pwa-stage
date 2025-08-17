@@ -21,7 +21,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
     <script type="text/babel">
-        // Version: 1.0.0 (STAGE)
+        // Version: 1.1.0 (STAGE)
         // Created by Gemini
 
         // === HELPER FUNCTIONS ===
@@ -52,7 +52,7 @@
             const savedState = localStorage.getItem('conga_state_react');
             if (savedState) {
               const state = JSON.parse(savedState);
-              return state.players || [];
+              return state.players && state.players.length > 1 ? state.players : [{ id: uid(), name: "Player 1", score: 0, reenganches: 0, avatar: null }, { id: uid(), name: "Player 2", score: 0, reenganches: 0, avatar: null }];
             }
             return [{ id: uid(), name: "Player 1", score: 0, reenganches: 0, avatar: null }, { id: uid(), name: "Player 2", score: 0, reenganches: 0, avatar: null }];
           });
@@ -101,7 +101,6 @@
           const [editPlayerPhoto, setEditPlayerPhoto] = React.useState(null);
         
           const [roundScores, setRoundScores] = React.useState({});
-          const [roundCutterId, setRoundCutterId] = React.useState(null);
           const [roundError, setRoundError] = React.useState('');
         
           const dragItem = React.useRef(null);
@@ -201,10 +200,7 @@
                 newGameOver = true;
                 const winner = playersUnderLimit[0];
                 newWinsLog.push({ playerId: winner.id, name: winner.name, date: new Date().toISOString().slice(0, 10), timestamp: Date.now() });
-                if (roundCutterId) {
-                  const cutterEntry = { id: roundCutterId, name: players.find(p => p.id === roundCutterId)?.name || '—', round: roundNo, timestamp: Date.now(), result: roundCutterId === winner.id ? "cut_win" : "normal" };
-                  newCutsHistory.push(cutterEntry);
-                }
+                
                 setPlayers(newPlayers);
                 setGameState(prev => ({
                   ...prev,
@@ -212,7 +208,7 @@
                   winsLog: newWinsLog,
                   cutsHistory: newCutsHistory,
                   roundCounter: roundNo,
-                  rounds: [...prev.rounds, { round: roundNo, inputs: roundScores, totals: newPlayers.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {}), cutterId: roundCutterId, timestamp: Date.now() }],
+                  rounds: [...prev.rounds, { round: roundNo, inputs: roundScores, totals: newPlayers.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {}), timestamp: Date.now() }],
                 }));
                 setShowRoundModal(false);
                 setShowWinOverlay(true);
@@ -247,23 +243,25 @@
               nextDealerId: newDealerId,
               cutsHistory: newCutsHistory,
               roundCounter: roundNo,
-              rounds: [...prev.rounds, { round: roundNo, inputs: roundScores, totals: newPlayers.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {}), cutterId: roundCutterId, timestamp: Date.now() }],
+              rounds: [...prev.rounds, { round: roundNo, inputs: roundScores, totals: newPlayers.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {}), timestamp: Date.now() }],
             }));
             setShowRoundModal(false);
           };
         
           const handleEditPlayer = (id) => {
-            if (!gameState.lockOrder) {
-                const player = players.find(p => p.id === id);
-                if (!player) return;
-                setEditPlayerId(id);
-                setEditPlayerName(player.name);
-                setEditPlayerScore(player.score);
-                setEditPlayerReeng(player.reenganches);
-                setEditPlayerIsDealer(player.id === gameState.nextDealerId);
-                setEditPlayerPhoto(player.avatar);
-                setShowEditModal(true);
+            if (gameState.lockOrder) {
+                alert("Please unlock reordering to edit players.");
+                return;
             }
+            const player = players.find(p => p.id === id);
+            if (!player) return;
+            setEditPlayerId(id);
+            setEditPlayerName(player.name);
+            setEditPlayerScore(player.score);
+            setEditPlayerReeng(player.reenganches);
+            setEditPlayerIsDealer(player.id === gameState.nextDealerId);
+            setEditPlayerPhoto(player.avatar);
+            setShowEditModal(true);
           };
         
           const saveEditPlayer = (e) => {
@@ -317,7 +315,7 @@
                     <span className="text-xl md:text-2xl font-black tracking-wide">Alanis Scorekeeper</span>
                   </div>
                   <button onClick={() => setShowSettingsModal(true)} className="w-11 h-11 grid place-items-center rounded-xl border border-white/10 bg-[#0f1428] text-gray-100 hover:brightness-110 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.78 1.35a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.73v.5a2 2 0 0 1-1 1.73l-.15.08a2 2 0 0 0-.73 2.73l.78 1.35a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2-2h.44a2 2 0 0 0 2 2v.18a2 2 0 0 1 1 1.73l.43.25a2 2 0 0 1 2 0l.15-.08a2 2 0 0 0 2.73-.73l.78-1.35a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.73l.15-.08a2 2 0 0 0 .73-2.73l-.78-1.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2-2V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.78 1.35a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.73v.5a2 2 0 0 1-1 1.73l-.15.08a2 2 0 0 0-.73 2.73l.78 1.35a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2-2h.44a2 2 0 0 0 2 2v.18a2 2 0 0 1 1 1.73l.43.25a2 2 0 0 1 2 0l.15-.08a2 2 0 0 0 2.73-.73l-.78-1.35a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.73l.15-.08a2 2 0 0 0 .73-2.73l-.78-1.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2-2V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                 </header>
         
