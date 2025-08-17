@@ -9,57 +9,48 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icons/icon-512.png">
 <link rel="manifest" href="manifest.webmanifest">
-
 <style>
   :root{
     --bg:#0f1220; --card:#171a2b; --muted:#2a2f4a; --text:#e8ecff; --sub:#b8c0ff;
     --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b; --warn:#ffb020;
     --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
     background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
-    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;
-  }
+    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;}
   .app{max-width:980px; margin:0 auto; padding:10px 12px 120px;}
-
   header{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:2px 0 8px 0;}
   .top-left{display:flex; align-items:center; gap:10px}
-  .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:3px 10px; border-radius:999px; font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.6px;}
-  .brand{opacity:.95; font-weight:900; letter-spacing:.2px; font-size: clamp(16px, 4vw, 22px);}
+  .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:6px 12px; border-radius:999px; font-weight:900; font-size:12px; letter-spacing:.6px;}
+  .brand{opacity:.95; font-weight:900; letter-spacing:.2px; font-size: clamp(16px, 4vw, 22px);} 
   .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:4px}
-
-  .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
-
-  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:9px 12px; border-radius:12px;
-    background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
-    color:var(--text); font-weight:700; letter-spacing:.2px; transition:.15s; white-space:nowrap;}
+  .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
+  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 14px; border-radius:12px;
+    background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.10);
+    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; display:inline-flex; align-items:center; gap:10px; white-space:nowrap}
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
-  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);}
+  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.25);} 
+  .btn .ico{font-size:18px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
 
-  .iconbtn{ display:inline-flex; align-items:center; gap:8px; padding:10px 14px;
-    border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-weight:800}
-  .iconbtn span{white-space:nowrap}
-
-  /* Controls row */
-  .controls{ display:flex; gap:12px; align-items:center; flex-wrap:nowrap }
-  .controls .spacer{ flex:1 }
-  @media (max-width:420px){
-    .controls{ gap:8px }
-    .iconbtn{ padding:8px 12px }
-  }
+  /* Header controls row */
+  .controls{display:flex; align-items:center; gap:12px; flex-wrap:nowrap}
+  .controls .btn{padding:10px 16px}
+  .controls .btn .label{font-size:16px}
+  .controls .spacer{flex:1 1 auto}
 
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
-
   .row{
-    display:grid; grid-template-columns: 28px 64px 1fr auto; align-items:center; gap:10px;
-    padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,.06);
+    display:grid;
+    grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
+    align-items:center; gap:10px;
+    padding:10px; border-radius:14px;
+    border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px;
   }
@@ -76,9 +67,9 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  .banner{ margin:10px 0; padding:12px 14px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
-    background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1));
-    color:#d7fff0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .banner{ margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
+    background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:none; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
 
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
@@ -90,8 +81,9 @@
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
-  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
-
+  /* Prevent iOS auto-zoom on focus */
+  input, select, textarea, button { font-size:16px; }
+  .switch{display:flex; align-items:center; gap:10px; background:#0f1428; border:1px solid var(--muted); padding:8px 10px; border-radius:12px; height:38px;}
   .grid-rows{ display:grid; gap:6px }
   .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
     padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
@@ -99,8 +91,15 @@
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
-  .error{ color:var(--danger); font-weight:700; margin-right:auto }
+  .error{ color:var(--danger); font-weight:800; margin-right:auto }
   .hint{ color:var(--sub); font-size:12px }
+
+  .table-wrap{ overflow:auto; max-height:60vh; border:1px solid rgba(255,255,255,.12); border-radius:12px;}
+  table{ width:max(520px,100%); border-collapse:separate; border-spacing:0; }
+  thead th{ position:sticky; top:0; background:#121633; border-bottom:1px solid rgba(255,255,255,.12); padding:10px; text-align:center; font-weight:800;}
+  tbody td, tbody th{ padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.06); text-align:center; font-variant-numeric:tabular-nums; }
+  tbody tr:nth-child(odd){ background:rgba(255,255,255,.02) }
+  tbody th{ text-align:left; white-space:nowrap; }
 
   /* WIN OVERLAY */
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
@@ -115,19 +114,15 @@
 
   /* Crop dialog layout + responsive canvas */
   #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
-  #cropFrame{border-radius:14px; background:#0b1225; border:1px solid rgba(255,255,255,.12); padding:10px}
-  #cropCanvas{width:100%;height:auto;display:block;touch-action:none}
-  .crop-controls{display:flex; gap:10px; align-items:center; justify-content:space-between;}
+  #cropCanvas{width:100%;height:auto;display:block;touch-action:none;background:#0b1225;border:1px solid rgba(255,255,255,.12);border-radius:12px}
   .crop-frame-hint{margin-bottom:6px;color:var(--sub)}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
 </style>
 </head>
-
 <body>
 <div class="app" id="app">
   <header>
     <div class="top-left">
-      <span class="chip">Conga / Chinchón</span>
+      <span class="chip">CONGA / CHINCHÓN</span>
       <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.5.1</span></span>
     </div>
     <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
@@ -135,10 +130,12 @@
 
   <section class="card" style="padding:10px; margin-bottom:8px">
     <div class="controls">
-      <button id="lockToggle" class="iconbtn" title="Lock/unlock reordering" aria-label="Lock/unlock">🔓 <span>Reorder</span></button>
-      <button id="historyBtn" class="btn ghost">History</button>
-      <div class="spacer"></div>
-      <button id="newRoundBtn" class="btn primary">New round</button>
+      <button id="lockToggle" class="btn ghost" title="Reorder" aria-label="Reorder">
+        <span class="ico" id="lockIco">🔒</span><span class="label">Reorder</span>
+      </button>
+      <button id="historyBtn" class="btn ghost"><span class="label">History</span></button>
+      <span class="spacer"></span>
+      <button id="newRoundBtn" class="btn primary"><span class="label">New round</span></button>
     </div>
   </section>
 
@@ -148,8 +145,9 @@
     <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px">+ Add player</button>
   </section>
 
-  <section id="banner" class="banner" style="display:none" aria-live="polite">
+  <section id="banner" class="banner" aria-live="polite">
     <div><strong id="bannerText">—</strong></div>
+    <div class="tag" id="bannerTag">—</div>
     <div style="margin-left:auto; display:flex; gap:8px">
       <button class="btn success" id="newGameBtn">New game</button>
     </div>
@@ -189,13 +187,15 @@
 <!-- Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
-    <div class="ver" id="roundTitle" style="font-weight:800">New Round</div>
+    <div>
+      <div id="roundTitle" style="font-weight:800">New Round</div>
+      <div class="hint">Enter points (negatives OK). Only one “−10” allowed per round.</div>
+    </div>
     <button class="btn ghost" onclick="roundDialog.close()">Close</button>
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
       <div class="grid-rows" id="roundRows"></div>
-      <div class="hint" style="margin-top:6px">Rule: only one player can take “−10” per round.</div>
     </div>
     <div class="modal-foot">
       <div id="roundError" class="error" style="display:none"></div>
@@ -236,6 +236,7 @@
             <div style="display:flex; gap:8px; flex-wrap:wrap">
               <button type="button" class="btn" id="changePhotoBtn">Change photo</button>
               <button type="button" class="btn ghost" id="removePhotoBtn">Remove photo</button>
+              <button type="button" class="btn ghost" id="viewHistoryBtn">View cut history</button>
             </div>
           </div>
           <label class="switch" style="display:flex; align-items:center; gap:10px">
@@ -263,11 +264,12 @@
       <div class="win-photo"><img id="winPhoto" alt=""></div>
       <div>
         <div class="win-name" id="winName">Winner</div>
-        <div class="win-sub" id="winSubtitle">WINNER</div>
+        <div class="win-sub" id="winSubtitle">won</div>
       </div>
     </div>
     <div class="win-actions">
-      <button class="btn success" id="winCloseBtn">Close</button>
+      <button class="btn ghost" id="winCloseBtn">Close</button>
+      <button class="btn success" id="winNewGameBtn">New game</button>
     </div>
   </div>
 </div>
@@ -285,17 +287,36 @@
   </div>
   <div class="modal-body">
     <div class="crop-frame-hint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <div id="cropFrame">
-      <canvas id="cropCanvas" width="600" height="600"></canvas>
-    </div>
-    <div class="crop-controls">
-      <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1" style="flex:1">
-      <button class="btn" id="cropReset">Reset</button>
-    </div>
+    <canvas id="cropCanvas" width="600" height="600"></canvas>
+    <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1">
   </div>
   <div class="modal-foot">
+    <button class="btn ghost" id="cropReset">Reset</button>
+    <div style="flex:1"></div>
     <button class="btn ghost" onclick="cropDialog.close()">Cancel</button>
     <button class="btn success" id="cropSave">Save</button>
+  </div>
+</dialog>
+
+<!-- Cut history dialog -->
+<dialog id="historyDialog" aria-labelledby="historyTitle">
+  <div class="modal-head">
+    <div id="historyTitle" style="font-weight:800">Cut history</div>
+    <button class="btn ghost" onclick="historyDialog.close()">Close</button>
+  </div>
+  <div class="modal-body">
+    <div class="history-list" id="historyList" style="display:grid; gap:8px; max-height:50vh; overflow:auto;"></div>
+  </div>
+</dialog>
+
+<!-- Rounds history dialog -->
+<dialog id="roundsDialog" aria-labelledby="roundsTitle">
+  <div class="modal-head">
+    <div id="roundsTitle" style="font-weight:800">Rounds history</div>
+    <button class="btn ghost" onclick="roundsDialog.close()">Close</button>
+  </div>
+  <div class="modal-body">
+    <div class="table-wrap"><div id="roundsTableWrap"></div></div>
   </div>
 </dialog>
 
@@ -313,6 +334,7 @@
 </template>
 
 <input id="photoInput" type="file" accept="image/*" hidden>
+<input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
 /* === STAGE v3.5.1 === */
@@ -328,24 +350,23 @@
   const todayStr=()=> new Date().toISOString().slice(0,10);
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // Prevent background scroll while a dialog is open
-  ['cropDialog','editDialog','roundDialog','settingsDialog'].forEach(id=>{
-    const d = document.getElementById(id);
-    if (!d) return;
-    d.addEventListener('close', ()=>{ document.body.style.overflow=''; });
-    d.addEventListener('cancel', ()=>{ document.body.style.overflow=''; });
-    d.addEventListener('show', ()=>{ document.body.style.overflow='hidden'; });
-    d.addEventListener('mousedown', ()=>{}); // noop keeps iOS happy
-  });
+  // Viewport zoom control (prevents iOS auto zoom when dialogs open)
+  const vp = document.querySelector('meta[name="viewport"]');
+  const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5';
+  function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
+  function restoreZoom(){ try{ if(!vp) return; vp.setAttribute('content', VP_BASE); }catch{} }
+  const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
 
   // Storage
   const storageKey="conga_state_stage_v351";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
+  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=true;
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
   const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
+      // default two players on first load
+      if(players.length===0){ players=[{id:uid(),name:"Player 1",score:0,reenganches:0,avatar:null},{id:uid(),name:"Player 2",score:0,reenganches:0,avatar:null}]; }
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
       nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
@@ -354,16 +375,8 @@
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = !!s.lockOrder; pruneWins();
-    }catch(e){ players=[]; }
-    // Boot with 2 players if empty
-    if (!players || players.length===0){
-      players = [{id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-                 {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}];
-      nextDealerId = players[0].id;
-      save();
-    }
-  };
+      lockOrder = (typeof s.lockOrder==="boolean") ? s.lockOrder : true; pruneWins();
+    }catch(e){ players=[]; } };
 
   // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
@@ -371,30 +384,37 @@
     const limitInput=$("#limitInput"); if(limitInput) limitInput.value=limit;
     const autoAdv=$("#autoAdvance"); if(autoAdv) autoAdv.checked=autoAdvanceDealer;
     const lockSwitch=$("#lockOrderSwitch"); if(lockSwitch) lockSwitch.checked=lockOrder;
+    const lockIco=$("#lockIco"); if(lockIco) lockIco.textContent = lockOrder ? "🔒" : "🔓";
 
-    // Banner text
-    const banner=$("#banner");
-    if (banner){
-      if (gameOver){
-        banner.style.display="";
-        const last = winsLog[winsLog.length-1];
-        $("#bannerText").textContent = last ? `${last.name} won` : "Game over";
-      } else banner.style.display="none";
+    // Banner (used when the whole game is over)
+    const banner=$("#banner"); const bannerText=$("#bannerText"); const bannerTag=$("#bannerTag");
+    if(banner){
+      banner.style.display = gameOver ? "flex" : "none";
+      if(gameOver){
+        const alive = players.filter(p=> (p.score||0) <= limit);
+        const winner = alive[0] || players[0];
+        bannerText.textContent = `${winner.name} won`;
+        bannerTag.textContent = "Game over";
+      }
     }
-
-    const lockBtn=$("#lockToggle"); if(lockBtn){ lockBtn.firstChild.nodeValue = lockOrder ? "🔒 " : "🔓 "; lockBtn.title = lockOrder ? "Unlock reordering" : "Lock reordering"; }
 
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
-      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-      // DnD only when unlocked; long-press edit only when locked
+      n.dataset.index=i; n.dataset.id=p.id;
+
+      // Only allow drag when unlocked; only allow long-press edit when locked
+      const handle=n.querySelector(".drag");
       if(!lockOrder){
-        n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver);
-        n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd);
-      } else {
+        n.draggable=true; handle.classList.remove("locked");
+        n.removeAttribute("title");
+        n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd);
+      }else{
+        n.draggable=false; handle.classList.add("locked");
+        n.setAttribute("title","Long-press to Edit");
         attachLongPress(n, ()=>openEdit(p.id));
       }
+
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -402,16 +422,15 @@
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
       const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
       const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Reorder is locked"); } else { handle.classList.remove("locked"); handle.onclick=null; }
       list && list.appendChild(n);
     }
-    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0||gameOver;
+    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0;
     save();
   }
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = (e)=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
     const end = ()=>{ clearTimeout(tmr); };
     el.addEventListener('touchstart', start, {passive:true});
     el.addEventListener('mousedown', start);
@@ -432,8 +451,9 @@
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
+    bind("#viewHistoryBtn","onclick", ()=> openHistory(p.id));
     bind("#deletePlayerBtn","onclick", ()=>{ if(confirm("Delete this player? This cannot be undone.")){ editDlg.close(); removePlayer(p.id); }});
-    editDlg && editDlg.showModal(); document.body.style.overflow='hidden';
+    editDlg && editDlg.showModal(); pulseNoZoom();
   }
   if(editForm) editForm.addEventListener("submit", (e)=>{
     e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
@@ -442,32 +462,31 @@
   });
 
   // Photo input -> cropper
-  if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{
-    if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
-    const file=photoInput.files[0];
-    const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-    openCropper(dataUrl, window._photoTarget); window._photoTarget=null;
-  }); }
+  if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
 
   // Round dialog
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
-  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
-    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
-      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">Current: ${p.score||0}</div>`;
-      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
-      r.append(name,inp,minus); rows.appendChild(r);
-    });
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); document.body.style.overflow='hidden';
-  };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
   function validateRound(){
     const inputs=roundInputs();
     // only one -10 allowed
-    const countMinus10 = Object.values(inputs).filter(v=>v===-10).length;
-    if(countMinus10>1){ if(rErr){ rErr.textContent="Only one player can take −10."; rErr.style.display=""; } if(applyBtn) applyBtn.disabled=true; return false; }
+    const minus10 = Object.values(inputs).filter(v=>v===-10).length;
+    if(minus10>1){
+      if(rErr){ rErr.textContent="Only one player can have −10 per round."; rErr.style.display=""; }
+      if(applyBtn) applyBtn.disabled=true;
+      return false;
+    }
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
   }
+  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
+    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
+      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">Current: ${p.score||0}</div>`;
+      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=-10; validateRound(); };
+      r.append(name,inp,minus); rows.appendChild(r);
+    });
+    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
+  };
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
   function applyRound(inputs){
@@ -493,47 +512,34 @@
 
     players.forEach(p=>{ p.score=proj.get(p.id); });
 
-    // General end condition: exactly one alive (≤ limit) and at least one busted (≥ limit+1)
-    const alive = players.filter(p => (p.score <= limit));
-    const busted = players.filter(p => (p.score >= (limit+1)));
-    if (alive.length === 1 && busted.length >= 1){
-      const winner = alive[0];
+    // Dealer auto-advance (kept by id if reordered)
+    if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
+
+    // Winner detection: exactly one <= limit
+    const alive = players.filter(p => (p.score||0) <= limit);
+    if(alive.length===1){
       gameOver = true;
+      const winner = alive[0];
       winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
       rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
       roundDlg && roundDlg.close(); showWinOverlay(winner); save(); render(); return;
     }
 
-    // Dealer auto-advance
-    if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
-
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
     gameOver=false; render();
   }
 
+  // Dialog submit
   if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); if(!validateRound()) return; applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
 
-  // Rounds history (simple table of totals)
-  function openRoundsTable(){ const dlg=document.createElement('dialog'); dlg.innerHTML = `
-    <div class="modal-head"><div style="font-weight:800">Rounds history</div><button class="btn ghost" id="x">Close</button></div>
-    <div class="modal-body"><div class="table-wrap"><div id="wrap"></div></div></div>`;
-    document.body.appendChild(dlg);
-    const wrap=dlg.querySelector('#wrap');
-    if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; }
-    else{
-      const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px";
-      const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead);
-      const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); players.forEach(p=>{ const td=document.createElement('td'); const v=(r.totals && typeof r.totals==='object')? r.totals[p.id] : (r.inputs? r.inputs[p.id]: ""); td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table);
-    }
-    dlg.querySelector('#x').onclick=()=>dlg.close();
-    dlg.addEventListener('close', ()=>dlg.remove());
-    dlg.showModal();
-  }
+  function openHistory(id){ const list=$("#historyList"); if(!list) return; list.innerHTML=""; const my=(cutsHistory||[]).filter(h=>h.id===id).sort((a,b)=>a.round-b.round); if(my.length===0){ list.innerHTML='<div class="history-item">No cuts recorded.</div>'; } else { for(const h of my){ const d=new Date(h.timestamp); const label=h.result==='cut_win'?'✂️🏆 Cut win':(h.result==='normal'?'✂️ Cut (no win)':'✂️ Cut'); const row=document.createElement('div'); row.className='history-item'; row.textContent=`R${h.round} • ${label} • ${d.toLocaleString()}`; list.appendChild(row); } } $("#historyDialog") && $("#historyDialog").showModal(); }
+
+  function openRoundsTable(){ const wrap=$("#roundsTableWrap"); if(!wrap) return; wrap.innerHTML=""; if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; $("#roundsDialog") && $("#roundsDialog").showModal(); return; } const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px"; const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead); const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); const showTotals = r.totals && typeof r.totals === 'object'; players.forEach(p=>{ const td=document.createElement('td'); const v=showTotals ? r.totals[p.id] : r.inputs[p.id]; td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table); $("#roundsDialog") && $("#roundsDialog").showModal(); }
 
   // Wire-up
-  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
+  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); pulseNoZoom(); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt("Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
@@ -550,75 +556,88 @@
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  // Win overlay
+  // Winner overlay
+  function avatarFallback(name){
+    const i=(name||' ').trim().split(/\s+/).map(s=>s[0]).join('').slice(0,2).toUpperCase();
+    const s=120, c=document.createElement('canvas'); c.width=c.height=s;
+    const x=c.getContext('2d');
+    x.fillStyle='#0b1225'; x.fillRect(0,0,s,s);
+    x.fillStyle='#e8ecff'; x.font='700 56px ui-sans-serif,system-ui'; x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(i, s/2, s/2+2);
+    return c.toDataURL('image/png');
+  }
   function showWinOverlay(winner){
     const ov=document.getElementById('winOverlay'); if(!ov) return;
     document.getElementById('winName').textContent = winner?.name || 'Winner';
     document.getElementById('winSubtitle').textContent = 'won';
-    const imgEl=document.getElementById('winPhoto'); imgEl.src = winner?.avatar || '';
+    const img=document.getElementById('winPhoto'); if(img) img.src = winner?.avatar || avatarFallback(winner?.name);
     ov.style.display='flex';
     try{ document.getElementById('winSound').play().catch(()=>{});}catch{}
-    startConfetti(120); // smaller confetti
+    startConfetti(document.getElementById('confettiCanvas'), 70);
   }
-  document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{
+  document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
+  document.getElementById('winNewGameBtn')?.addEventListener('click', ()=>{
+    players.forEach(p=>{p.score=0;p.reenganches=0;});
+    rounds=[]; roundCounter=0; gameOver=false;
     document.getElementById('winOverlay').style.display='none';
+    render(); window.scrollTo({top:0,behavior:'smooth'});
   });
 
-  // Confetti (smaller)
-  function startConfetti(n=120){
-    const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d');
-    const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight;
-    c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
-    const pieces=Array.from({length:n},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*3, vy:1.8+Math.random()*2.2, vx:-0.8+Math.random()*1.6, a:Math.random()*Math.PI*2}));
-    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.09; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick();
+  // Smaller/lighter confetti
+  function startConfetti(c, count=70){
+    if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
+    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+    const pieces=Array.from({length:count},()=>({x:Math.random()*W, y:-10-Math.random()*H, s:4+Math.random()*8, vy:1.6+Math.random()*2.2, vx:-0.7+Math.random()*1.4, r:Math.random()*Math.PI*2, dr:-0.05+Math.random()*0.1, hue:(Math.random()*360)|0}));
+    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.r+=p.dr; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=`hsl(${p.hue},90%,60%)`; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick();
   }
 
   // ===== Image Cropper =====
   function openCropper(dataUrl, targetId){
     const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
     if(!dlg || !cvs || !zoom || !saveBtn) return;
-    document.body.style.overflow='hidden';
-    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
-
-    const cx = cvs.width/2, cy = cvs.height/2; const r = Math.min(cvs.width,cvs.height)*0.35; // circle radius
+    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1, pinchCx=0, pinchCy=0;
 
     function draw(){
       ctx.clearRect(0,0,cvs.width,cvs.height);
       // image
       ctx.save();
-      ctx.translate(cx + offX, cy + offY);
+      ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY);
       ctx.scale(scale, scale);
       ctx.drawImage(img, -img.width/2, -img.height/2);
       ctx.restore();
 
-      // dim outside of circle
-      ctx.save();
-      ctx.fillStyle='rgba(8,12,26,.55)';
-      ctx.fillRect(0,0,cvs.width,cvs.height);
-      ctx.globalCompositeOperation='destination-out';
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-      ctx.restore();
+      // circular mask overlay: dark outside, clear inside
+      const r = Math.min(cvs.width, cvs.height) * 0.37; // inner circle radius
+      const cx = cvs.width/2, cy = cvs.height/2;
 
-      // circle stroke
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-      ctx.lineWidth=6; ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.stroke();
+      // darken whole canvas
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,.55)';
+      ctx.fillRect(0,0,cvs.width,cvs.height);
+      // punch a hole
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+      // white ring
+      ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.9)';
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
     }
 
     function clamp(){
       const w = img.width*scale, h = img.height*scale;
-      const maxX = Math.max(0,(w/2) - r);
-      const maxY = Math.max(0,(h/2) - r);
+      const maxX = Math.max(0,(w-cvs.width)/2), maxY = Math.max(0,(h-cvs.height)/2);
       offX = Math.min(maxX, Math.max(-maxX, offX));
       offY = Math.min(maxY, Math.max(-maxY, offY));
     }
 
     img.onload = ()=>{
-      // Fit so circle is fully covered
-      const needW = (r*2) / img.width;
-      const needH = (r*2) / img.height;
-      minScale = Math.max(needW, needH);
-      scale = Math.max(minScale, 1); // pleasant default (never under-cover)
-      zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100));
+      const sx = cvs.width / img.width;
+      const sy = cvs.height / img.height;
+      minScale = Math.max(sx, sy) * 0.95; // show more of the image by default
+      scale = minScale;
+      zoom.min = String(Math.max(0.4, Math.round(minScale*100)/100));
+      zoom.max = "3";
       zoom.value = String(scale);
       offX=0; offY=0; clamp(); draw();
     };
@@ -630,68 +649,79 @@
     cvs.addEventListener('pointerup', e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} });
     cvs.addEventListener('pointercancel', ()=> dragging=false);
 
-    // Touch pinch zoom
-    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:false});
+    // Touch pinch zoom (stabilized)
+    cvs.addEventListener('touchstart', (e)=>{
+      if(e.touches.length===2){
+        pinch=true;
+        const [a,b]=e.touches; pinchCx=(a.clientX+b.clientX)/2; pinchCy=(a.clientY+b.clientY)/2;
+        pinchStartDist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+        pinchStartScale = scale;
+      }
+    }, {passive:true});
+
     cvs.addEventListener('touchmove', (e)=>{
       if(pinch && e.touches.length===2){
         e.preventDefault();
-        const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-        const next = pinchStartScale * (dist / pinchStartDist);
-        scale = Math.min(3, Math.max(minScale, next));
-        zoom.value = String(scale);
-        clamp(); draw();
+        const [a,b]=e.touches; const dist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+        const next = Math.min(3, Math.max(minScale, pinchStartScale * (dist / pinchStartDist)));
+        // zoom around pinch center by adjusting offsets proportionally
+        const dx = (pinchCx - cvs.width/2 - offX);
+        const dy = (pinchCy - cvs.height/2 - offY);
+        offX -= dx * (next/scale - 1);
+        offY -= dy * (next/scale - 1);
+        scale = next; zoom.value = String(scale); clamp(); draw();
       }
     }, {passive:false});
+
     cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
 
     // Wheel zoom (desktop)
     const onWheel = (e)=>{
       e.preventDefault();
       const factor = e.deltaY > 0 ? 0.95 : 1.05;
-      const next = scale * factor;
-      scale = Math.min(3, Math.max(minScale, next));
-      zoom.value = String(scale);
-      clamp(); draw();
+      const next = Math.min(3, Math.max(minScale, scale * factor));
+      const rect=cvs.getBoundingClientRect(); const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+      const dx = (cx - cvs.width/2 - offX);
+      const dy = (cy - cvs.height/2 - offY);
+      offX -= dx * (next/scale - 1);
+      offY -= dy * (next/scale - 1);
+      scale = next; zoom.value = String(scale); clamp(); draw();
     };
     cvs.addEventListener('wheel', onWheel, {passive:false});
 
     // Slider zoom
     const onZoom = ()=>{
-      const val = parseFloat(zoom.value || String(scale));
-      scale = Math.min(3, Math.max(minScale, val));
-      clamp(); draw();
+      const next = Math.min(3, Math.max(minScale, parseFloat(zoom.value || String(scale))));
+      const dx = (cvs.width/2 - cvs.width/2 - offX); // center-based
+      const dy = (cvs.height/2 - cvs.height/2 - offY);
+      offX -= dx * (next/scale - 1);
+      offY -= dy * (next/scale - 1);
+      scale = next; clamp(); draw();
     };
     zoom.addEventListener('input', onZoom);
 
     // Reset
     const onReset = ()=>{
-      scale = Math.max(1, minScale); offX = 0; offY = 0;
-      zoom.value = String(scale);
-      clamp(); draw();
+      scale = minScale; offX = 0; offY = 0; zoom.value = String(scale); clamp(); draw();
     };
     resetBtn?.addEventListener('click', onReset);
 
-    // Save -> write avatar (exactly as previewed)
+    // Save -> write avatar (square 512x512 of what you see inside the circle area)
     const onSave = ()=>{
-      const out = document.createElement('canvas');
-      out.width = 512; out.height = 512;
+      const out = document.createElement('canvas'); out.width = 512; out.height = 512;
       const octx = out.getContext('2d');
-      const k = (out.width/2) / r; // map canvas-space circle radius -> output radius (256)
+      octx.fillStyle = '#0b1225'; octx.fillRect(0,0,out.width,out.height);
 
-      // Clip to circle so outside is transparent
-      octx.save();
-      octx.beginPath(); octx.arc(out.width/2, out.height/2, out.width/2, 0, Math.PI*2); octx.clip();
-
+      // replicate the transform (scale & offset) into output space
+      const k = out.width / cvs.width;
       octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
-      octx.scale(scale*k, scale*k);
+      octx.scale(scale, scale);
       octx.drawImage(img, -img.width/2, -img.height/2);
-      octx.restore();
 
       const dataOut = out.toDataURL('image/png', 0.92);
       const p = players.find(x=>x.id===targetId);
       if (p){ p.avatar = dataOut; render(); save(); }
       cleanup(); dlg.close();
-      document.body.style.overflow='';
     };
     saveBtn.addEventListener('click', onSave);
 
@@ -709,8 +739,9 @@
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
     }
+
     dlg.addEventListener('close', cleanup, {once:true});
-    dlg.showModal();
+    dlg.showModal(); pulseNoZoom();
   }
   // ===== end cropper =====
 
