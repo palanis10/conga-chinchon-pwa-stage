@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.4</title>
+<title>Conga by Alanis — STAGE v3.5.5</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,7 +27,7 @@
   }
   .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
 
-  /* ===== Header (compact) ===== */
+  /* ===== Header (compact, stacked) ===== */
   header{
     display:grid;
     grid-template-columns: 1fr auto auto;
@@ -38,12 +38,12 @@
   }
   .brand-wrap{min-width:0}
   .brand{
-  display:flex;
-  flex-direction:column;       /* NEW: stack */
-  align-items:flex-start;      /* NEW: left align */
-  gap:2px;                     /* tighter gap */
-  min-width:0;
-}
+    display:flex;
+    flex-direction:column;       /* stack title over version */
+    align-items:flex-start;
+    gap:2px;
+    min-width:0;
+  }
   .title{
     font-weight:900; letter-spacing:.2px;
     font-size: clamp(18px, 5vw, 26px);
@@ -51,13 +51,9 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .ver{
-  display:block;               /* NEW: own line */
-  font-weight:800;
-  font-size:12px;
-  color:var(--sub);
-  opacity:.9;
-  line-height:1.1;
-}
+    display:block;
+    font-weight:800; font-size:12px; color:var(--sub); opacity:.9; line-height:1.1;
+  }
   .lang-pill{
     display:inline-flex; gap:8px; align-items:center;
     border:1px dashed rgba(255,255,255,.18);
@@ -123,7 +119,7 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  /* ===== Dialogs (only styles that matter for layout in this rev) ===== */
+  /* ===== Dialogs ===== */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
@@ -168,7 +164,7 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.5.4</div>
+        <div class="ver" id="verLine">STAGE v3.5.5</div>
       </div>
     </div>
 
@@ -203,7 +199,7 @@
     <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
   </div>
   <div class="modal-body" style="display:grid; gap:14px">
-
+    <!-- Language row removed on purpose; header pill remains -->
     <div>
       <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
@@ -382,56 +378,39 @@
     document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
     $("#pillEn")?.classList.toggle("active", LANG==="en");
     $("#pillEs")?.classList.toggle("active", LANG==="es");
-    const sel=$("#langSelect"); if(sel) sel.value=LANG;
+    const sel=$("#langSelect"); if(sel) sel.value=LANG; // safe even if row removed
   }
 
   /* ===== state ===== */
-  const storageKey="conga_state_stage_v354";
+  const storageKey="conga_state_stage_v355"; // bumped storage key for this version
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
 
+  const defaultsPlayers = () => ([
+    {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+    {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+  ]);
+
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
-const load=()=>{ 
-  try{
-    const s = JSON.parse(localStorage.getItem(storageKey) || "{}");
-
-    const defaults = () => ([
-      {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-      {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
-    ]);
-
-    // Use saved players only if there is at least ONE
-    players = (Array.isArray(s.players) && s.players.length > 0) ? s.players : defaults();
-
-    limit             = Number.isFinite(s.limit) ? s.limit : 100;
-    autoAdvanceDealer = typeof s.autoAdvanceDealer === "boolean" ? s.autoAdvanceDealer : true;
-    nextDealerId      = typeof s.nextDealerId === "string" ? s.nextDealerId : (players[0] ? players[0].id : null);
-    gameOver          = !!s.gameOver;
-    cutsHistory       = Array.isArray(s.cutsHistory) ? s.cutsHistory : [];
-    roundCounter      = Number.isFinite(s.roundCounter) ? s.roundCounter : 0;
-    rounds            = Array.isArray(s.rounds) ? s.rounds : [];
-    winsLog           = Array.isArray(s.winsLog) ? s.winsLog : [];
-    lockOrder         = !!s.lockOrder;
-    pruneWins();
-  }catch(e){
-    // If parsing fails, start with defaults
-    players = [
-      {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-      {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
-    ];
-  }
-};
-
-  
-    // If anything goes wrong parsing storage, start fresh with defaults
-    players = [
-      {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-      {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
-    ];
-  }
-};
-
+  const load=()=>{ 
+    try{
+      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+      players = (Array.isArray(s.players) && s.players.length>0) ? s.players : defaultsPlayers();
+      limit = Number.isFinite(s.limit)? s.limit : 100;
+      autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
+      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
+      gameOver = !!s.gameOver;
+      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
+      roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
+      rounds = Array.isArray(s.rounds)? s.rounds : [];
+      winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
+      lockOrder = !!s.lockOrder; pruneWins();
+    }catch(e){
+      players = defaultsPlayers();
+      nextDealerId = players[0]?.id || null;
+    }
+  };
 
   /* ===== render ===== */
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
@@ -494,14 +473,13 @@ const load=()=>{
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* photo -> simple square cropper (existing behavior preserved) */
+  /* photo -> simple square cropper */
   if(photoInput){
     photoInput.removeAttribute('capture');
     photoInput.addEventListener("change", async()=>{
       if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
       const file=photoInput.files[0];
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-      // use offscreen canvas to letterbox to square using center crop (stable + fast)
       const img=new Image(); img.onload=()=>{
         const side=Math.min(img.width,img.height);
         const sx=(img.width-side)/2, sy=(img.height-side)/2;
@@ -558,7 +536,7 @@ const load=()=>{
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
     gameOver=false;
 
-    // Winner check (lowest score, everyone else >= limit+1 OR someone exactly lowest <= limit when others > limit ?)
+    // Winner check
     const alive = players.filter(p=>p.score<=limit);
     if(alive.length===1){
       gameOver=true;
@@ -575,7 +553,7 @@ const load=()=>{
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
     dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
-    const twrap=dlg.querySelector(".table-wrap");
+    const twrap=dlg.querySelector('.table-wrap');
     const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
     trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name}</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
     const tbody=document.createElement('tbody');
@@ -595,7 +573,12 @@ const load=()=>{
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
   bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ 
+      players = defaultsPlayers();
+      limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false;
+      cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[];
+      render();
+    }});
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
@@ -628,7 +611,7 @@ const load=()=>{
   /* CSV */
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
 
-  /* language controls (header pill + settings) */
+  /* language controls (header pill) */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
   $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
   $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
