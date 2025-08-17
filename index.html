@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5" />
-<title>Conga / Chinchón – Alanis Scorekeeper — STAGE v3.4</title>
+<title>Conga / Chinchón – Alanis Scorekeeper — STAGE v3.5.1</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,27 +27,19 @@
   .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:4px}
   .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:9px 12px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
-    color:var(--text); font-weight:700; letter-spacing:.2px; transition:.15s;}
+    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s;}
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
   .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
-  .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
+  .iconbtn{ height:44px; display:inline-grid; grid-auto-flow:column; align-items:center; gap:8px; padding:0 12px;
+    border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
+  .iconbtn .txt{font-size:15px; font-weight:800; letter-spacing:.2px}
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
-  .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
-
-  /* Next-dealer row layout */
-  .nd-grid{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
-  .nd-title{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .nd-actions{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
-  .btn .lockIcon{margin-right:6px}
-  @media (max-width:520px){
-    .nd-grid{grid-template-columns:1fr}
-    .nd-actions{justify-content:flex-start;flex-wrap:wrap}
-  }
-
+  .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+  .players header{ margin:10px 0 6px 2px; color:var(--sub); font-size:12px; }
   .row{
     display:grid;
     grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
@@ -72,14 +64,12 @@
   .banner{ margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
     background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
-
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px; max-height:70vh; overflow:auto }
-  .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
@@ -88,12 +78,13 @@
   input, select, textarea, button { font-size:16px; }
   .switch{display:flex; align-items:center; gap:10px; background:#0f1428; border:1px solid var(--muted); padding:8px 10px; border-radius:12px; height:38px;}
   .grid-rows{ display:grid; gap:6px }
-  .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
+  .round-row{ display:grid; grid-template-columns: 1fr 100px 64px; gap:8px; align-items:center;
     padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
+  .round-row .minus10.active{ outline:2px solid #4ee1a0; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
   .hint{ color:var(--sub); font-size:12px }
   .table-wrap{ overflow:auto; max-height:60vh; border:1px solid rgba(255,255,255,.12); border-radius:12px;}
@@ -114,6 +105,11 @@
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
   .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
   .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
+
+  /* Crop dialog layout + responsive canvas */
+  #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
+  #cropCanvas{width:100%;height:auto;display:block;background:#0b1225;border:1px solid rgba(255,255,255,.12);border-radius:12px}
+  .crop-frame-hint{margin-bottom:6px;color:var(--sub)}
 </style>
 </head>
 <body>
@@ -121,22 +117,18 @@
   <header>
     <div class="top-left">
       <span class="chip">Conga / Chinchón</span>
-      <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.4</span></span>
+      <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.5.1</span></span>
     </div>
     <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
   </header>
 
-  <!-- Next dealer + actions -->
   <section class="card" style="padding:10px; margin-bottom:8px">
-    <div class="nd-grid">
-      <div class="nd-title"><strong>Next dealer:</strong> <span id="nextDealerName">—</span></div>
-      <div class="nd-actions">
-        <button id="lockToggle" class="btn ghost" title="Lock/unlock reordering" aria-label="Lock/unlock">
-          <span class="lockIcon">🔓</span><span class="reorderText">Reorder</span>
-        </button>
-        <button id="historyBtn" class="btn ghost">History</button>
-        <button id="newRoundBtn" class="btn primary">New round</button>
-      </div>
+    <div class="controls">
+      <button id="lockToggle" class="iconbtn" title="Lock/unlock reordering" aria-label="Lock/unlock">
+        🔓 <span class="txt">Reorder</span>
+      </button>
+      <button id="historyBtn" class="btn ghost">History</button>
+      <button id="newRoundBtn" class="btn primary">New round</button>
     </div>
   </section>
 
@@ -147,8 +139,7 @@
   </section>
 
   <section id="banner" class="banner" style="display:none" aria-live="polite">
-    <div><strong id="bannerText">Game over</strong></div>
-    <div class="tag">Game over</div>
+    <div><strong id="bannerText">—</strong></div>
     <div style="margin-left:auto; display:flex; gap:8px">
       <button class="btn success" id="newGameBtn">New game</button>
     </div>
@@ -174,6 +165,7 @@
       <input id="lockOrderSwitch" type="checkbox" />
       <span>Lock player reordering</span>
     </label>
+    <div class="hint">Dealer is shown with a teal ring. Long-press a player (while locked) to set them as next dealer.</div>
     <div style="display:flex; gap:8px; flex-wrap:wrap">
       <button class="btn" id="exportBtn">Export CSV</button>
       <button class="btn ghost" id="resetScoresBtn">Reset scores</button>
@@ -185,10 +177,13 @@
   </div>
 </dialog>
 
-<!-- Round dialog (no cutter section) -->
+<!-- Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
-    <div><div id="roundTitle" style="font-weight:800">New Round</div></div>
+    <div>
+      <div id="roundTitle" style="font-weight:800">New Round</div>
+      <div class="hint">Enter points (negatives OK). “−10” toggles the special cut — only one player may have it.</div>
+    </div>
     <button class="btn ghost" onclick="roundDialog.close()">Close</button>
   </div>
   <form id="roundForm" method="dialog">
@@ -284,9 +279,9 @@
   </div>
   <div class="modal-body">
     <div class="crop-frame-hint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <canvas id="cropCanvas" width="600" height="600" style="touch-action:none; background:#0b1225; border:1px solid rgba(255,255,255,.12); border-radius:12px"></canvas>
+    <canvas id="cropCanvas"></canvas>
     <div class="crop-controls" style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px;">
-      <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1" style="flex:1">
+      <input id="cropZoom" type="range" min="0.5" max="4" step="0.01" value="1" style="flex:1">
       <button class="btn" id="cropReset">Reset</button>
     </div>
   </div>
@@ -295,11 +290,6 @@
     <button class="btn success" id="cropSave">Save</button>
   </div>
 </dialog>
-
-  /* Crop dialog layout + responsive canvas */
-#cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
-#cropCanvas{width:100%;height:auto;display:block}
-.crop-frame-hint{margin-bottom:6px;color:var(--sub)}
 
 <!-- Cut history dialog -->
 <dialog id="historyDialog" aria-labelledby="historyTitle">
@@ -340,7 +330,7 @@
 <input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
-/* === STAGE v3.4 (layout fixes + default 2 players + -10 rule + crop sizing) === */
+/* === STAGE v3.5.1 === */
 (() => {
   "use strict";
   const $ = s => document.querySelector(s);
@@ -353,7 +343,7 @@
   const todayStr=()=> new Date().toISOString().slice(0,10);
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // Viewport zoom control
+  // Viewport zoom control (prevents iOS auto zoom when dialogs open)
   const vp = document.querySelector('meta[name="viewport"]');
   const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5';
   function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
@@ -361,7 +351,7 @@
   const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
 
   // Storage
-  const storageKey="conga_state_stage_v34";
+  const storageKey="conga_state_stage_v351";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
@@ -379,20 +369,6 @@
       lockOrder = !!s.lockOrder; pruneWins();
     }catch(e){ players=[]; } };
 
-  // Ensure we always show at least 2 players on first load
-  function ensureTwoPlayers(){
-    if(players.length < 2){
-      const need = 2 - players.length;
-      for(let i=0;i<need;i++){
-        const idx = players.length + 1;
-        players.push({id:uid(), name:`Player ${idx}`, score:0, reenganches:0, avatar:null});
-      }
-      if(!nextDealerId && players[0]) nextDealerId = players[0].id;
-      gameOver=false;
-      save();
-    }
-  }
-
   // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
   function render(){
@@ -400,21 +376,19 @@
     const autoAdv=$("#autoAdvance"); if(autoAdv) autoAdv.checked=autoAdvanceDealer;
     const lockSwitch=$("#lockOrderSwitch"); if(lockSwitch) lockSwitch.checked=lockOrder;
 
-    const nd=$("#nextDealerName"); if(nd){ const p=players.find(p=>p.id===nextDealerId); nd.textContent=p?(p.name||"—"):"—"; }
     const banner=$("#banner"); if(banner) banner.style.display=gameOver?"":"none";
-    const lockBtn=$("#lockToggle");
-    if(lockBtn){
-      lockBtn.innerHTML = `<span class="lockIcon">${lockOrder ? "🔒" : "🔓"}</span><span class="reorderText">Reorder</span>`;
-      lockBtn.title = lockOrder ? "Unlock to enable reordering" : "Lock to finish reordering";
-      lockBtn.setAttribute("aria-label", lockBtn.title);
-    }
+    const lockBtn=$("#lockToggle"); if(lockBtn){ lockBtn.firstChild.textContent = lockOrder ? "🔒" : "🔓"; lockBtn.title = lockOrder ? "Unlock player order" : "Lock player order"; lockBtn.setAttribute("aria-label", lockBtn.title); }
 
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
-      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder; // drag only when unlocked
-      if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      if(lockOrder){ attachLongPress(n, ()=>openEdit(p.id)); } // edit only when locked
+      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
+      if(!lockOrder){ // drag enabled
+        n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd);
+      }else{
+        // long-press edit only when order is locked
+        attachLongPress(n, ()=>openEdit(p.id));
+      }
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -465,27 +439,22 @@
   // Photo input -> cropper
   if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
 
-  // Round dialog (no cutter UI, with -10 rule)
+  // Round dialog (no cutter selector; -10 toggles, only one allowed)
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
   const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">Current: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10";
+      minus.onclick=()=>{ if(minus.classList.contains('active')){ minus.classList.remove('active'); inp.value=String(clampInt(inp.value||0)+10); } else { minus.classList.add('active'); inp.value=String(clampInt(inp.value||0)-10); } validateRound(); };
       r.append(name,inp,minus); rows.appendChild(r);
     });
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
   function validateRound(){
-    const inputs=roundInputs();
-    // only one exact -10 allowed per round
-    const minus10Count = Object.values(inputs).filter(v=>v===-10).length;
-    if(minus10Count>1){
-      if(rErr){ rErr.textContent="Only one −10 allowed per round."; rErr.style.display=""; }
-      if(applyBtn) applyBtn.disabled=true; 
-      return false;
-    }
+    const activeMinus = Array.from(document.querySelectorAll('.minus10.active')).length;
+    if(activeMinus>1){ if(rErr){ rErr.textContent="Only one player can take −10."; rErr.style.display=""; } if(applyBtn) applyBtn.disabled=true; return false; }
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
   }
 
@@ -554,169 +523,139 @@
   // Confetti
   function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:200},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
 
-  // ===== Image Cropper =====
- function openCropper(dataUrl, targetId){
-  const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
-  if(!dlg || !cvs || !zoom || !saveBtn) return;
+  // ===== Image Cropper (centered circular overlay, responsive) =====
+  function openCropper(dataUrl, targetId){
+    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
+    if(!dlg || !cvs || !zoom || !saveBtn) return;
+    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
 
-  // Responsive square canvas that leaves room for the slider in the dialog
-  const S = Math.min(520, Math.floor(window.innerWidth*0.86), Math.floor(window.innerHeight*0.55));
-  cvs.width = S; cvs.height = S;
+    function sizeCanvasToContainer(){
+      const DPR = window.devicePixelRatio || 1;
+      const rect = cvs.getBoundingClientRect();
+      cvs.width = Math.max(300, Math.floor(rect.width * DPR));
+      cvs.height = Math.max(300, Math.floor((rect.width) * DPR)); // keep it square for a perfect circle
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.scale(DPR, DPR);
+    }
 
-  const ctx = cvs.getContext('2d');
-  let img = new Image();
-  let scale=1, minScale=1;
-  let offX=0, offY=0;
-  let dragging=false, startX=0, startY=0;
-  let pinch=false, pinchStartDist=0, pinchStartScale=1;
+    function circleRadius(){ const rect=cvs.getBoundingClientRect(); return Math.min(rect.width, rect.height)/2 - 16; } // 16px margin
+    function draw(){
+      sizeCanvasToContainer();
+      const rect=cvs.getBoundingClientRect(); const w=rect.width, h=rect.height; const cx=w/2, cy=h/2, r=circleRadius();
+      ctx.clearRect(0,0,w,h);
+      // image
+      ctx.save();
+      ctx.translate(cx + offX, cy + offY);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, -img.width/2, -img.height/2);
+      ctx.restore();
+      // dark outside + ring
+      ctx.save();
+      ctx.fillStyle='rgba(0,0,0,.35)';
+      ctx.beginPath(); ctx.rect(0,0,w,h); ctx.arc(cx,cy,r,0,Math.PI*2,true); ctx.fill('evenodd'); ctx.restore();
+      ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+    }
+    function clamp(){ // keep image covering the circle
+      const rect=cvs.getBoundingClientRect(); const r=circleRadius();
+      const needW = 2*r, needH = 2*r;
+      const w = img.width*scale, h = img.height*scale;
+      const maxX = Math.max(0,(w-needW)/2); const maxY = Math.max(0,(h-needH)/2);
+      offX = Math.min(maxX, Math.max(-maxX, offX));
+      offY = Math.min(maxY, Math.max(-maxY, offY));
+    }
 
-  function drawOverlay(){
-    const cx = cvs.width/2, cy = cvs.height/2;
-    const r  = Math.floor(Math.min(cvs.width, cvs.height) * 0.45);
-    ctx.save();
-    // Dim everything
-    ctx.fillStyle = 'rgba(10,15,30,.45)';
-    ctx.fillRect(0,0,cvs.width,cvs.height);
-    // Cut out a circular window
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
-    // White ring
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'rgba(255,255,255,.9)';
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
-    ctx.restore();
-  }
+    img.onload = ()=>{ sizeCanvasToContainer(); const r=circleRadius(); const need=2*r;
+      const sx = need / img.width; const sy = need / img.height; minScale = Math.max(sx, sy); scale = Math.max(minScale, 1);
+      zoom.min = String(Math.max(0.5, Math.round(minScale*100)/100)); zoom.value = String(scale); offX=0; offY=0; clamp(); draw(); };
+    img.src = dataUrl;
 
-  function draw(){
-    ctx.clearRect(0,0,cvs.width,cvs.height);
-    ctx.save();
-    ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY);
-    ctx.scale(scale, scale);
-    ctx.drawImage(img, -img.width/2, -img.height/2);
-    ctx.restore();
-    drawOverlay();
-  }
+    // Pointer pan
+    cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); });
+    cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); });
+    cvs.addEventListener('pointerup', e=>{ dragging=false; try{cvs.releasePointerCapture(e.pointerId);}catch{} });
+    cvs.addEventListener('pointercancel', ()=> dragging=false);
 
-  function clamp(){
-    const w = img.width*scale, h = img.height*scale;
-    const maxX = Math.max(0,(w-cvs.width)/2);
-    const maxY = Math.max(0,(h-cvs.height)/2);
-    offX = Math.min(maxX, Math.max(-maxX, offX));
-    offY = Math.min(maxY, Math.max(-maxY, offY));
-  }
+    // Touch pinch zoom
+    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:false});
+    cvs.addEventListener('touchmove', (e)=>{
+      if(pinch && e.touches.length===2){
+        e.preventDefault();
+        const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+        const next = pinchStartScale * (dist / pinchStartDist);
+        scale = Math.min(4, Math.max(minScale, next));
+        zoom.value = String(scale);
+        clamp(); draw();
+      }
+    }, {passive:false});
+    cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
 
-  img.onload = ()=>{
-    const sx = cvs.width / img.width;
-    const sy = cvs.height / img.height;
-    minScale = Math.max(sx, sy);
-    scale = minScale;
-    zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100));
-    zoom.value = String(scale);
-    offX=0; offY=0;
-    clamp(); draw();
-  };
-  img.src = dataUrl;
-
-  // Pointer pan
-  const onPointerDown = e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); };
-  const onPointerMove = e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); };
-  const onPointerUp   = e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId);}catch{} };
-  const onPointerCancel=()=>{ dragging=false; };
-
-  cvs.addEventListener('pointerdown', onPointerDown);
-  cvs.addEventListener('pointermove', onPointerMove);
-  cvs.addEventListener('pointerup', onPointerUp);
-  cvs.addEventListener('pointercancel', onPointerCancel);
-
-  // Touch pinch zoom
-  const onTStart = (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale=scale; } };
-  const onTMove  = (e)=>{
-    if(pinch && e.touches.length===2){
+    // Wheel zoom (desktop)
+    const onWheel = (e)=>{
       e.preventDefault();
-      const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-      const next = pinchStartScale * (dist/pinchStartDist);
-      scale = Math.min(3, Math.max(minScale, next));
+      const factor = e.deltaY > 0 ? 0.95 : 1.05;
+      const next = scale * factor;
+      scale = Math.min(4, Math.max(minScale, next));
       zoom.value = String(scale);
       clamp(); draw();
+    };
+    cvs.addEventListener('wheel', onWheel, {passive:false});
+
+    // Slider zoom
+    const onZoom = ()=>{
+      const val = parseFloat(zoom.value || String(scale));
+      scale = Math.min(4, Math.max(minScale, val));
+      clamp(); draw();
+    };
+    zoom.addEventListener('input', onZoom);
+
+    // Reset
+    const onReset = ()=>{
+      const r=circleRadius(); const need=2*r; const sx=need/img.width, sy=need/img.height; minScale=Math.max(sx,sy); scale=minScale;
+      zoom.value = String(scale); offX = 0; offY = 0; clamp(); draw();
+    };
+    resetBtn?.addEventListener('click', onReset);
+
+    // Save -> write avatar
+    const onSave = ()=>{
+      const rect=cvs.getBoundingClientRect(); const r=circleRadius(); const need=2*r;
+      const out = document.createElement('canvas'); out.width = 512; out.height = 512;
+      const octx = out.getContext('2d');
+      // optional: circular clip so PNG outside is transparent
+      octx.save(); octx.beginPath(); octx.arc(out.width/2, out.height/2, out.width/2-2, 0, Math.PI*2); octx.clip();
+      const k = out.width / need; // map circle diameter to output
+      octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
+      octx.scale(scale*k, scale*k);
+      octx.drawImage(img, -img.width/2, -img.height/2);
+      octx.restore();
+
+      const dataOut = out.toDataURL('image/png', 0.92);
+      const p = players.find(x=>x.id===targetId);
+      if (p){ p.avatar = dataOut; render(); save(); }
+      cleanup(); dlg.close();
+    };
+    saveBtn.addEventListener('click', onSave);
+
+    // Cleanup listeners when dialog closes
+    function cleanup(){
+      cvs.removeEventListener('wheel', onWheel);
+      zoom.removeEventListener('input', onZoom);
+      resetBtn?.removeEventListener('click', onReset);
+      saveBtn.removeEventListener('click', onSave);
     }
-  };
-  const onTEnd=()=>{ pinch=false; };
+    dlg.addEventListener('close', cleanup, {once:true});
 
-  cvs.addEventListener('touchstart', onTStart, {passive:false});
-  cvs.addEventListener('touchmove',  onTMove,  {passive:false});
-  cvs.addEventListener('touchend',   onTEnd,   {passive:true});
-
-  // Wheel zoom (desktop)
-  const onWheel = (e)=>{
-    e.preventDefault();
-    const factor = e.deltaY > 0 ? 0.95 : 1.05;
-    const next = scale * factor;
-    scale = Math.min(3, Math.max(minScale, next));
-    zoom.value = String(scale);
-    clamp(); draw();
-  };
-  cvs.addEventListener('wheel', onWheel, {passive:false});
-
-  // Slider zoom
-  const onZoom = ()=>{
-    const val = parseFloat(zoom.value || String(scale));
-    scale = Math.min(3, Math.max(minScale, val));
-    clamp(); draw();
-  };
-  zoom.addEventListener('input', onZoom);
-
-  // Reset
-  const onReset = ()=>{
-    scale = minScale; offX = 0; offY = 0;
-    zoom.value = String(scale);
-    clamp(); draw();
-  };
-  resetBtn?.addEventListener('click', onReset);
-
-  // Save -> write avatar (square export; circle is just a guide)
-  const onSave = ()=>{
-    const out = document.createElement('canvas');
-    out.width = 512; out.height = 512;
-    const k = out.width / cvs.width;
-    const octx = out.getContext('2d');
-    octx.fillStyle = '#0b1225';
-    octx.fillRect(0,0,out.width,out.height);
-    octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
-    octx.scale(scale, scale);
-    octx.drawImage(img, -img.width/2, -img.height/2);
-    const dataOut = out.toDataURL('image/png', 0.92);
-
-    const p = players.find(x=>x.id===targetId);
-    if (p){ p.avatar = dataOut; render(); save(); }
-    cleanup(); dlg.close();
-  };
-  saveBtn.addEventListener('click', onSave);
-
-  // Cleanup
-  function cleanup(){
-    cvs.removeEventListener('pointerdown', onPointerDown);
-    cvs.removeEventListener('pointermove', onPointerMove);
-    cvs.removeEventListener('pointerup', onPointerUp);
-    cvs.removeEventListener('pointercancel', onPointerCancel);
-    cvs.removeEventListener('touchstart', onTStart);
-    cvs.removeEventListener('touchmove', onTMove);
-    cvs.removeEventListener('touchend', onTEnd);
-    cvs.removeEventListener('wheel', onWheel);
-    zoom.removeEventListener('input', onZoom);
-    resetBtn?.removeEventListener('click', onReset);
-    saveBtn.removeEventListener('click', onSave);
+    dlg.showModal(); pulseNoZoom();
   }
-  dlg.addEventListener('close', cleanup, {once:true});
-
-  dlg.showModal(); pulseNoZoom();
-}
-
   // ===== end cropper =====
 
   // Init
   load();
-  ensureTwoPlayers();
+  if(players.length<2){ // ensure at least two players on first run / cleared state
+    players = [];
+    addPlayer("Player 1");
+    addPlayer("Player 2");
+    nextDealerId = players[0].id;
+  }
   render();
 })();
 </script>
