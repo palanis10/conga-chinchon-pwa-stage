@@ -27,39 +27,27 @@
   .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:4px}
   .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 14px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
-    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; display:inline-flex; align-items:center; justify-content:center; gap:8px}
+    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; font-size:clamp(13px, 2.8vw, 16px)}
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
-  .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
+  .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; font-weight:900}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
   .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
-  .iconbtn{ height:44px; display:inline-grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px; padding:0 12px}
+  .iconbtn{ min-width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px; padding:0 12px}
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
 
-  /* Cropper: keep page from scrolling/bouncing while dialog is open */
-body.no-scroll { overflow: hidden; }
-#cropDialog { overscroll-behavior: contain; }
-#cropDialog .modal-body { overflow: visible; } /* canvas area shouldn’t scroll */
-
-  /* Three controls MUST stay on one line */
-  .controls{
-    display:grid;
-    grid-template-columns: repeat(3, minmax(0,1fr));
-    gap:8px; align-items:center;
-  }
-  .controls .btn, .controls .iconbtn{ width:100%; white-space:nowrap; height:40px; }
-  @media (max-width:360px){
-    .controls{ gap:6px }
-    .controls .btn, .controls .iconbtn{ padding:7px 8px; font-size:14px; }
-  }
+  /* Controls row */
+  .controls{display:flex; align-items:center; gap:10px; flex-wrap:nowrap}
+  .controls .iconbtn span{margin-left:8px; font-weight:900}
+  .controls .iconbtn .lock{font-size:18px}
+  .controls .iconbtn{display:flex; align-items:center; gap:8px}
+  .controls .primary{margin-left:auto}
 
   .row{
-    display:grid; grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
-    align-items:center; gap:10px;
-    padding:10px; border-radius:14px;
-    border:1px solid rgba(255,255,255,.06);
+    display:grid; grid-template-columns: 28px 64px 1fr auto; align-items:center; gap:10px;
+    padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px;
   }
@@ -75,56 +63,40 @@ body.no-scroll { overflow: hidden; }
   .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
-  .banner{ margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
-    background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
-  .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
 
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
-    box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+    box-shadow: 0 24px 64px rgba(0,0,0,.55); overscroll-behavior:contain }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px } 
+  .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
-  /* Prevent iOS auto-zoom on focus */
-  input, select, textarea, button { font-size:16px; }
-  .switch{display:flex; align-items:center; gap:10px; background:#0f1428; border:1px solid var(--muted); padding:8px 10px; border-radius:12px; height:38px;}
+  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
+
   .grid-rows{ display:grid; gap:6px }
-  /* Round-row (no cutter column) */
   .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
     padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
-  .error{ color:var(--danger); font-weight:700; margin-right:auto }
-  .hint{ color:var(--sub); font-size:12px }
-  .table-wrap{ overflow:auto; max-height:60vh; border:1px solid rgba(255,255,255,.12); border-radius:12px;}
-  table{ width:max(520px,100%); border-collapse:separate; border-spacing:0; }
-  thead th{ position:sticky; top:0; background:#121633; border-bottom:1px solid rgba(255,255,255,.12); padding:10px; text-align:center; font-weight:800;}
-  tbody td, tbody th{ padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.06); text-align:center; font-variant-numeric:tabular-nums; }
-  tbody tr:nth-child(odd){ background:rgba(255,255,255,.02) }
-  tbody th{ text-align:left; white-space:nowrap; }
 
-  /* WIN OVERLAY */
-  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
-  .win-card{ width:min(560px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
-  .win-head{ display:flex; align-items:center; gap:12px}
-  .win-photo{ width:72px; height:72px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 6px rgba(78,225,160,.25)}
-  .win-photo img{ width:100%; height:100%; object-fit:cover}
-  .win-name{ font-size:22px; font-weight:900}
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
-  .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
-
-  /* Crop dialog layout + responsive canvas */
-  #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
-  #cropCanvas{width:100%;height:auto;display:block;background:#0b1225;border:1px solid rgba(255,255,255,.12);border-radius:12px}
+  /* Crop dialog layout + canvas */
+  #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:hidden}
+  #cropCanvas{width:100%;height:auto;display:block;touch-action:none;background:#0b1225;border:1px solid rgba(255,255,255,.12);border-radius:12px}
   .crop-frame-hint{margin-bottom:6px;color:var(--sub)}
+
+  /* Smol: keep controls on one line */
+  @media (max-width: 420px){
+    .controls .iconbtn{padding:8px 10px}
+    .controls .primary{padding:9px 12px}
+  }
 </style>
 </head>
 <body>
@@ -139,8 +111,10 @@ body.no-scroll { overflow: hidden; }
 
   <section class="card" style="padding:10px; margin-bottom:8px">
     <div class="controls">
-      <button id="lockToggle" class="btn ghost" title="Toggle reordering"><span id="lockGlyph">🔒</span><span>Reorder</span></button>
-      <button id="historyBtn" class="btn ghost">History</button>
+      <button id="lockToggle" class="iconbtn" title="Lock/unlock reordering" aria-label="Lock/unlock">
+        <span class="lock">🔒</span><span>Reorder</span>
+      </button>
+      <button id="historyBtn" class="iconbtn ghost">History</button>
       <button id="newRoundBtn" class="btn primary">New round</button>
     </div>
   </section>
@@ -149,13 +123,6 @@ body.no-scroll { overflow: hidden; }
     <header><div>Players</div></header>
     <div id="playersList" aria-live="polite"></div>
     <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px">+ Add player</button>
-  </section>
-
-  <section id="banner" class="banner" style="display:none" aria-live="polite">
-    <div><strong id="bannerText">Player won</strong></div>
-    <div style="margin-left:auto; display:flex; gap:8px">
-      <button class="btn success" id="newGameBtn">New game</button>
-    </div>
   </section>
 </div>
 
@@ -189,13 +156,10 @@ body.no-scroll { overflow: hidden; }
   </div>
 </dialog>
 
-<!-- Round dialog (no cutter) -->
+<!-- Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
-    <div>
-      <div id="roundTitle" style="font-weight:800">New Round</div>
-      <div class="hint">Enter points (negatives OK). “−10” changes the input.</div>
-    </div>
+    <div class="ver" id="roundTitle" style="font-weight:800; color:var(--text)">New Round</div>
     <button class="btn ghost" onclick="roundDialog.close()">Close</button>
   </div>
   <form id="roundForm" method="dialog">
@@ -257,17 +221,17 @@ body.no-scroll { overflow: hidden; }
 </dialog>
 
 <!-- Win overlay -->
-<div class="win-overlay" id="winOverlay" aria-live="polite">
-  <div class="win-card">
-    <canvas id="confettiCanvas"></canvas>
-    <div class="win-head">
-      <div class="win-photo"><img id="winPhoto" alt=""></div>
+<div class="win-overlay" id="winOverlay" aria-live="polite" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px">
+  <div class="win-card" style="width:min(560px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden">
+    <canvas id="confettiCanvas" style="position:absolute; inset:0; pointer-events:none"></canvas>
+    <div class="win-head" style="display:flex; align-items:center; gap:12px">
+      <div class="win-photo" style="width:72px; height:72px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 6px rgba(78,225,160,.25)"><img id="winPhoto" alt=""></div>
       <div>
-        <div class="win-name" id="winName">Winner</div>
+        <div class="win-name" id="winName" style="font-size:22px; font-weight:900">Winner</div>
         <div class="win-sub" id="winSubtitle">WINNER</div>
       </div>
     </div>
-    <div class="win-actions">
+    <div class="win-actions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap">
       <button class="btn success" id="winCloseBtn">Close</button>
     </div>
   </div>
@@ -286,15 +250,26 @@ body.no-scroll { overflow: hidden; }
   </div>
   <div class="modal-body">
     <div class="crop-frame-hint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <canvas id="cropCanvas"></canvas>
-    <div class="crop-controls" style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px;">
-      <input id="cropZoom" type="range" step="0.01" value="1" style="flex:1">
+    <canvas id="cropCanvas" width="600" height="600"></canvas>
+    <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:2px;">
+      <input id="cropZoom" type="range" min="0.2" max="3" step="0.01" value="1" style="flex:1">
       <button class="btn" id="cropReset">Reset</button>
     </div>
   </div>
   <div class="modal-foot">
     <button class="btn ghost" onclick="cropDialog.close()">Cancel</button>
     <button class="btn success" id="cropSave">Save</button>
+  </div>
+</dialog>
+
+<!-- Rounds history dialog -->
+<dialog id="roundsDialog" aria-labelledby="roundsTitle">
+  <div class="modal-head">
+    <div id="roundsTitle" style="font-weight:800">Rounds history</div>
+    <button class="btn ghost" onclick="roundsDialog.close()">Close</button>
+  </div>
+  <div class="modal-body">
+    <div class="table-wrap"><div id="roundsTableWrap"></div></div>
   </div>
 </dialog>
 
@@ -312,10 +287,8 @@ body.no-scroll { overflow: hidden; }
 </template>
 
 <input id="photoInput" type="file" accept="image/*" hidden>
-<input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
-/* === STAGE v3.5.1 === */
 (() => {
   "use strict";
   const $ = s => document.querySelector(s);
@@ -328,37 +301,42 @@ body.no-scroll { overflow: hidden; }
   const todayStr=()=> new Date().toISOString().slice(0,10);
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // Viewport zoom control (prevents iOS auto zoom when dialogs open)
+  // Viewport zoom control
   const vp = document.querySelector('meta[name="viewport"]');
   const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5';
-  function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
-  function restoreZoom(){ try{ if(!vp) return; vp.setAttribute('content', VP_BASE); }catch{} }
+  function disableAutoZoom(){ try{ vp?.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
+  function restoreZoom(){ try{ vp?.setAttribute('content', VP_BASE); }catch{} }
   const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
 
   // Storage
   const storageKey="conga_state_stage_v351";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=true; // default locked
+  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=true; // start locked by default
+
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
-  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,winsLog,lockOrder})); };
+  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
   const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
       nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
       gameOver = !!s.gameOver;
+      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = typeof s.lockOrder==="boolean" ? s.lockOrder : true;
+      lockOrder = (typeof s.lockOrder==="boolean") ? s.lockOrder : true;
       pruneWins();
-    }catch(e){ players=[]; } };
-
-  // Ensure 2 players on first load
-  function ensureTwoPlayers(){
-    if(players.length===0){ addPlayer("Player 1"); addPlayer("Player 2"); nextDealerId = players[0].id; }
-    else if(players.length===1){ addPlayer("Player 2"); }
-  }
+    }catch(e){ players=[]; }
+    // ensure at least 2 players
+    if(players.length < 2){
+      players = [
+        {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+        {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+      ];
+      nextDealerId = players[0].id;
+    }
+  };
 
   // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
@@ -367,23 +345,24 @@ body.no-scroll { overflow: hidden; }
     const autoAdv=$("#autoAdvance"); if(autoAdv) autoAdv.checked=autoAdvanceDealer;
     const lockSwitch=$("#lockOrderSwitch"); if(lockSwitch) lockSwitch.checked=lockOrder;
 
-    const banner=$("#banner"); if(banner) banner.style.display=gameOver?"":"none";
-    const lockBtn=$("#lockToggle"), lockGlyph=$("#lockGlyph");
-    if(lockBtn && lockGlyph){
-      lockGlyph.textContent = lockOrder ? "🔒" : "🔓";
-      lockBtn.title = lockOrder ? "Unlock to reorder" : "Lock reordering";
-      lockBtn.setAttribute("aria-label", lockBtn.title);
+    const lockBtn=$("#lockToggle");
+    if(lockBtn){
+      lockBtn.querySelector('.lock').textContent = lockOrder ? "🔒" : "🔓";
+      lockBtn.setAttribute("aria-label", lockOrder ? "Locked (tap to unlock)" : "Unlocked (tap to lock)");
+      lockBtn.title = lockBtn.getAttribute("aria-label");
     }
 
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
       n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-      // only allow long-press edit when reordering is LOCKED
-      if(lockOrder){
+      // DnD only when unlocked; long-press edit only when locked
+      if(!lockOrder){
+        n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver);
+        n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd);
+      } else {
         attachLongPress(n, ()=>openEdit(p.id));
       }
-      if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -430,27 +409,43 @@ body.no-scroll { overflow: hidden; }
   });
 
   // Photo input -> cropper
-  if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
+  if(photoInput){
+    photoInput.removeAttribute('capture');
+    photoInput.addEventListener("change", async()=>{
+      if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
+      const file=photoInput.files[0];
+      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+      openCropper(dataUrl, window._photoTarget); window._photoTarget=null;
+    });
+  }
 
-  // Round dialog (no cutter)
+  // Round dialog
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
   const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">Current: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ 
+        const current=clampInt(inp.value===""?0:+inp.value); 
+        inp.value = (current===-10)? 0 : -10; 
+        validateRound(); 
+      };
       r.append(name,inp,minus); rows.appendChild(r);
     });
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
   function validateRound(){
-    const values = Object.values(roundInputs());
-    const countMinus10 = values.filter(v=>v===-10).length;
-    if(countMinus10>1){ if(rErr){ rErr.textContent="Only one player can be −10 in a round."; rErr.style.display=""; } if(applyBtn) applyBtn.disabled=true; return false; }
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
+    const inputs=roundInputs(); 
+    const countMinus10 = Object.values(inputs).filter(v=>v===-10).length;
+    if(countMinus10>1){
+      if(rErr){ rErr.textContent="Only one player can have −10 per round."; rErr.style.display=""; }
+      applyBtn.disabled=true; return false;
+    }
+    if(rErr) rErr.style.display="none"; applyBtn.disabled=false; return true;
   }
 
+  function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
   function applyRound(inputs){
     const snapshotInputs = JSON.parse(JSON.stringify(inputs));
     const roundNo = roundCounter + 1;
@@ -476,19 +471,16 @@ body.no-scroll { overflow: hidden; }
 
     // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
-
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
     gameOver=false; render();
   }
-
-  function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
   // Dialog submit
   if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); if(!validateRound()) return; applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
 
-  function openRoundsTable(){ /* left as-is for stage; omitted to keep file concise */ }
+  function openRoundsTable(){ const wrap=$("#roundsTableWrap"); if(!wrap) return; wrap.innerHTML=""; if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; $("#roundsDialog") && $("#roundsDialog").showModal(); return; } const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px"; const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead); const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); const showTotals = r.totals && typeof r.totals === 'object'; players.forEach(p=>{ const td=document.createElement('td'); const v=showTotals ? r.totals[p.id] : r.inputs[p.id]; td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table); $("#roundsDialog") && $("#roundsDialog").showModal(); }
 
   // Wire-up
   bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); pulseNoZoom(); });
@@ -497,8 +489,8 @@ body.no-scroll { overflow: hidden; }
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt("Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
   bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm("Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
-  bind("#newGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
+  bind("#winCloseBtn","onclick", ()=>{ $("#winOverlay").style.display='none'; });
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
@@ -508,243 +500,161 @@ body.no-scroll { overflow: hidden; }
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  // Win overlay (simple)
-  function showWinOverlay(winner){ const ov=document.getElementById('winOverlay'); if(!ov) return; document.getElementById('winName').textContent = winner?.name || 'Winner'; document.getElementById('winSubtitle').textContent = (winner?.name||'') + ' won'; ov.style.display='flex'; try{ document.getElementById('winSound').play().catch(()=>{});}catch{} startConfetti(); }
-  document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
-
-  // Confetti
+  // Win overlay
+  function showWinOverlay(winner){ const ov=document.getElementById('winOverlay'); if(!ov) return; document.getElementById('winName').textContent = winner?.name || 'Winner'; document.getElementById('winSubtitle').textContent = 'Instant win'; ov.style.display='flex'; try{ document.getElementById('winSound').play().catch(()=>{});}catch{} startConfetti(); }
   function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:200},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
 
-     // ===== Image Cropper (smooth pan/pinch, exact save, outside dimmed) =====
+  // ===== Image Cropper =====
   function openCropper(dataUrl, targetId){
-    const dlg = $('#cropDialog');
-    const cvs = $('#cropCanvas');
-    const zoom = $('#cropZoom');
-    const resetBtn = $('#cropReset');
-    const saveBtn = $('#cropSave');
+    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
     if(!dlg || !cvs || !zoom || !saveBtn) return;
+    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
+    const DPR = window.devicePixelRatio||1;
 
-    // lock page scroll while the modal is open (iOS)
-    document.body.classList.add('no-scroll');
+    // prevent page scroll while cropping
+    const prevOverflowBody = document.body.style.overflow;
+    const prevOverflowHtml = document.documentElement.style.overflow;
+    document.body.style.overflow='hidden'; document.documentElement.style.overflow='hidden';
 
-    const ctx = cvs.getContext('2d', { alpha: true });
-    let img = new Image();
+    function draw(){
+      ctx.clearRect(0,0,cvs.width,cvs.height);
+      // image
+      ctx.save();
+      ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, -img.width/2, -img.height/2);
+      ctx.restore();
 
-    // canvas state (measured in CSS px; we draw with DPR transform)
-    let DPR = window.devicePixelRatio || 1;
-    let cssSize = 0;     // canvas side in CSS px
-    let circleR = 0;     // crop circle radius in CSS px
-    let scale = 1;       // current zoom
-    let minScale = 1;    // min zoom so the circle is fully covered
-    let offX = 0, offY = 0; // pan offsets (CSS px from canvas center)
+      // circular mask: dim outside, keep inside clear
+      const r = Math.min(cvs.width, cvs.height) * 0.36 + Math.min(cvs.width, cvs.height) * 0.14; // nice large circle
+      const cx = cvs.width/2, cy = cvs.height/2;
 
-    // gesture state
-    let dragging = false, pinching = false;
-    let startX = 0, startY = 0;
-    let pinchStartDist = 0, pinchStartScale = 1;
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';               // dim
+      ctx.fillRect(0,0,cvs.width,cvs.height);           // cover all
+      ctx.globalCompositeOperation = 'destination-out'; // punch a hole
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
 
-    // RAF renderer
-    let rafId = 0, needsDraw = true;
-    const requestDraw = () => { if(!rafId) rafId = requestAnimationFrame(tick); };
-    const tick = () => { rafId = 0; if(needsDraw){ needsDraw=false; draw(); } };
-
-    function sizeCanvas(){
-      const rect = cvs.getBoundingClientRect();
-      cssSize = Math.max(280, Math.floor(rect.width || 600)); // responsive square
-      cvs.width = Math.floor(cssSize * DPR);
-      cvs.height = Math.floor(cssSize * DPR);
-      ctx.setTransform(DPR,0,0,DPR,0,0); // draw in CSS px regardless of DPR
-      circleR = cssSize/2 - 24;          // leave room for the white ring
+      // white ring
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.92)'; ctx.stroke();
+      ctx.restore();
     }
 
-    function clampPan(){
-      const w = img.width * scale;
-      const h = img.height * scale;
-      const maxX = Math.max(0, w/2 - circleR);
-      const maxY = Math.max(0, h/2 - circleR);
+    function clamp(){ // keep image covering generously (but allow gaps if user wants)
+      const w = img.width*scale, h = img.height*scale;
+      const maxX = (w+cvs.width)/2, maxY = (h+cvs.height)/2; // generous bounds
       offX = Math.min(maxX, Math.max(-maxX, offX));
       offY = Math.min(maxY, Math.max(-maxY, offY));
     }
 
-    function draw(){
-      // draw image
-      ctx.clearRect(0,0,cssSize,cssSize);
-      ctx.save();
-      ctx.translate(cssSize/2 + offX, cssSize/2 + offY);
-      ctx.scale(scale, scale);
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, -img.width/2, -img.height/2);
-      ctx.restore();
-
-      // dim outside the circle
-      ctx.save();
-      ctx.fillStyle = 'rgba(0,0,0,.50)';
-      ctx.fillRect(0,0,cssSize,cssSize);
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      // white circle ring
-      ctx.strokeStyle = 'rgba(255,255,255,.98)';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.stroke();
-    }
-
-    // init once image is ready
     img.onload = ()=>{
-      sizeCanvas();
-      // Fit by the circle (not by canvas edge): min scale must cover circle diameter
-      minScale = Math.max((2*circleR)/img.width, (2*circleR)/img.height);
-      scale = minScale;
-      offX = 0; offY = 0;
-
-      zoom.min = String(minScale.toFixed(2));
-      zoom.max = String((minScale*3).toFixed(2));
-      zoom.value = String(scale.toFixed(2));
-
-      clampPan(); needsDraw = true; requestDraw();
+      // start less zoomed (fit inside)
+      const sx = cvs.width / img.width;
+      const sy = cvs.height / img.height;
+      const contain = Math.min(sx, sy);
+      minScale = contain;
+      scale = contain;
+      zoom.min = String(Math.max(0.2, Math.round(minScale*100)/100));
+      zoom.value = String(scale);
+      offX=0; offY=0; clamp(); draw();
     };
     img.src = dataUrl;
 
-    // Controls
-    const onPointerDown = (e) => {
-      e.preventDefault();
-      if(pinching) return;
-      dragging = true; startX = e.clientX; startY = e.clientY;
-      cvs.setPointerCapture?.(e.pointerId);
-    };
-    const onPointerMove = (e) => {
-      if(!dragging || pinching) return;
-      e.preventDefault();
-      offX += (e.clientX - startX);
-      offY += (e.clientY - startY);
-      startX = e.clientX; startY = e.clientY;
-      clampPan(); needsDraw=true; requestDraw();
-    };
-    const onPointerUp = (e) => { dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} };
-    const onPointerCancel = () => { dragging=false; };
+    // Pointer pan
+    cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture?.(e.pointerId); });
+    cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); });
+    const endPtr = e=>{ dragging=false; try{ cvs.releasePointerCapture?.(e.pointerId); }catch{} };
+    cvs.addEventListener('pointerup', endPtr); cvs.addEventListener('pointercancel', endPtr);
 
-    const onTouchStart = (e) => {
-      if(e.touches.length===2){
-        pinching = true; dragging = false;
-        pinchStartDist = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        pinchStartScale = scale;
+    // Touch pinch zoom
+    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:true});
+    cvs.addEventListener('touchmove', (e)=>{
+      if(pinch && e.touches.length===2){
+        e.preventDefault();
+        const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+        const next = pinchStartScale * (dist / pinchStartDist);
+        scale = Math.min(3, Math.max(minScale, next));
+        zoom.value = String(scale);
+        clamp(); draw();
       }
-    };
-    const onTouchMove = (e) => {
-      if(pinching && e.touches.length===2){
-        e.preventDefault(); // stop page scroll
-        const d = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        scale = Math.min(minScale*3, Math.max(minScale, pinchStartScale * (d/pinchStartDist)));
-        zoom.value = String(scale.toFixed(2));
-        clampPan(); needsDraw=true; requestDraw();
-      }
-    };
-    const onTouchEnd = () => { pinching = false; };
+    }, {passive:false});
+    cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
 
-    const onWheel = (e) => {
+    // Wheel zoom (desktop)
+    const onWheel = (e)=>{
       e.preventDefault();
-      const next = scale * (e.deltaY > 0 ? 0.95 : 1.05);
-      scale = Math.min(minScale*3, Math.max(minScale, next));
-      zoom.value = String(scale.toFixed(2));
-      clampPan(); needsDraw=true; requestDraw();
+      const factor = e.deltaY > 0 ? 0.95 : 1.05;
+      const next = scale * factor;
+      scale = Math.min(3, Math.max(minScale, next));
+      zoom.value = String(scale);
+      clamp(); draw();
     };
+    cvs.addEventListener('wheel', onWheel, {passive:false});
 
-    const onZoom = () => {
-      const v = parseFloat(zoom.value || String(scale));
-      scale = Math.min(minScale*3, Math.max(minScale, v));
-      clampPan(); needsDraw=true; requestDraw();
+    // Slider zoom
+    const onZoom = ()=>{
+      const val = parseFloat(zoom.value || String(scale));
+      scale = Math.min(3, Math.max(minScale, val));
+      clamp(); draw();
     };
+    zoom.addEventListener('input', onZoom);
 
-    const onReset = () => {
-      scale = minScale; offX = 0; offY = 0;
-      zoom.value = String(scale.toFixed(2));
-      clampPan(); needsDraw=true; requestDraw();
+    // Reset
+    const onReset = ()=>{
+      scale = minScale; offX = 0; offY = 0; zoom.value = String(scale); clamp(); draw();
     };
+    resetBtn?.addEventListener('click', onReset);
 
-    const onSave = () => {
-      // Export exactly what you see, to a circular PNG avatar
+    // Save -> write avatar
+    const onSave = ()=>{
       const out = document.createElement('canvas');
       out.width = 512; out.height = 512;
       const octx = out.getContext('2d');
 
-      // clip to a circle
-      octx.save();
-      octx.beginPath(); octx.arc(out.width/2, out.height/2, out.width/2, 0, Math.PI*2); octx.clip();
+      // translate offsets into output space
+      const kx = out.width / cvs.width;
+      const ky = out.height / cvs.height;
+      const s = scale * kx; // square canvases -> same factor; use kx
 
-      // map CSS px -> output px
-      const ratio = out.width / cssSize;
-
-      // use the SAME transform as preview
-      octx.setTransform(
-        scale, 0, 0, scale,
-        out.width/2 + offX*ratio,
-        out.height/2 + offY*ratio
-      );
-      octx.imageSmoothingEnabled = true;
-      octx.imageSmoothingQuality = 'high';
+      octx.fillStyle = '#0b1225';
+      octx.fillRect(0,0,out.width,out.height);
+      octx.translate(out.width/2 + offX*kx, out.height/2 + offY*ky);
+      octx.scale(s, s);
       octx.drawImage(img, -img.width/2, -img.height/2);
-      octx.restore();
 
       const dataOut = out.toDataURL('image/png', 0.92);
       const p = players.find(x=>x.id===targetId);
       if (p){ p.avatar = dataOut; render(); save(); }
       cleanup(); dlg.close();
     };
+    saveBtn.addEventListener('click', onSave);
 
     function cleanup(){
-      cvs.removeEventListener('pointerdown', onPointerDown);
-      cvs.removeEventListener('pointermove', onPointerMove);
-      cvs.removeEventListener('pointerup', onPointerUp);
-      cvs.removeEventListener('pointercancel', onPointerCancel);
-      cvs.removeEventListener('touchstart', onTouchStart);
-      cvs.removeEventListener('touchmove', onTouchMove);
-      cvs.removeEventListener('touchend', onTouchEnd);
+      cvs.removeEventListener('pointerdown', ()=>{});
+      cvs.removeEventListener('pointermove', ()=>{});
+      cvs.removeEventListener('pointerup', ()=>{});
+      cvs.removeEventListener('pointercancel', ()=>{});
+      cvs.removeEventListener('touchstart', ()=>{});
+      cvs.removeEventListener('touchmove', ()=>{});
+      cvs.removeEventListener('touchend', ()=>{});
       cvs.removeEventListener('wheel', onWheel);
       zoom.removeEventListener('input', onZoom);
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
-      window.removeEventListener('resize', onResize, {passive:true});
-
-      // unlock page scroll
-      document.body.classList.remove('no-scroll');
+      // restore scroll
+      document.body.style.overflow = prevOverflowBody;
+      document.documentElement.style.overflow = prevOverflowHtml;
     }
-
-    function onResize(){
-      sizeCanvas(); clampPan(); needsDraw=true; requestDraw();
-    }
-
-    // listeners (non-passive where we call preventDefault)
-    cvs.addEventListener('pointerdown', onPointerDown, {passive:false});
-    cvs.addEventListener('pointermove', onPointerMove, {passive:false});
-    cvs.addEventListener('pointerup', onPointerUp, {passive:false});
-    cvs.addEventListener('pointercancel', onPointerCancel, {passive:false});
-    cvs.addEventListener('touchstart', onTouchStart, {passive:true});
-    cvs.addEventListener('touchmove', onTouchMove, {passive:false});
-    cvs.addEventListener('touchend', onTouchEnd, {passive:true});
-    cvs.addEventListener('wheel', onWheel, {passive:false});
-    zoom.addEventListener('input', onZoom);
-    resetBtn?.addEventListener('click', onReset);
-    saveBtn.addEventListener('click', onSave);
-    window.addEventListener('resize', onResize, {passive:true});
-
     dlg.addEventListener('close', cleanup, {once:true});
     dlg.showModal(); pulseNoZoom();
   }
   // ===== end cropper =====
 
-
-
   // Init
   load();
-  ensureTwoPlayers();
   render();
 })();
 </script>
