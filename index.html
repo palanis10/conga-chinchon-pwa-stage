@@ -510,165 +510,207 @@
   // Confetti
   function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:200},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
 
-  // ===== Image Cropper (circle-aware min zoom) =====
+   // ===== Image Cropper (smooth + accurate save) =====
   function openCropper(dataUrl, targetId){
     const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
     if(!dlg || !cvs || !zoom || !saveBtn) return;
+
     const ctx = cvs.getContext('2d');
     let img = new Image();
-    let scale=1, minScale=1, offX=0, offY=0;
-    let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
-    let circleR=0, cssSize=0, DPR=window.devicePixelRatio||1;
+
+    // state in CSS px (not device px)
+    let cssSize = 0, DPR = window.devicePixelRatio || 1;
+    let circleR = 0;                // crop circle radius in CSS px
+    let scale = 1, minScale = 1;    // zoom
+    let offX = 0, offY = 0;         // pan
+    let dragging = false, pinching = false;
+    let startX = 0, startY = 0;
+    let pinchStartDist = 0, pinchStartScale = 1;
+
+    // RAF renderer
+    let rafId = 0, dirty = true;
+    function requestDraw(){ if(!rafId){ rafId = requestAnimationFrame(()=>{ rafId = 0; if(dirty){ dirty=false; draw(); } }); } }
 
     function sizeCanvas(){
+      // square canvas that follows available width in the dialog
       const rect = cvs.getBoundingClientRect();
-      cssSize = Math.floor(rect.width || 600);
-      const px = cssSize * DPR;
-      cvs.width = px; cvs.height = px;
-      // draw in CSS pixels (not raw device px)
-      ctx.setTransform(DPR,0,0,DPR,0,0);
-      // circle radius with a little margin for the stroke
-      circleR = cssSize/2 - 24;
+      cssSize = Math.max(260, Math.floor(rect.width || 600));
+      cvs.width  = Math.floor(cssSize * DPR);
+      cvs.height = Math.floor(cssSize * DPR);
+      ctx.setTransform(DPR,0,0,DPR,0,0); // draw in CSS px
+      circleR = cssSize/2 - 24;          // leave room for ring stroke
     }
 
     function draw(){
-      ctx.clearRect(0,0,cssSize,cssSize);
       // image
+      ctx.clearRect(0,0,cssSize,cssSize);
       ctx.save();
       ctx.translate(cssSize/2 + offX, cssSize/2 + offY);
       ctx.scale(scale, scale);
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, -img.width/2, -img.height/2);
       ctx.restore();
 
-      // darken outside the circle
+      // dim outside circle
       ctx.fillStyle='rgba(0,0,0,.45)';
       ctx.fillRect(0,0,cssSize,cssSize);
       ctx.globalCompositeOperation='destination-out';
       ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.fill();
       ctx.globalCompositeOperation='source-over';
-      // ring
-      ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=3;
+
+      // white ring
+      ctx.strokeStyle='rgba(255,255,255,.98)'; ctx.lineWidth=3;
       ctx.beginPath(); ctx.arc(cssSize/2, cssSize/2, circleR, 0, Math.PI*2); ctx.stroke();
     }
 
-    function clamp(){
-      const w = img.width*scale;
-      const h = img.height*scale;
+    function clampPan(){
+      const w = img.width  * scale;
+      const h = img.height * scale;
       const maxX = Math.max(0, (w/2 - circleR));
       const maxY = Math.max(0, (h/2 - circleR));
       offX = Math.min(maxX, Math.max(-maxX, offX));
       offY = Math.min(maxY, Math.max(-maxY, offY));
     }
 
+    // Init after image loads
     img.onload = ()=>{
       sizeCanvas();
-      // minimum scale so the image fully covers the circle (not the whole canvas)
       minScale = Math.max((2*circleR)/img.width, (2*circleR)/img.height);
       scale = minScale;
-      // slider range around minScale
+      offX = 0; offY = 0;
+
+      // slider follows min/max zoom
       zoom.min = String(minScale.toFixed(2));
       zoom.max = String((minScale*3).toFixed(2));
       zoom.value = String(scale.toFixed(2));
-      offX=0; offY=0; clamp(); draw();
+
+      clampPan(); dirty=true; requestDraw();
     };
     img.src = dataUrl;
 
-    window.addEventListener('resize', ()=>{ sizeCanvas(); clamp(); draw(); }, {passive:true});
+    // Handlers
+    const onPointerDown = e => {
+      if(pinching) return; // ignore pan while pinching
+      dragging = true; startX = e.clientX; startY = e.clientY;
+      cvs.setPointerCapture?.(e.pointerId);
+    };
+    const onPointerMove = e => {
+      if(!dragging || pinching) return;
+      offX += (e.clientX - startX);
+      offY += (e.clientY - startY);
+      startX = e.clientX; startY = e.clientY;
+      clampPan(); dirty=true; requestDraw();
+    };
+    const onPointerUp = e => { dragging = false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} };
+    const onPointerCancel = ()=>{ dragging = false; };
 
-    // Pointer pan
-    const pointerDown = e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture?.(e.pointerId); };
-    const pointerMove = e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); };
-    const pointerUp   = e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} };
-    const pointerCancel=()=>{ dragging=false; };
-
-    // Touch pinch zoom
-    function tstart(e){ if(e.touches.length===2){ pinch=true; pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale=scale; } }
-    function tmove(e){
-      if(pinch && e.touches.length===2){
+    const onTouchStart = e=>{
+      if(e.touches.length===2){
+        pinching = true; dragging = false; // stop pan immediately
+        pinchStartDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        pinchStartScale = scale;
+      }
+    };
+    const onTouchMove = e=>{
+      if(pinching && e.touches.length===2){
         e.preventDefault();
-        const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-        const next = pinchStartScale * (dist/pinchStartDist);
+        const d = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const next = pinchStartScale * (d / pinchStartDist);
         scale = Math.min(minScale*3, Math.max(minScale, next));
         zoom.value = String(scale.toFixed(2));
-        clamp(); draw();
+        clampPan(); dirty=true; requestDraw();
       }
-    }
-    function tend(){ pinch=false; }
+    };
+    const onTouchEnd = ()=>{ pinching = false; };
 
-    // Wheel zoom (desktop)
-    const onWheel = (e)=>{
+    const onWheel = e=>{
       e.preventDefault();
-      const factor = e.deltaY > 0 ? 0.95 : 1.05;
-      const next = scale * factor;
+      const next = scale * (e.deltaY > 0 ? 0.95 : 1.05);
       scale = Math.min(minScale*3, Math.max(minScale, next));
       zoom.value = String(scale.toFixed(2));
-      clamp(); draw();
+      clampPan(); dirty=true; requestDraw();
     };
 
-    // Slider zoom
     const onZoom = ()=>{
-      const val = parseFloat(zoom.value || String(scale));
-      scale = Math.min(minScale*3, Math.max(minScale, val));
-      clamp(); draw();
+      const v = parseFloat(zoom.value || String(scale));
+      scale = Math.min(minScale*3, Math.max(minScale, v));
+      clampPan(); dirty=true; requestDraw();
     };
 
-    // Reset
     const onReset = ()=>{
       scale = minScale; offX = 0; offY = 0;
       zoom.value = String(scale.toFixed(2));
-      clamp(); draw();
+      clampPan(); dirty=true; requestDraw();
     };
 
-    // Save -> write avatar
     const onSave = ()=>{
+      // Export exact view to a circular PNG that matches the preview
       const out = document.createElement('canvas');
       out.width = 512; out.height = 512;
       const octx = out.getContext('2d');
-      // draw in CSS pixel space -> map offsets by cssSize
-      const k = out.width / cssSize;
-      octx.fillStyle = '#0b1225'; octx.fillRect(0,0,out.width,out.height);
-      octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
-      octx.scale(scale, scale);
-      octx.drawImage(img, -img.width/2, -img.height/2);
-      const dataOut = out.toDataURL('image/png', 0.92);
+      const ratio = out.width / cssSize; // CSS px -> output px
 
+      // circular clip
+      octx.save();
+      octx.beginPath();
+      octx.arc(out.width/2, out.height/2, out.width/2, 0, Math.PI*2);
+      octx.clip();
+
+      // draw with same transform mapping
+      octx.translate(out.width/2 + offX*ratio, out.height/2 + offY*ratio);
+      octx.scale(scale, scale);
+      octx.imageSmoothingQuality = 'high';
+      octx.drawImage(img, -img.width/2, -img.height/2);
+      octx.restore();
+
+      const dataOut = out.toDataURL('image/png', 0.92);
       const p = players.find(x=>x.id===targetId);
       if (p){ p.avatar = dataOut; render(); save(); }
-      cleanup();
-      dlg.close();
+      cleanup(); dlg.close();
     };
 
     function cleanup(){
-      cvs.removeEventListener('pointerdown', pointerDown);
-      cvs.removeEventListener('pointermove', pointerMove);
-      cvs.removeEventListener('pointerup', pointerUp);
-      cvs.removeEventListener('pointercancel', pointerCancel);
-      cvs.removeEventListener('touchstart', tstart);
-      cvs.removeEventListener('touchmove', tmove);
-      cvs.removeEventListener('touchend', tend);
+      cvs.removeEventListener('pointerdown', onPointerDown);
+      cvs.removeEventListener('pointermove', onPointerMove);
+      cvs.removeEventListener('pointerup', onPointerUp);
+      cvs.removeEventListener('pointercancel', onPointerCancel);
+      cvs.removeEventListener('touchstart', onTouchStart);
+      cvs.removeEventListener('touchmove', onTouchMove);
+      cvs.removeEventListener('touchend', onTouchEnd);
       cvs.removeEventListener('wheel', onWheel);
       zoom.removeEventListener('input', onZoom);
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
-      window.removeEventListener('resize', ()=>{});
+      window.removeEventListener('resize', onResize, {passive:true});
     }
 
-    cvs.addEventListener('pointerdown', pointerDown);
-    cvs.addEventListener('pointermove', pointerMove);
-    cvs.addEventListener('pointerup', pointerUp);
-    cvs.addEventListener('pointercancel', pointerCancel);
-    cvs.addEventListener('touchstart', tstart, {passive:false});
-    cvs.addEventListener('touchmove', tmove, {passive:false});
-    cvs.addEventListener('touchend', tend, {passive:true});
+    function onResize(){ sizeCanvas(); clampPan(); dirty=true; requestDraw(); }
+
+    // wire up
+    cvs.addEventListener('pointerdown', onPointerDown);
+    cvs.addEventListener('pointermove', onPointerMove);
+    cvs.addEventListener('pointerup', onPointerUp);
+    cvs.addEventListener('pointercancel', onPointerCancel);
+    cvs.addEventListener('touchstart', onTouchStart, {passive:true});
+    cvs.addEventListener('touchmove', onTouchMove, {passive:false});
+    cvs.addEventListener('touchend', onTouchEnd, {passive:true});
     cvs.addEventListener('wheel', onWheel, {passive:false});
     zoom.addEventListener('input', onZoom);
     resetBtn?.addEventListener('click', onReset);
     saveBtn.addEventListener('click', onSave);
+    window.addEventListener('resize', onResize, {passive:true});
 
     dlg.addEventListener('close', cleanup, {once:true});
     dlg.showModal(); pulseNoZoom();
   }
   // ===== end cropper =====
+
 
   // Init
   load();
