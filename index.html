@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.6</title>
+<title>Conga by Alanis — STAGE v3.5.7</title>
 
 <!-- Prevent double-tap zoom / weird text scaling on iOS -->
 <style>
@@ -77,6 +77,30 @@
   }
   .icon{width:22px;height:22px;filter:invert(92%) sepia(6%) saturate(245%) hue-rotate(188deg) brightness(104%) contrast(93%)}
 
+      /* === v3.5.7 HOTFIX: header/chips sizing & spacing === */
+.header{
+  grid-template-columns: minmax(0,1fr) auto auto;
+  align-items: center;
+}
+.title{
+  /* keep on one line and scale sanely on small phones */
+  font-size: clamp(18px, 6vw, 26px);
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.stage{ margin-top: 2px; font-size: clamp(12px, 2.8vw, 14px); }
+
+.lang-wrap{ transform: translateY(-2px); }
+
+.controls{ margin-top: 6px; padding: 10px; gap: 10px; }
+.chip{ padding: 10px 12px; font-size: clamp(13px, 3.6vw, 16px); }
+.chip.solid{ padding: 10px 12px; }
+
+.add{ gap: 8px; }            /* fixes “+Add player” tight spacing */
+.avatar{ width: 58px; height: 58px; }   /* slightly smaller on compact widths */
+.name, .score{ font-size: clamp(18px, 5.2vw, 24px); }
+
+      
   /* Controls row */
   .controls{
     margin-top:8px;
@@ -188,7 +212,7 @@
     <button id="settingsBtn" class="icon-btn gear" aria-label="Settings">
       <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14,12.94a7.43,7.43,0,0,0,.05-1,7.43,7.43,0,0,0-.05-1l2.11-1.65a.5.5,0,0,0,.12-.64l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.28,7.28,0,0,0-1.73-1L13.5,2.5a.5.5,0,0,0-.5-.5H11a.5.5,0,0,0-.5.5L10,4.97a7.28,7.28,0,0,0-1.73,1l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.64L3.86,10a7.43,7.43,0,0,0-.05,1,7.43,7.43,0,0,0,.05,1L1.75,13.65a.5.5,0,0,0-.12.64l2,3.46a.5.5,0,0,0,.6.22l2.49-1a7.28,7.28,0,0,0,1.73,1L10,21.5a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5l.5-2.47a7.28,7.28,0,0,0,1.73-1l2.49,1a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0-.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
     </button>
-    <div class="stage">STAGE v3.5.6</div>
+    <div class="stage">STAGE v3.5.7</div>
   </header>
 
   <!-- Controls -->
