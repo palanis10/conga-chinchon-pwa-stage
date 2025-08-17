@@ -25,19 +25,29 @@
   .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:3px 10px; border-radius:999px; font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.6px;}
   .brand{opacity:.95; font-weight:900; letter-spacing:.2px; font-size: clamp(16px, 4vw, 22px);} 
   .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:4px}
-
   .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:9px 12px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
-    color:var(--text); font-weight:700; letter-spacing:.2px; transition:.15s; white-space:nowrap}
+    color:var(--text); font-weight:700; letter-spacing:.2px; transition:.15s;}
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
-  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.25);} 
+  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
   .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
+
+  /* Next-dealer row layout */
+  .nd-grid{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
+  .nd-title{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nd-actions{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+  .btn .lockIcon{margin-right:6px}
+  @media (max-width:520px){
+    .nd-grid{grid-template-columns:1fr}
+    .nd-actions{justify-content:flex-start;flex-wrap:wrap}
+  }
+
   .row{
     display:grid;
     grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
@@ -63,21 +73,13 @@
     background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
 
-  /* Next-dealer row layout */
-.nd-grid{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px}
-.nd-title{min-width:0;white-space:normal}
-.nd-actions{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
-@media (max-width:420px){
-  .nd-grid{grid-template-columns:1fr}
-  .nd-actions{justify-content:flex-start;flex-wrap:wrap}
-}
-
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px; max-height:70vh; overflow:auto }
+  .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
@@ -86,15 +88,12 @@
   input, select, textarea, button { font-size:16px; }
   .switch{display:flex; align-items:center; gap:10px; background:#0f1428; border:1px solid var(--muted); padding:8px 10px; border-radius:12px; height:38px;}
   .grid-rows{ display:grid; gap:6px }
-
-  /* round row (no cutter column) */
   .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
     padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
-
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
   .hint{ color:var(--sub); font-size:12px }
   .table-wrap{ overflow:auto; max-height:60vh; border:1px solid rgba(255,255,255,.12); border-radius:12px;}
@@ -115,15 +114,6 @@
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
   .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
   .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
-
-  /* ===== Crop dialog responsive sizing ===== */
-  #cropDialog{ width:min(560px,96vw); max-height:92vh; }
-  #cropDialog .modal-body{ max-height:calc(92vh - 140px); overflow:hidden; }
-  #cropCanvas{
-    width:min(86vw, calc(92vh - 220px), 540px);
-    height:auto; aspect-ratio:1 / 1; display:block;
-    background:#0b1225; border:1px solid rgba(255,255,255,.12); border-radius:12px
-  }
 </style>
 </head>
 <body>
@@ -136,21 +126,19 @@
     <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
   </header>
 
- <section class="card" style="padding:10px; margin-bottom:8px">
-  <div class="nd-grid">
-    <div class="nd-title">
-      <strong>Next dealer:</strong> <span id="nextDealerName">—</span>
+  <!-- Next dealer + actions -->
+  <section class="card" style="padding:10px; margin-bottom:8px">
+    <div class="nd-grid">
+      <div class="nd-title"><strong>Next dealer:</strong> <span id="nextDealerName">—</span></div>
+      <div class="nd-actions">
+        <button id="lockToggle" class="btn ghost" title="Lock/unlock reordering" aria-label="Lock/unlock">
+          <span class="lockIcon">🔓</span><span class="reorderText">Reorder</span>
+        </button>
+        <button id="historyBtn" class="btn ghost">History</button>
+        <button id="newRoundBtn" class="btn primary">New round</button>
+      </div>
     </div>
-
-    <div class="nd-actions">
-      <button id="lockToggle" class="btn ghost" title="Lock/unlock reordering" aria-label="Lock/unlock">
-        <span class="lockIcon">🔓</span> <span class="reorderText">Reorder</span>
-      </button>
-      <button id="historyBtn" class="btn ghost">History</button>
-      <button id="newRoundBtn" class="btn primary">New round</button>
-    </div>
-  </div>
-</section>
+  </section>
 
   <section class="players">
     <header><div>Players</div></header>
@@ -159,8 +147,8 @@
   </section>
 
   <section id="banner" class="banner" style="display:none" aria-live="polite">
-    <div><strong id="bannerText">—</strong></div>
-    <div class="tag" id="bannerTag">Winner</div>
+    <div><strong id="bannerText">Game over</strong></div>
+    <div class="tag">Game over</div>
     <div style="margin-left:auto; display:flex; gap:8px">
       <button class="btn success" id="newGameBtn">New game</button>
     </div>
@@ -186,7 +174,6 @@
       <input id="lockOrderSwitch" type="checkbox" />
       <span>Lock player reordering</span>
     </label>
-    <div class="hint">Tip: Long-press a player row to Edit and set the dealer (when reordering is locked).</div>
     <div style="display:flex; gap:8px; flex-wrap:wrap">
       <button class="btn" id="exportBtn">Export CSV</button>
       <button class="btn ghost" id="resetScoresBtn">Reset scores</button>
@@ -198,13 +185,10 @@
   </div>
 </dialog>
 
-<!-- Round dialog -->
+<!-- Round dialog (no cutter section) -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
-    <div>
-      <div id="roundTitle" style="font-weight:800">New Round</div>
-      <div class="hint">Enter points (negatives OK). Only one “−10” allowed per round.</div>
-    </div>
+    <div><div id="roundTitle" style="font-weight:800">New Round</div></div>
     <button class="btn ghost" onclick="roundDialog.close()">Close</button>
   </div>
   <form id="roundForm" method="dialog">
@@ -250,6 +234,7 @@
             <div style="display:flex; gap:8px; flex-wrap:wrap">
               <button type="button" class="btn" id="changePhotoBtn">Change photo</button>
               <button type="button" class="btn ghost" id="removePhotoBtn">Remove photo</button>
+              <button type="button" class="btn ghost" id="viewHistoryBtn">View cut history</button>
             </div>
           </div>
           <label class="switch" style="display:flex; align-items:center; gap:10px">
@@ -299,7 +284,7 @@
   </div>
   <div class="modal-body">
     <div class="crop-frame-hint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <canvas id="cropCanvas" width="600" height="600"></canvas>
+    <canvas id="cropCanvas" width="600" height="600" style="touch-action:none; background:#0b1225; border:1px solid rgba(255,255,255,.12); border-radius:12px"></canvas>
     <div class="crop-controls" style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px;">
       <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1" style="flex:1">
       <button class="btn" id="cropReset">Reset</button>
@@ -308,6 +293,17 @@
   <div class="modal-foot">
     <button class="btn ghost" onclick="cropDialog.close()">Cancel</button>
     <button class="btn success" id="cropSave">Save</button>
+  </div>
+</dialog>
+
+<!-- Cut history dialog -->
+<dialog id="historyDialog" aria-labelledby="historyTitle">
+  <div class="modal-head">
+    <div id="historyTitle" style="font-weight:800">Cut history</div>
+    <button class="btn ghost" onclick="historyDialog.close()">Close</button>
+  </div>
+  <div class="modal-body">
+    <div class="history-list" id="historyList" style="display:grid; gap:8px; max-height:50vh; overflow:auto;"></div>
   </div>
 </dialog>
 
@@ -339,7 +335,7 @@
 <input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
-/* === STAGE v3.4 (UI tweaks + iOS zoom guard + cropper fit + rules update) === */
+/* === STAGE v3.4 (layout fixes + default 2 players + -10 rule + crop sizing) === */
 (() => {
   "use strict";
   const $ = s => document.querySelector(s);
@@ -352,7 +348,7 @@
   const todayStr=()=> new Date().toISOString().slice(0,10);
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // Viewport zoom control (prevents iOS auto zoom when dialogs open)
+  // Viewport zoom control
   const vp = document.querySelector('meta[name="viewport"]');
   const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5';
   function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
@@ -362,31 +358,35 @@
   // Storage
   const storageKey="conga_state_stage_v34";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=true; // start locked
+  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
-  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,winsLog,lockOrder})); };
-  const load=()=>{ try{
-      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
+  const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
-      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : null;
+      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
       gameOver = !!s.gameOver;
+      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = typeof s.lockOrder==="boolean" ? s.lockOrder : true;
-    }catch(e){ players=[]; }
-    // Ensure at least 2 players on first run
-    if (!Array.isArray(players) || players.length < 2){
-      players = [];
-      for (let i=1;i<=2;i++) players.push({id:uid(), name:`Player ${i}`, score:0, reenganches:0, avatar:null});
-      nextDealerId = players[0]?.id || null;
-      gameOver=false; rounds=[]; roundCounter=0; save();
+      lockOrder = !!s.lockOrder; pruneWins();
+    }catch(e){ players=[]; } };
+
+  // Ensure we always show at least 2 players on first load
+  function ensureTwoPlayers(){
+    if(players.length < 2){
+      const need = 2 - players.length;
+      for(let i=0;i<need;i++){
+        const idx = players.length + 1;
+        players.push({id:uid(), name:`Player ${idx}`, score:0, reenganches:0, avatar:null});
+      }
+      if(!nextDealerId && players[0]) nextDealerId = players[0].id;
+      gameOver=false;
+      save();
     }
-    if (!nextDealerId && players[0]) nextDealerId = players[0].id;
-    pruneWins();
-  };
+  }
 
   // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
@@ -398,21 +398,18 @@
     const nd=$("#nextDealerName"); if(nd){ const p=players.find(p=>p.id===nextDealerId); nd.textContent=p?(p.name||"—"):"—"; }
     const banner=$("#banner"); if(banner) banner.style.display=gameOver?"":"none";
     const lockBtn=$("#lockToggle");
-if(lockBtn){
-  lockBtn.innerHTML = (lockOrder ? "🔒" : "🔓") + ' <span class="reorderText">Reorder</span>';
-  lockBtn.title = lockOrder ? "Unlock to enable reordering" : "Lock to finish reordering";
-  lockBtn.setAttribute("aria-label", lockBtn.title);
-}
-
+    if(lockBtn){
+      lockBtn.innerHTML = `<span class="lockIcon">${lockOrder ? "🔒" : "🔓"}</span><span class="reorderText">Reorder</span>`;
+      lockBtn.title = lockOrder ? "Unlock to enable reordering" : "Lock to finish reordering";
+      lockBtn.setAttribute("aria-label", lockBtn.title);
     }
 
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
-      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
+      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder; // drag only when unlocked
       if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      // OLD: attachLongPress(n, ()=>openEdit(p.id));
-      if(lockOrder) attachLongPress(n, ()=>openEdit(p.id)); // only allow Edit when order is locked
+      if(lockOrder){ attachLongPress(n, ()=>openEdit(p.id)); } // edit only when locked
       if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -420,16 +417,16 @@ if(lockBtn){
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
       const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
       const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Reordering is locked"); } else { handle.classList.remove("locked"); handle.onclick=null; }
+      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Order locked"); } else { handle.classList.remove("locked"); handle.onclick=null; }
       list && list.appendChild(n);
     }
-    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length<2||gameOver;
+    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0||gameOver;
     save();
   }
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved){ if(lockOrder) cb(); else toast("Reordering active. Lock to Edit."); } },600); };
+    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
     const end = ()=>{ clearTimeout(tmr); };
     el.addEventListener('touchstart', start, {passive:true});
     el.addEventListener('mousedown', start);
@@ -438,8 +435,7 @@ if(lockBtn){
   }
 
   // Drag & drop
-  let dragIdx=null;
-  const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
+  let dragIdx=null; const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
   const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
   const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; arr.splice(to,0,m); const keep=nextDealerId; players=arr; nextDealerId=keep; render(); }};
   const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
@@ -451,6 +447,7 @@ if(lockBtn){
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
+    bind("#viewHistoryBtn","onclick", ()=> openHistory(p.id));
     bind("#deletePlayerBtn","onclick", ()=>{ if(confirm("Delete this player? This cannot be undone.")){ editDlg.close(); removePlayer(p.id); }});
     editDlg && editDlg.showModal(); pulseNoZoom();
   }
@@ -463,13 +460,13 @@ if(lockBtn){
   // Photo input -> cropper
   if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
 
-  // Round dialog
+  // Round dialog (no cutter UI, with -10 rule)
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
   const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
-      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">Current: ${p.score||0}</div>`;
+      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">Current: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=-10; validateRound(); };
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
       r.append(name,inp,minus); rows.appendChild(r);
     });
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
@@ -477,11 +474,12 @@ if(lockBtn){
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
   function validateRound(){
     const inputs=roundInputs();
-    // only one -10 allowed
-    const minus10s = Object.values(inputs).filter(v=>v===-10).length;
-    if(minus10s>1){
-      if(rErr){ rErr.textContent="Only one “−10” allowed per round."; rErr.style.display=""; }
-      if(applyBtn) applyBtn.disabled=true; return false;
+    // only one exact -10 allowed per round
+    const minus10Count = Object.values(inputs).filter(v=>v===-10).length;
+    if(minus10Count>1){
+      if(rErr){ rErr.textContent="Only one −10 allowed per round."; rErr.style.display=""; }
+      if(applyBtn) applyBtn.disabled=true; 
+      return false;
     }
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
   }
@@ -513,28 +511,16 @@ if(lockBtn){
     // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
 
-    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
-
-    // Winner check: exactly one ≤ limit and all others > limit
-    const survivors = players.filter(p=> (p.score||0) <= limit);
-    if (survivors.length === 1 && players.length > 1){
-      gameOver = true;
-      const winner = survivors[0];
-      winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
-      showWinOverlay(winner);
-      const bt=$("#bannerText"); if(bt) bt.textContent = `${winner.name} won`;
-      $("#bannerTag") && ($("#bannerTag").textContent="Winner");
-    }else{
-      gameOver = false;
-    }
-
-    render();
+    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
+    gameOver=false; render();
   }
 
   // Dialog submit
   if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); if(!validateRound()) return; applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
+
+  function openHistory(id){ const list=$("#historyList"); if(!list) return; list.innerHTML=""; const my=(cutsHistory||[]).filter(h=>h.id===id).sort((a,b)=>a.round-b.round); if(my.length===0){ list.innerHTML='<div class="history-item">No cuts recorded.</div>'; } else { for(const h of my){ const d=new Date(h.timestamp); const label=h.result==='cut_win'?'✂️🏆 Cut win':(h.result==='normal'?'✂️ Cut (no win)':'✂️ Cut'); const row=document.createElement('div'); row.className='history-item'; row.textContent=`R${h.round} • ${label} • ${d.toLocaleString()}`; list.appendChild(row); } } $("#historyDialog") && $("#historyDialog").showModal(); }
 
   function openRoundsTable(){ const wrap=$("#roundsTableWrap"); if(!wrap) return; wrap.innerHTML=""; if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; $("#roundsDialog") && $("#roundsDialog").showModal(); return; } const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px"; const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead); const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); const showTotals = r.totals && typeof r.totals === 'object'; players.forEach(p=>{ const td=document.createElement('td'); const v=showTotals ? r.totals[p.id] : r.inputs[p.id]; td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table); $("#roundsDialog") && $("#roundsDialog").showModal(); }
 
@@ -545,28 +531,19 @@ if(lockBtn){
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt("Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
   bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm("Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
   bind("#newGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; render(); window.scrollTo({top:0,behavior:"smooth"}); });
-  bind("#reorderToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
+  bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
   on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
 
   // helpers
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
-  const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(players.length<2){ toast("At least 2 players recommended"); } if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
+  const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
   // Win overlay (simple)
-  function showWinOverlay(winner){
-    const ov=$('#winOverlay'); if(!ov) return;
-    $('#winName').textContent = winner?.name || 'Winner';
-    $('#winSubtitle').textContent = 'Winner';
-    ov.style.display='flex';
-    try{ document.getElementById('winSound').play().catch(()=>{});}catch{}
-    startConfetti();
-    const bt=$("#bannerText"); if(bt) bt.textContent = `${winner?.name||'Player'} won`;
-    $("#banner").style.display='';
-  }
+  function showWinOverlay(winner){ const ov=document.getElementById('winOverlay'); if(!ov) return; document.getElementById('winName').textContent = winner?.name || 'Winner'; document.getElementById('winSubtitle').textContent = 'Instant win'; ov.style.display='flex'; try{ document.getElementById('winSound').play().catch(()=>{});}catch{} startConfetti(); }
   document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
 
   // Confetti
@@ -578,28 +555,19 @@ if(lockBtn){
     if(!dlg || !cvs || !zoom || !saveBtn) return;
     const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
 
-    // CSS px -> canvas px factor (because canvas is visually scaled)
-    let css2canvas = 1;
-    const updateCss2Canvas = () => { const r = cvs.getBoundingClientRect(); css2canvas = cvs.width / r.width; };
-    updateCss2Canvas(); window.addEventListener('resize', updateCss2Canvas, {passive:true});
-
-    function draw(){
-      ctx.clearRect(0,0,cvs.width,cvs.height);
+    function draw(){ ctx.clearRect(0,0,cvs.width,cvs.height);
       ctx.save(); ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY); ctx.scale(scale, scale); ctx.drawImage(img, -img.width/2, -img.height/2); ctx.restore();
+      // Optional: preview mask could be drawn here if desired
     }
-    function clamp(){
-      const w = img.width*scale, h = img.height*scale;
-      const maxX = Math.max(0,(w-cvs.width)/2); const maxY = Math.max(0,(h-cvs.height)/2);
-      offX = Math.min(maxX, Math.max(-maxX, offX)); offY = Math.min(maxY, Math.max(-maxY, offY));
-    }
+    function clamp(){ const w = img.width*scale, h = img.height*scale; const maxX = Math.max(0,(w-cvs.width)/2); const maxY = Math.max(0,(h-cvs.height)/2); offX = Math.min(maxX, Math.max(-maxX, offX)); offY = Math.min(maxY, Math.max(-maxY, offY)); }
 
     img.onload = ()=>{ const sx = cvs.width / img.width; const sy = cvs.height / img.height; minScale = Math.max(sx, sy); scale = minScale; zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100)); zoom.value = String(scale); offX=0; offY=0; clamp(); draw(); };
     img.src = dataUrl;
 
-    // Pointer pan (respect visual scale)
-    cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; updateCss2Canvas(); cvs.setPointerCapture(e.pointerId); });
-    cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX)*css2canvas; offY += (e.clientY-startY)*css2canvas; startX=e.clientX; startY=e.clientY; clamp(); draw(); });
-    cvs.addEventListener('pointerup', e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} });
+    // Pointer pan
+    cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); });
+    cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); });
+    cvs.addEventListener('pointerup', e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId);}catch{} });
     cvs.addEventListener('pointercancel', ()=> dragging=false);
 
     // Touch pinch zoom
@@ -607,7 +575,10 @@ if(lockBtn){
     cvs.addEventListener('touchmove', (e)=>{
       if(pinch && e.touches.length===2){
         e.preventDefault();
-        const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+        const dist = Math.hypot(
+          e.touches[0].clientX-e.touches[1].clientX,
+          e.touches[0].clientY-e.touches[1].clientY
+        );
         const next = pinchStartScale * (dist / pinchStartDist);
         scale = Math.min(3, Math.max(minScale, next));
         zoom.value = String(scale);
@@ -637,33 +608,39 @@ if(lockBtn){
 
     // Reset
     const onReset = ()=>{
-      scale = minScale; offX = 0; offY = 0; zoom.value = String(scale); clamp(); draw();
+      scale = minScale; offX = 0; offY = 0;
+      zoom.value = String(scale);
+      clamp(); draw();
     };
     resetBtn?.addEventListener('click', onReset);
 
-    // Save -> write avatar (square export)
+    // Save -> write avatar
     const onSave = ()=>{
-      const out = document.createElement('canvas'); out.width = 512; out.height = 512;
-      const k = out.width / cvs.width; const octx = out.getContext('2d');
-      octx.fillStyle = '#0b1225'; octx.fillRect(0,0,out.width,out.height);
+      const out = document.createElement('canvas');
+      out.width = 512; out.height = 512;
+      const k = out.width / cvs.width; // scale offsets to target canvas size
+      const octx = out.getContext('2d');
+      octx.fillStyle = '#0b1225';
+      octx.fillRect(0,0,out.width,out.height);
       octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
       octx.scale(scale, scale);
       octx.drawImage(img, -img.width/2, -img.height/2);
       const dataOut = out.toDataURL('image/png', 0.92);
-      const p = players.find(x=>x.id===targetId); if (p){ p.avatar = dataOut; render(); save(); }
-      cleanup(); dlg.close();
+
+      const p = players.find(x=>x.id===targetId);
+      if (p){ p.avatar = dataOut; render(); save(); }
+      cleanup();
+      dlg.close();
     };
     saveBtn.addEventListener('click', onSave);
 
     // Cleanup listeners when dialog closes
     function cleanup(){
-      window.removeEventListener('resize', updateCss2Canvas);
-      cvs.replaceWith(cvs.cloneNode(true)); // quick detach of canvas listeners
+      cvs.removeEventListener('wheel', onWheel);
       zoom.removeEventListener('input', onZoom);
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
     }
-
     dlg.addEventListener('close', cleanup, {once:true});
     dlg.showModal(); pulseNoZoom();
   }
@@ -671,6 +648,7 @@ if(lockBtn){
 
   // Init
   load();
+  ensureTwoPlayers();
   render();
 })();
 </script>
