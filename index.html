@@ -203,13 +203,7 @@
     <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
   </div>
   <div class="modal-body" style="display:grid; gap:14px">
-    <div style="display:flex; gap:8px; align-items:center">
-      <label style="margin:0;min-width:120px" data-i18n="language">Language</label>
-      <select id="langSelect" style="max-width:160px">
-        <option value="en">English (EN)</option>
-        <option value="es">Español (ES)</option>
-      </select>
-    </div>
+
     <div>
       <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
@@ -398,33 +392,38 @@
 
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
-  const load=()=>{ 
+const load=()=>{ 
   try{
-    const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+    const s = JSON.parse(localStorage.getItem(storageKey) || "{}");
 
-    const makeDefaults=()=>[
+    const defaults = () => ([
+      {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
+      {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
+    ]);
+
+    // Use saved players only if there is at least ONE
+    players = (Array.isArray(s.players) && s.players.length > 0) ? s.players : defaults();
+
+    limit             = Number.isFinite(s.limit) ? s.limit : 100;
+    autoAdvanceDealer = typeof s.autoAdvanceDealer === "boolean" ? s.autoAdvanceDealer : true;
+    nextDealerId      = typeof s.nextDealerId === "string" ? s.nextDealerId : (players[0] ? players[0].id : null);
+    gameOver          = !!s.gameOver;
+    cutsHistory       = Array.isArray(s.cutsHistory) ? s.cutsHistory : [];
+    roundCounter      = Number.isFinite(s.roundCounter) ? s.roundCounter : 0;
+    rounds            = Array.isArray(s.rounds) ? s.rounds : [];
+    winsLog           = Array.isArray(s.winsLog) ? s.winsLog : [];
+    lockOrder         = !!s.lockOrder;
+    pruneWins();
+  }catch(e){
+    // If parsing fails, start with defaults
+    players = [
       {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
       {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
     ];
+  }
+};
 
-    // Be robust to empty/malformed saved state
-    if (Array.isArray(s.players) && s.players.length >= 1){
-      players = s.players;
-    } else {
-      players = makeDefaults();             // <- ensure players exist
-    }
-
-    limit = Number.isFinite(s.limit)? s.limit : 100;
-    autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
-    nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
-    gameOver = !!s.gameOver;
-    cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
-    roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
-    rounds = Array.isArray(s.rounds)? s.rounds : [];
-    winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-    lockOrder = !!s.lockOrder;
-    pruneWins();
-  }catch(e){
+  
     // If anything goes wrong parsing storage, start fresh with defaults
     players = [
       {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
