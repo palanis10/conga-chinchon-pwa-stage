@@ -127,18 +127,21 @@
     <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
   </header>
 
-  <section class="card" style="padding:10px; margin-bottom:8px">
-    <div style="display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px">
-  <div style="min-width:0; white-space:normal;">
-    <strong>Next dealer:</strong> <span id="nextDealerName">—</span>
+ <section class="card" style="padding:10px; margin-bottom:8px">
+  <div class="nd-grid">
+    <div class="nd-title">
+      <strong>Next dealer:</strong> <span id="nextDealerName">—</span>
+    </div>
+
+    <div class="nd-actions">
+      <button id="lockToggle" class="btn ghost" title="Lock/unlock reordering" aria-label="Lock/unlock">
+        <span class="lockIcon">🔓</span> <span class="reorderText">Reorder</span>
+      </button>
+      <button id="historyBtn" class="btn ghost">History</button>
+      <button id="newRoundBtn" class="btn primary">New round</button>
+    </div>
   </div>
-  <div style="display:flex; gap:8px; align-items:center">
-    <button id="lockToggle" class="iconbtn" title="Lock/unlock reordering" aria-label="Lock/unlock">🔓</button>
-    <button id="historyBtn" class="btn ghost">History</button>
-    <button id="newRoundBtn" class="btn primary">New round</button>
-  </div>
-</div>
-  </section>
+</section>
 
   <section class="players">
     <header><div>Players</div></header>
