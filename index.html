@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5" />
-<title>Conga / Chinchón – Alanis Scorekeeper — STAGE v3.5.2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
+<title>Conga – Alanis Scorekeeper — STAGE v3.5.3</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,17 +15,19 @@
     --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b; --warn:#ffb020;
     --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0; font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; font-family: ui-sans-serif,-apple-system,Segoe UI,Roboto,Arial,Noto Sans,sans-serif;
     background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
     color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;}
   .app{max-width:980px; margin:0 auto; padding:10px 12px 120px;}
-  header{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:2px 0 8px 0;}
-  .top-left{display:flex; align-items:center; gap:10px}
+
+  header{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 0 8px;}
+  .top-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
   .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:3px 10px; border-radius:999px; font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.6px;}
   .brand{opacity:.95; font-weight:900; letter-spacing:.2px; font-size: clamp(16px, 4vw, 22px);} 
-  .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:4px}
-  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 12px; border-radius:12px;
+  .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:6px}
+  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 14px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
     color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; white-space:nowrap}
   .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
@@ -33,13 +35,15 @@
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
   .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
   .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
-  .btn.sm{ padding:8px 10px; font-size:clamp(12px,3.2vw,14px)}
-  .iconbtn{ width:auto; height:44px; display:flex; align-items:center; justify-content:center; gap:8px;
-    padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text);
-    cursor:pointer; font-size:16px; font-weight:800; white-space:nowrap}
+  .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
+  .toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .toolbar .btn{padding:10px 12px}
+  .toolbar .btn.history{padding:10px 10px} /* slightly narrower to make room on iPhone */
+
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
   .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
+
   .row{
     display:grid;
     grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
@@ -61,9 +65,10 @@
   .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
-  .banner{ margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(255,255,255,.1);
-    background: linear-gradient(90deg, rgba(78,225,160,.15), rgba(122,162,255,.1)); color:#d7fff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
-  .banner .tag{ background:#0f1428; border:1px solid rgba(255,255,255,.08); padding:4px 8px; border-radius:999px; font-size:12px; color:#b8c0ff }
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
+
+  /* Dialogs */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
@@ -74,98 +79,99 @@
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
-  input, select, textarea, button { font-size:16px; }
+  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
-  /* Actions row (Reorder / History / New round) */
-  .actions-3{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:stretch; min-width:0}
-  .actions-3 > *{ min-width:0 }
-  .actions-3 .btn,.actions-3 .iconbtn{ width:100%; }
-  @media (max-width:420px){
-    .actions-3 .btn,.actions-3 .iconbtn{ padding:8px 10px; font-size:14px }
-  }
+  .grid-rows{ display:grid; gap:6px; max-height:50vh; overflow:auto } /* scrollable round modal */
+  .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
+    padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
+  .round-row input[type="number"]{ height:34px; padding:6px 8px; }
+  .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
 
-  /* Rounds table + other small bits omitted for brevity */
+  /* WIN OVERLAY */
+  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
+  .win-card{ width:min(560px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
+  .win-head{ display:flex; align-items:center; gap:12px}
+  .win-photo{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 6px rgba(78,225,160,.25)}
+  .win-photo img{ width:100%; height:100%; object-fit:cover}
+  .win-name{ font-size:22px; font-weight:900}
+  #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
+  .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
+
+  /* Language toggle */
+  .lang-toggle{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#0f1428; font-weight:800}
+  .lang-toggle button{ background:none; border:0; color:var(--text); opacity:.65; cursor:pointer; padding:0 2px; font-weight:900}
+  .lang-toggle .on{ opacity:1; text-decoration:underline}
 
   /* Crop dialog layout + responsive canvas */
   #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
-  #cropCanvas{width:100%;height:auto;display:block;border-radius:12px;background:#0b1225;border:1px solid rgba(255,255,255,.12)}
+  #cropCanvas{width:100%;height:auto;display:block;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#000}
   .crop-frame-hint{margin-bottom:6px;color:var(--sub)}
 
-  /* Confetti canvas */
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
+  /* Crop overlay ring/dim */
+  .c-mask{position:absolute;inset:0;pointer-events:none}
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <header>
     <div class="top-left">
-      <span class="chip">Conga / Chinchón</span>
-      <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.5.2</span></span>
+      <span class="chip">Conga</span>
+      <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.5.3</span></span>
     </div>
-    <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
+    <div class="toolbar">
+      <span class="lang-toggle" id="langToggle">
+        <button data-lang="en" id="langEN" class="on">EN</button> /
+        <button data-lang="es" id="langES">ES</button>
+      </span>
+      <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
+    </div>
   </header>
 
-  <section class="card" style="padding:12px; margin-bottom:10px">
-    <div class="actions-3">
-      <button id="lockToggle" class="iconbtn" title="Lock/unlock reordering" aria-label="Lock/unlock">
-        <span id="lockGlyph">🔓</span><span id="reorderTxt">Reorder</span>
-      </button>
-      <button id="historyBtn" class="btn ghost sm"><span id="historyTxt">History</span></button>
-      <button id="newRoundBtn" class="btn primary sm"><span id="newRoundTxt">New round</span></button>
+  <section class="card" style="padding:10px; margin-bottom:8px">
+    <div class="toolbar">
+      <button id="lockToggle" class="btn ghost" title="Reorder" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
+      <button id="historyBtn" class="btn ghost history"><span data-i18n="history">History</span></button>
+      <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
     </div>
   </section>
 
   <section class="players">
-    <header><div id="playersHdr">Players</div></header>
+    <header><div data-i18n="players">Players</div></header>
     <div id="playersList" aria-live="polite"></div>
-    <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px" aria-live="polite" id="addPlayerBtnTxt">+ Add player</button>
-  </section>
-
-  <section id="banner" class="banner" style="display:none" aria-live="polite">
-    <div><strong id="bannerText">Game over</strong></div>
-    <div class="tag" id="bannerTag">Game over</div>
-    <div style="margin-left:auto; display:flex; gap:8px">
-      <button class="btn success" id="newGameBtn">New game</button>
-    </div>
+    <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
   </section>
 </div>
 
 <!-- SETTINGS -->
 <dialog id="settingsDialog" aria-labelledby="settingsTitle">
   <div class="modal-head">
-    <div id="settingsTitle" style="font-weight:800">Settings</div>
-    <button class="btn ghost" onclick="settingsDialog.close()" id="settingsCloseBtn">Close</button>
+    <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
+    <button class="btn ghost" onclick="settingsDialog.close()" data-i18n="close">Close</button>
   </div>
   <div class="modal-body" style="display:grid; gap:14px">
     <div>
-      <label for="limitInput">Limit (default 100)</label>
+      <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
     </div>
-
-    <div>
-      <label for="langSelect">Language / Idioma</label>
-      <select id="langSelect">
-        <option value="en">English</option>
-        <option value="es">Español</option>
-      </select>
-    </div>
-
     <label class="switch">
       <input id="autoAdvance" type="checkbox" />
-      <span id="autoAdvanceLbl">Auto-advance dealer after round</span>
+      <span data-i18n="autoAdvance">Auto-advance dealer after round</span>
     </label>
     <label class="switch">
       <input id="lockOrderSwitch" type="checkbox" />
-      <span id="lockOrderLbl">Lock player reordering</span>
+      <span data-i18n="lockOrder">Lock player reordering</span>
     </label>
     <div style="display:flex; gap:8px; flex-wrap:wrap">
-      <button class="btn" id="exportBtn">Export CSV</button>
-      <button class="btn ghost" id="resetScoresBtn">Reset scores</button>
-      <button class="btn warn" id="clearAllBtn">Clear all</button>
+      <button class="btn" id="exportBtn" data-i18n="exportCSV">Export CSV</button>
+      <button class="btn ghost" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
+      <button class="btn warn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
     </div>
   </div>
   <div class="modal-foot">
-    <button class="btn success" onclick="settingsDialog.close()">Done</button>
+    <button class="btn success" onclick="settingsDialog.close()" data-i18n="done">Done</button>
   </div>
 </dialog>
 
@@ -173,10 +179,10 @@
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
     <div>
-      <div id="roundTitle" style="font-weight:800">New Round</div>
-      <div class="hint">Enter points (negatives OK). “−10” changes the input.</div>
+      <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New round</div>
+      <div class="hint" data-i18n="roundHint">Enter points (negatives OK). “−10” changes the input.</div>
     </div>
-    <button class="btn ghost" onclick="roundDialog.close()">Close</button>
+    <button class="btn ghost" onclick="roundDialog.close()" data-i18n="close">Close</button>
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
@@ -184,8 +190,8 @@
     </div>
     <div class="modal-foot">
       <div id="roundError" class="error" style="display:none"></div>
-      <button type="button" class="btn ghost" onclick="roundDialog.close()">Cancel</button>
-      <button id="applyRoundBtn" type="submit" class="btn success">Apply</button>
+      <button type="button" class="btn ghost" onclick="roundDialog.close()" data-i18n="cancel">Cancel</button>
+      <button id="applyRoundBtn" type="submit" class="btn success" data-i18n="apply">Apply</button>
     </div>
   </form>
 </dialog>
@@ -193,50 +199,50 @@
 <!-- Edit player dialog -->
 <dialog id="editDialog" aria-labelledby="editTitle">
   <div class="modal-head">
-    <div id="editTitle" style="font-weight:800">Edit player</div>
-    <button class="btn ghost" onclick="editDialog.close()">Close</button>
+    <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
+    <button class="btn ghost" onclick="editDialog.close()" data-i18n="close">Close</button>
   </div>
   <form id="editForm" method="dialog">
     <div class="modal-body">
       <input type="hidden" id="editId" />
       <div style="display:grid; gap:10px">
         <div>
-          <label for="editName">Name</label>
+          <label for="editName" data-i18n="name">Name</label>
           <input id="editName" type="text" required />
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
           <div>
-            <label for="editScore">Score</label>
+            <label for="editScore" data-i18n="score">Score</label>
             <input id="editScore" type="number" step="1" />
           </div>
           <div>
-            <label for="editReeng">Reenganches</label>
+            <label for="editReeng" data-i18n="reenganches">Reenganches</label>
             <input id="editReeng" type="number" step="1" min="0" />
           </div>
         </div>
 
         <div style="display:grid; gap:10px; margin-top:6px">
           <div>
-            <label>Photo</label>
+            <label data-i18n="photo">Photo</label>
             <div style="display:flex; gap:8px; flex-wrap:wrap">
-              <button type="button" class="btn" id="changePhotoBtn">Change photo</button>
-              <button type="button" class="btn ghost" id="removePhotoBtn">Remove photo</button>
-              <button type="button" class="btn ghost" id="viewHistoryBtn">View cut history</button>
+              <button type="button" class="btn" id="changePhotoBtn" data-i18n="changePhoto">Change photo</button>
+              <button type="button" class="btn ghost" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
+              <button type="button" class="btn ghost" id="viewHistoryBtn" data-i18n="viewCutHistory">View cut history</button>
             </div>
           </div>
           <label class="switch" style="display:flex; align-items:center; gap:10px">
             <input id="setDealerSwitch" type="checkbox">
-            <span>Set as next dealer</span>
+            <span data-i18n="setDealer">Set as next dealer</span>
           </label>
           <div>
-            <button type="button" class="btn warn" id="deletePlayerBtn">Delete player</button>
+            <button type="button" class="btn warn" id="deletePlayerBtn" data-i18n="deletePlayer">Delete player</button>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn ghost" type="button" onclick="editDialog.close()">Cancel</button>
-      <button class="btn success" type="submit">Save</button>
+      <button class="btn ghost" type="button" onclick="editDialog.close()" data-i18n="cancel">Cancel</button>
+      <button class="btn success" type="submit" data-i18n="save">Save</button>
     </div>
   </form>
 </dialog>
@@ -249,11 +255,12 @@
       <div class="win-photo"><img id="winPhoto" alt=""></div>
       <div>
         <div class="win-name" id="winName">Winner</div>
-        <div class="win-sub" id="winSubtitle">WINNER</div>
+        <div class="win-sub" id="winSubtitle"></div>
       </div>
     </div>
     <div class="win-actions">
-      <button class="btn success" id="winCloseBtn">Close</button>
+      <button class="btn success" id="winNewGameBtn" data-i18n="newGame">New game</button>
+      <button class="btn ghost" id="winCloseBtn" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -266,28 +273,31 @@
 <!-- Crop dialog -->
 <dialog id="cropDialog" aria-labelledby="cropTitle">
   <div class="modal-head">
-    <div id="cropTitle" style="font-weight:800">Crop photo</div>
-    <button class="btn ghost" onclick="cropDialog.close()">Close</button>
+    <div id="cropTitle" style="font-weight:800" data-i18n="cropPhoto">Crop photo</div>
+    <button class="btn ghost" onclick="cropDialog.close()" data-i18n="close">Close</button>
   </div>
   <div class="modal-body">
-    <div class="crop-frame-hint" id="cropHint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <canvas id="cropCanvas" width="600" height="600" style="touch-action:none;"></canvas>
-    <div class="crop-controls" style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px;">
+    <div class="crop-frame-hint" data-i18n="cropHint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
+    <div style="position:relative">
+      <canvas id="cropCanvas" width="600" height="600" style="touch-action:none;"></canvas>
+      <canvas id="cropMask" class="c-mask" width="600" height="600"></canvas>
+    </div>
+    <div class="crop-controls" style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:6px;">
       <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1" style="flex:1">
-      <button class="btn" id="cropReset">Reset</button>
+      <button class="btn" id="cropReset" data-i18n="reset">Reset</button>
     </div>
   </div>
   <div class="modal-foot">
-    <button class="btn ghost" onclick="cropDialog.close()">Cancel</button>
-    <button class="btn success" id="cropSave">Save</button>
+    <button class="btn ghost" onclick="cropDialog.close()" data-i18n="cancel">Cancel</button>
+    <button class="btn success" id="cropSave" data-i18n="save">Save</button>
   </div>
 </dialog>
 
 <!-- Rounds history dialog -->
 <dialog id="roundsDialog" aria-labelledby="roundsTitle">
   <div class="modal-head">
-    <div id="roundsTitle" style="font-weight:800">Rounds history</div>
-    <button class="btn ghost" onclick="roundsDialog.close()">Close</button>
+    <div id="roundsTitle" style="font-weight:800" data-i18n="roundsHistory">Rounds history</div>
+    <button class="btn ghost" onclick="roundsDialog.close()" data-i18n="close">Close</button>
   </div>
   <div class="modal-body">
     <div class="table-wrap"><div id="roundsTableWrap"></div></div>
@@ -311,11 +321,9 @@
 <input id="importJsonInput" type="file" accept="application/json" hidden>
 
 <script>
-/* === STAGE v3.5.2 (iPhone actions row fix + Language toggle EN/ES) === */
+/* === STAGE v3.5.3 (header/vers fixes + i18n + round modal restore + cropper + win overlay) === */
 (() => {
   "use strict";
-
-  // ---------- Helpers ----------
   const $ = s => document.querySelector(s);
   const bind = (sel, prop, fn) => { const el = $(sel); if (el) el[prop] = fn; };
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
@@ -326,36 +334,46 @@
   const todayStr=()=> new Date().toISOString().slice(0,10);
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // iOS focus zoom guard
-  const vp = document.querySelector('meta[name="viewport"]');
-  const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5';
-  function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
-  function restoreZoom(){ try{ if(!vp) return; vp.setAttribute('content', VP_BASE); }catch{} }
-  const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
-
-  // ---------- i18n ----------
-  const I18N = {
-    en:{
-      reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"+ Add player",
-      settings:"Settings", close:"Close", cropPhoto:"Crop photo", cropHint:"Drag to position. Pinch to zoom (on phone) or use slider.",
-      cancel:"Cancel", save:"Save", reset:"Reset", autoAdv:"Auto-advance dealer after round", lockOrder:"Lock player reordering",
-      newGame:"New game", gameOver:"Game over", winner:"won"
+  // i18n
+  const dict = {
+    en: {
+      reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
+      settings:"Settings", close:"Close", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
+      lockOrder:"Lock player reordering", exportCSV:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all", done:"Done",
+      newGame:"New game", cropPhoto:"Crop photo", cropHint:"Drag to position. Pinch to zoom (on phone) or use slider.", reset:"Reset",
+      cancel:"Cancel", save:"Save", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
+      photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", viewCutHistory:"View cut history",
+      setDealer:"Set as next dealer", deletePlayer:"Delete player", roundsHistory:"Rounds history",
+      roundHint:'Enter points (negatives OK). “−10” changes the input.', apply:"Apply",
+      winner:"Winner", won:"won"
     },
-    es:{
-      reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"+ Agregar jugador",
-      settings:"Ajustes", close:"Cerrar", cropPhoto:"Recortar foto", cropHint:"Arrastra para posicionar. Pellizca para hacer zoom (en el teléfono) o usa el control.",
-      cancel:"Cancelar", save:"Guardar", reset:"Reiniciar", autoAdv:"Avanzar mano automáticamente", lockOrder:"Bloquear reordenamiento",
-      newGame:"Nuevo juego", gameOver:"Juego terminado", winner:"ganó"
+    es: {
+      reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
+      settings:"Ajustes", close:"Cerrar", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
+      lockOrder:"Bloquear reordenamiento", exportCSV:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo", done:"Listo",
+      newGame:"Nuevo juego", cropPhoto:"Recortar foto", cropHint:"Arrastra para posicionar. Haz zoom con dos dedos o usa el control.",
+      reset:"Reiniciar", cancel:"Cancelar", save:"Guardar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
+      photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Eliminar foto", viewCutHistory:"Ver historial de cortes",
+      setDealer:"Fijar como próximo mano", deletePlayer:"Eliminar jugador", roundsHistory:"Historial de rondas",
+      roundHint:'Ingresa puntos (negativos OK). “−10” cambia la entrada.', apply:"Aplicar",
+      winner:"Ganador", won:"ganó"
     }
   };
-  let lang='en';
-  const t=(k)=> (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
+  let lang = localStorage.getItem("conga_lang") || "en";
+  function tkey(el){ const k=el.getAttribute("data-i18n"); if(!k) return; el.textContent = (dict[lang] && dict[lang][k]) || dict.en[k] || k; }
+  function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(tkey); $("#langEN")?.classList.toggle("on",lang==="en"); $("#langES")?.classList.toggle("on",lang==="es"); }
 
-  // ---------- State ----------
-  const storageKey="conga_state_stage_v352";
-  let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false, lockOrder=false;
-  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[];
+  // Viewport zoom control (prevents iOS bounce/zoom when dialogs open)
+  const vp = document.querySelector('meta[name="viewport"]');
+  const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1';
+  function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
+  function restoreZoom(){ /* keep same to avoid jumps */ }
+  const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
 
+  // Storage
+  const storageKey="conga_state_stage_v353";
+  let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
+  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
   const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder,lang})); };
   const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
@@ -368,65 +386,46 @@
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = !!s.lockOrder;
-      lang = (s.lang==='es') ? 'es' : 'en';
-      pruneWins();
+      lockOrder = !!s.lockOrder; lang = s.lang || lang; pruneWins();
     }catch(e){ players=[]; } };
 
-  // First-time: ensure 2 players
+  // Ensure start with 2 players (first run)
   function ensureTwoPlayers(){
-    if(players.length>=2) return;
-    const need = 2-players.length;
-    for(let i=0;i<need;i++) players.push({id:uid(), name:`Player ${players.length+1}`, score:0, reenganches:0, avatar:null});
-    if(!nextDealerId && players[0]) nextDealerId=players[0].id;
+    if(players.length===0){
+      players.push({id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null});
+      players.push({id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null});
+      nextDealerId = players[0].id;
+    }
   }
 
-  // ---------- Render ----------
+  // Render
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
-  function applyTexts(){
-    $("#reorderTxt").textContent=t('reorder');
-    $("#historyTxt").textContent=t('history');
-    $("#newRoundTxt").textContent=t('newRound');
-    $("#playersHdr").textContent=t('players');
-    $("#addPlayerBtn").textContent=t('addPlayer');
-    $("#settingsTitle").textContent=t('settings');
-    $("#settingsCloseBtn").textContent=t('close');
-    $("#autoAdvanceLbl").textContent=t('autoAdv');
-    $("#lockOrderLbl").textContent=t('lockOrder');
-    $("#cropTitle").textContent=t('cropPhoto');
-    $("#cropHint").textContent=t('cropHint');
-    $("#cropReset").textContent=t('reset');
-    $("#cropSave").textContent=t('save');
-    $("#roundsTitle").textContent=t('history');
-    $("#newGameBtn").textContent=t('newGame');
-  }
   function render(){
-    applyTexts();
-    const lockBtn=$("#lockToggle");
-    if(lockBtn){ lockBtn.querySelector('#lockGlyph').textContent = lockOrder ? "🔒" : "🔓"; lockBtn.title = lockOrder ? "Unlock player order" : "Lock player order"; lockBtn.setAttribute("aria-label", lockBtn.title); }
+    applyI18n();
+    const lockBtn=$("#lockToggle"); if(lockBtn){ lockBtn.innerHTML = (lockOrder? "🔒 " : "🔓 ") + `<span data-i18n="reorder">${t("reorder")}</span>`; }
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
       n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
       if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      attachLongPress(n, ()=>{ if(lockOrder) toast("Order locked"); else openEdit(p.id); });
-      if(p.id===nextDealerId) n.classList.add("dealer");
+      attachLongPress(n, ()=> openEdit(p.id));
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
       n.querySelector(".playerName").textContent=p.name||"—";
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
       const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
       const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast("Order locked"); } else { handle.classList.remove("locked"); handle.onclick=null; }
+      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast((dict[lang].lockOrder)); } else { handle.classList.remove("locked"); handle.onclick=null; }
       list && list.appendChild(n);
     }
-    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length<2||gameOver;
+    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0||gameOver;
     save();
   }
+  function t(k){ return (dict[lang] && dict[lang][k]) || dict.en[k] || k; }
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const start = (e)=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
     const end = ()=>{ clearTimeout(tmr); };
     el.addEventListener('touchstart', start, {passive:true});
     el.addEventListener('mousedown', start);
@@ -460,20 +459,28 @@
   // Photo input -> cropper
   if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
 
-  // Round dialog
+  // Round dialog (NO cutter)
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
   const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
-      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">Current: ${p.score||0}</div>`;
+      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10 btn ghost"; minus.textContent="−10"; minus.style.height="34px"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
-      const cut=document.createElement("div"); cut.className="r-cutter"; cut.innerHTML=`<input type=\"checkbox\" disabled style="opacity:.2">`;
-      r.append(name,inp,minus,cut); rows.appendChild(r);
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ const v = (inp.value===""?0:+inp.value)-10; inp.value=clampInt(v); validateRound(); };
+      r.append(name,inp,minus); rows.appendChild(r);
     });
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
-  function validateRound(){ if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true; }
+  function validateRound(){
+    const inputs=roundInputs();
+    // Only one exact -10 allowed
+    const minus10Count = Object.values(inputs).filter(v=>v===-10).length;
+    if(minus10Count>1){
+      if(rErr){ rErr.textContent="Only one −10 allowed per round."; rErr.style.display=""; }
+      if(applyBtn) applyBtn.disabled=true; return false;
+    }
+    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
+  }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
   function applyRound(inputs){
@@ -499,104 +506,103 @@
 
     players.forEach(p=>{ p.score=proj.get(p.id); });
 
-    // Determine winner: anyone <= limit while all others > limit
-    let winner=null;
-    for(const p of players){
-      const mine = proj.get(p.id);
-      const othersOver = players.filter(x=>x.id!==p.id).every(x=> proj.get(x.id) > limit);
-      if (mine <= limit && othersOver){ winner=p; break; }
-    }
-    if (winner){
-      gameOver = true;
-      winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
-      rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
-      roundDlg && roundDlg.close(); showWinOverlay(winner); save(); render(); return;
-    }
-
     // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
 
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
-    gameOver=false; render();
+    gameOver=false;
+
+    // Check winner: someone <= limit and everybody else >= limit+1
+    const maybeWinner = players.find(p => p.score <= limit && players.filter(q=>q.id!==p.id).every(q=> q.score >= (limit+1)));
+    render();
+    if(maybeWinner){ gameOver=true; const w=maybeWinner;
+      winsLog.push({ playerId:w.id, name:w.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
+      roundDlg && roundDlg.close(); save(); showWinOverlay(w); return;
+    }
+    save();
   }
 
   if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); if(!validateRound()) return; applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
 
-  function openHistory(id){ const list=$("#historyList"); /* keep stub */ }
+  function openHistory(id){ const list=$("#historyList"); if(!list) return; /* optional: dialog exists above */ }
 
   function openRoundsTable(){ const wrap=$("#roundsTableWrap"); if(!wrap) return; wrap.innerHTML=""; if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; $("#roundsDialog") && $("#roundsDialog").showModal(); return; } const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px"; const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead); const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); const showTotals = r.totals && typeof r.totals === 'object'; players.forEach(p=>{ const td=document.createElement('td'); const v=showTotals ? r.totals[p.id] : r.inputs[p.id]; td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table); $("#roundsDialog") && $("#roundsDialog").showModal(); }
 
   // Wire-up
-  bind("#openSettings","onclick", ()=> { $("#langSelect").value=lang; $("#settingsDialog")?.showModal(); pulseNoZoom(); });
+  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); pulseNoZoom(); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
-  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt("Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
+  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(lang==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
-  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm("Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm("Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
-  bind("#newGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(lang==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm(lang==="es"?"¿Borrar jugadores y ajustes?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; ensureTwoPlayers(); render(); } });
+  bind("#winNewGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
   on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
-  on("#langSelect","change", e=>{ lang = (e.target.value==='es')?'es':'en'; render(); save(); });
+
+  // Language toggle
+  on("#langToggle","click",(e)=>{ const btn=e.target.closest("button[data-lang]"); if(!btn) return; lang=btn.dataset.lang; localStorage.setItem("conga_lang",lang); save(); render(); });
 
   // helpers
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
   // Win overlay
-  function showWinOverlay(winner){ const ov=document.getElementById('winOverlay'); if(!ov) return; document.getElementById('winName').textContent = winner?.name || 'Winner'; document.getElementById('winSubtitle').textContent = t('winner'); const ph=document.getElementById('winPhoto'); ph.src = winner?.avatar || ''; ph.style.display = winner?.avatar ? 'block':'none'; ov.style.display='flex'; try{ document.getElementById('winSound').play().catch(()=>{});}catch{} startConfetti(); }
+  function showWinOverlay(winner){
+    const ov=document.getElementById('winOverlay'); if(!ov) return;
+    document.getElementById('winName').textContent = winner?.name || t("winner");
+    document.getElementById('winSubtitle').textContent = t("won");
+    const photo=document.getElementById('winPhoto'); photo.src = winner?.avatar || "";
+    ov.style.display='flex';
+    try{ document.getElementById('winSound').play().catch(()=>{});}catch{}
+    startConfetti();
+  }
   document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
 
   // Confetti (smaller pieces)
-  function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const card=c.parentElement.getBoundingClientRect(); const W=card.width, H=card.height; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:80},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*3, vy:1.8+Math.random()*2.2, vx:-0.8+Math.random()*1.6, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
+  function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:120},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*3, vy:2+Math.random()*2.5, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
 
   // ===== Image Cropper =====
   function openCropper(dataUrl, targetId){
-    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
-    if(!dlg || !cvs || !zoom || !saveBtn) return;
-    const ctx = cvs.getContext('2d'); let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
+    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const mask = $('#cropMask'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
+    if(!dlg || !cvs || !zoom || !saveBtn || !mask) return;
+    const ctx = cvs.getContext('2d'); const mctx=mask.getContext('2d');
+    let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
 
     function draw(){
-      // dark overlay around circular crop area, keep inside clear
-      const W=cvs.width, H=cvs.height, CX=W/2, CY=H/2, R=Math.min(W,H)*0.36;
-      ctx.clearRect(0,0,W,H);
-      ctx.save(); // photo
-      ctx.translate(W/2 + offX, H/2 + offY);
-      ctx.scale(scale, scale);
-      ctx.drawImage(img, -img.width/2, -img.height/2);
-      ctx.restore();
-
-      // vignette outside the circle
-      ctx.save();
-      ctx.fillStyle="rgba(0,0,0,.45)";
-      ctx.fillRect(0,0,W,H);
-      ctx.globalCompositeOperation='destination-out';
-      ctx.beginPath(); ctx.arc(CX,CY,R,0,Math.PI*2); ctx.fill();
-      ctx.restore();
-
-      // white ring
-      ctx.strokeStyle="rgba(255,255,255,.95)";
-      ctx.lineWidth=4;
-      ctx.beginPath(); ctx.arc(CX,CY,R,0,Math.PI*2); ctx.stroke();
+      ctx.clearRect(0,0,cvs.width,cvs.height);
+      ctx.save(); ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY); ctx.scale(scale, scale); ctx.drawImage(img, -img.width/2, -img.height/2); ctx.restore();
+      // mask (dim outside circle)
+      mctx.clearRect(0,0,mask.width,mask.height);
+      mctx.fillStyle="rgba(0,0,0,.55)"; mctx.fillRect(0,0,mask.width,mask.height);
+      mctx.globalCompositeOperation="destination-out";
+      const r=Math.min(mask.width,mask.height)*0.38;
+      mctx.beginPath(); mctx.arc(mask.width/2, mask.height/2, r, 0, Math.PI*2); mctx.fill();
+      mctx.globalCompositeOperation="source-over";
+      mctx.lineWidth=4; mctx.strokeStyle="rgba(255,255,255,.9)";
+      mctx.beginPath(); mctx.arc(mask.width/2, mask.height/2, r, 0, Math.PI*2); mctx.stroke();
     }
-    function clamp(){ // keep image covering canvas around the crop circle
-      const W=cvs.width, H=cvs.height, R=Math.min(W,H)*0.36;
-      const needW=R*2, needH=R*2; // area to keep covered
-      const w = img.width*scale, h = img.height*scale;
-      const maxX = Math.max(0,(w-needW)/2); const maxY = Math.max(0,(h-needH)/2);
+    function clamp(){
+      const w = img.width*scale, h = img.height*scale; const maxX = Math.max(0,(w-cvs.width)/2); const maxY = Math.max(0,(h-cvs.height)/2);
       offX = Math.min(maxX, Math.max(-maxX, offX)); offY = Math.min(maxY, Math.max(-maxY, offY));
+    }
+    function setCanvasSize(){
+      // keep square canvas sized to dialog body width
+      const rect = cvs.parentElement.getBoundingClientRect();
+      const s = Math.min(600, Math.floor(rect.width));
+      cvs.width = s; cvs.height = s; mask.width = s; mask.height = s;
     }
 
     img.onload = ()=>{
-      const W=cvs.clientWidth|0, H=Math.round(W); cvs.width=W; cvs.height=H;
-      const sx = (W*0.72) / img.width; const sy = (H*0.72) / img.height;
+      setCanvasSize();
+      const sx = cvs.width / img.width; const sy = cvs.height / img.height;
+      // Fit to cover circle comfortably (not zoomed-in)
       minScale = Math.max(sx, sy);
-      scale = minScale; zoom.min = String(Math.max(0.4, Math.round(minScale*100)/100)); zoom.value = String(scale);
-      offX=0; offY=0; clamp(); draw();
+      scale = minScale; zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100)); zoom.value = String(scale); offX=0; offY=0; clamp(); draw();
     };
     img.src = dataUrl;
 
@@ -607,20 +613,19 @@
     cvs.addEventListener('pointercancel', ()=> dragging=false);
 
     // Touch pinch zoom
-    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:false});
+    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:true});
     cvs.addEventListener('touchmove', (e)=>{
       if(pinch && e.touches.length===2){
         e.preventDefault();
         const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
         const next = pinchStartScale * (dist / pinchStartDist);
         scale = Math.min(3, Math.max(minScale, next));
-        zoom.value = String(scale);
-        clamp(); draw();
+        zoom.value = String(scale); clamp(); draw();
       }
     }, {passive:false});
     cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
 
-    // Wheel zoom
+    // Wheel zoom (desktop)
     const onWheel = (e)=>{
       e.preventDefault();
       const factor = e.deltaY > 0 ? 0.95 : 1.05;
@@ -640,39 +645,33 @@
     zoom.addEventListener('input', onZoom);
 
     // Reset
-    const onReset = ()=>{
-      scale = minScale; offX = 0; offY = 0;
-      zoom.value = String(scale);
-      clamp(); draw();
-    };
+    const onReset = ()=>{ scale = minScale; offX = 0; offY = 0; zoom.value = String(scale); clamp(); draw(); };
     resetBtn?.addEventListener('click', onReset);
 
-    // Save -> write avatar (use same crop mask to output)
+    // Save -> write avatar (crop circle to 512x512)
     const onSave = ()=>{
-      const out = document.createElement('canvas');
-      out.width = 512; out.height = 512;
-      const octx = out.getContext('2d');
-      const R = Math.min(out.width,out.height)*0.48;
-      octx.save();
-      // circle clip
-      octx.beginPath(); octx.arc(out.width/2, out.height/2, R, 0, Math.PI*2); octx.clip();
-      // transform mirroring canvas offsets
+      const out = document.createElement('canvas'); out.width = 512; out.height = 512;
+      const r = Math.min(cvs.width, cvs.height)*0.38; // same as mask, relative
       const k = out.width / cvs.width;
+      const octx = out.getContext('2d');
+      octx.fillStyle = '#0b1225'; octx.fillRect(0,0,out.width,out.height);
+      // Clip to circle
+      octx.save();
+      octx.beginPath(); octx.arc(out.width/2, out.height/2, r*k, 0, Math.PI*2); octx.closePath(); octx.clip();
       octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
       octx.scale(scale, scale);
       octx.drawImage(img, -img.width/2, -img.height/2);
       octx.restore();
       const dataOut = out.toDataURL('image/png', 0.92);
-
       const p = players.find(x=>x.id===targetId);
       if (p){ p.avatar = dataOut; render(); save(); }
       cleanup(); dlg.close();
     };
     saveBtn.addEventListener('click', onSave);
 
-    // Cleanup listeners when dialog closes
+    // Cleanup
     function cleanup(){
-      cvs.removeEventListener('wheel', onWheel);
+      cvs.replaceWith(cvs.cloneNode(true)); mask.replaceWith(mask.cloneNode(true)); // drop handlers quickly
       zoom.removeEventListener('input', onZoom);
       resetBtn?.removeEventListener('click', onReset);
       saveBtn.removeEventListener('click', onSave);
@@ -686,11 +685,8 @@
   // Init
   load();
   ensureTwoPlayers();
-  $("#limitInput").value = limit;
-  $("#autoAdvance").checked = autoAdvanceDealer;
-  $("#lockOrderSwitch").checked = lockOrder;
+  applyI18n();
   render();
-
 })();
 </script>
 </body>
