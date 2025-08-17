@@ -1,592 +1,615 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Conga by Alanis — STAGE v3.5.9</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Conga by Alanis — STAGE v3.5.4</title>
+<meta name="theme-color" content="#0f1220" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
 
-  <!-- Prevent accidental zooming on mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<style>
+  :root{
+    --bg:#0f1220; --card:#171a2b; --muted:#2a2f4a; --text:#e8ecff; --sub:#b8c0ff;
+    --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b; --warn:#ffb020;
+    --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
+    background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.35;
+  }
+  .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
 
-  <meta name="theme-color" content="#0b1222" />
+  /* ===== Header (compact) ===== */
+  header{
+    display:grid;
+    grid-template-columns: 1fr auto auto;
+    align-items:center;
+    gap:10px;
+    padding:6px 0 2px 0;
+    margin-bottom:8px;
+  }
+  .brand-wrap{min-width:0}
+  .brand{
+    display:flex; align-items:baseline; gap:10px; min-width:0;
+  }
+  .title{
+    font-weight:900; letter-spacing:.2px;
+    font-size: clamp(18px, 5vw, 26px);
+    color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .ver{
+    font-weight:800; font-size:12px; color:var(--sub); opacity:.9;
+  }
+  .lang-pill{
+    display:inline-flex; gap:8px; align-items:center;
+    border:1px dashed rgba(255,255,255,.18);
+    border-radius:999px; padding:6px 10px; height:36px;
+    color:var(--text); font-weight:800; letter-spacing:.2px;
+    user-select:none;
+  }
+  .lang-pill button{
+    appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer;
+    opacity:.85;
+  }
+  .lang-pill .active{ opacity:1; text-decoration:underline; }
 
-  <style>
-    :root{
-      --bg:#0b1222;
-      --grad1:#0f1a2e;
-      --grad2:#0b1222;
-      --panel:#121c30;
-      --panel2:#101a2b;
-      --chip:#1b2944;
-      --chip-border:#3a4d71;
-      --text:#e7eefc;
-      --sub:#aeb9cd;
-      --brand1:#8aa8ff;
-      --brand2:#c49bff;
-      --ok:#64efb2;
-      --warn:#ff8c8c;
-      --ring:#2bd8a8;
-      --shadow:0 12px 30px rgba(0,0,0,.35);
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
-      color:var(--text);
-      background: radial-gradient(1200px 800px at 20% -10%, var(--grad1) 60%, var(--grad2));
-    }
-    .container{max-width:980px;margin:0 auto;padding:20px 16px 64px}
+  .iconbtn{
+    width:40px; height:40px; display:grid; place-items:center; border-radius:12px;
+    border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;
+  }
 
-    /* ===== Header (v3.5.5 look) ===== */
-    .header{
-      display:grid;
-      grid-template-columns:minmax(0,1fr) auto auto;
-      align-items:center;
-      gap:12px;
-      margin-top:4px;
-    }
-    .title-wrap{min-width:0}
-    .title{
-      font-weight:900;
-      font-size:clamp(22px,6vw,32px);
-      line-height:1.1;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
-    .stage{
-      margin-top:6px;
-      font-weight:800;
-      color:var(--sub);
-      letter-spacing:.5px;
-      font-size:clamp(12px,3.4vw,14px);
-    }
-    .lang{
-      display:flex;align-items:center;gap:10px;
-      background:rgba(255,255,255,.06);
-      border:1px dashed rgba(255,255,255,.15);
-      padding:10px 14px;border-radius:999px;
-      backdrop-filter: blur(4px);
-    }
-    .lang button{
-      border:0;background:transparent;color:var(--sub);
-      font-weight:900;letter-spacing:.5px;
-      padding:8px 12px;border-radius:10px;cursor:pointer
-    }
-    .lang button.active{background:#1e2a44;color:var(--text)}
-    .icon-btn{
-      width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
-      background:rgba(255,255,255,.07);border:1px dashed rgba(255,255,255,.15);cursor:pointer
-    }
+  /* ===== Card + tools row ===== */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding:10px;
+  }
 
-    /* ===== Controls row ===== */
-    .controls{
-      margin-top:16px;
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      border-radius:20px;padding:16px;box-shadow:var(--shadow)
-    }
-    .chip-row{
-      display:flex;gap:12px;align-items:center;flex-wrap:nowrap;
-    }
-    .chip{
-      display:flex;align-items:center;gap:10px;
-      padding:12px 14px;border-radius:16px;
-      background:rgba(255,255,255,.06);
-      border:2px dashed rgba(255,255,255,.18);
-      color:var(--text);font-weight:900;white-space:nowrap;min-width:0;
-      flex:1 1 0;justify-content:center;font-size:clamp(14px,3.8vw,18px)
-    }
-    .chip .lock{
-      width:18px;height:18px;border-radius:4px;
-      background: linear-gradient(#f9e48a, #caa12e);
-      display:inline-block;position:relative;flex:0 0 auto
-    }
-    .chip .lock:before{
-      content:"";position:absolute;left:50%;top:-6px;transform:translateX(-50%);
-      width:12px;height:8px;border:3px solid #caa12e;border-bottom:0;border-radius:10px
-    }
-    .chip.solid{
-      background:linear-gradient(135deg, #8aa8ff, #c49bff);
-      border:0;color:#0b1222;box-shadow:0 8px 18px rgba(69,105,255,.35);
-      font-weight:1000;
-    }
+  .tools{
+    display:flex; gap:8px; align-items:center; white-space:nowrap;
+  }
+  .btn{
+    appearance:none; border:0; cursor:pointer; user-select:none;
+    padding:10px 12px; border-radius:12px;
+    background: linear-gradient(135deg, #1a2344, #121a34);
+    border:1px dashed rgba(255,255,255,.22);
+    color:var(--text); font-weight:900; letter-spacing:.2px;
+    transition:.15s;
+    flex:1 1 0; min-width:0; white-space:nowrap;
+    font-size: clamp(12px, 3.4vw, 16px);
+  }
+  .btn:hover{ filter:brightness(1.07)}
+  .btn:active{ transform:translateY(1px)}
+  .btn.primary{ background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid; }
+  .btn.success{ background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid; }
 
-    .section-title{margin:18px 6px 10px;color:var(--sub);font-weight:800}
+  /* ===== Players ===== */
+  .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
+  .row{
+    display:grid; grid-template-columns: 28px 64px 1fr auto;
+    align-items:center; gap:10px; padding:10px; border-radius:14px;
+    border:1px solid rgba(255,255,255,.06);
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    margin-bottom:8px;
+  }
+  .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
+  .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
+  .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset; }
+  .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
+    background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800;}
+  .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25); }
+  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:22px; font-weight:900; }
+  .scorewrap{ display:flex; align-items:center; gap:8px; min-width:86px; justify-content:flex-end; }
+  .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
+  .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
+  .score.over{ color:var(--danger) }
 
-    /* ===== Players ===== */
-    .players{display:flex;flex-direction:column;gap:14px}
-    .row{
-      background:linear-gradient(180deg, #0f1a2a, #0d1728);
-      border-radius:20px;padding:16px;
-      outline:2px solid rgba(255,255,255,.06);
-      box-shadow:var(--shadow)
-    }
-    .row.active{outline-color:rgba(47,255,205,.45)}
-    .row.drag-hint{outline-color:#8aa8ff}
-    .row-body{display:grid;grid-template-columns:28px 72px 1fr auto;align-items:center;gap:14px}
-    .handle{font-size:20px;color:var(--sub);opacity:.9;cursor:grab}
-    .badge{
-      width:60px;height:60px;border-radius:50%;display:grid;place-items:center;
-      color:var(--text);font-weight:1000;background:#15223b;position:relative;user-select:none
-    }
-    .badge:before{
-      content:"";position:absolute;inset:-6px;border-radius:50%;
-      border:6px solid var(--ring);opacity:.9
-    }
-    .pname{font-size:clamp(16px,5.2vw,28px);font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .score{font-size:clamp(16px,5.2vw,28px);font-weight:1000;opacity:.95;text-align:right;min-width:2ch}
+  /* ===== Dialogs (only styles that matter for layout in this rev) ===== */
+  dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
+    box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+  dialog::backdrop{ background: rgba(2,6,23,.55) }
+  .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
+  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
+  input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
+    color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
+  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
-    .add-player{
-      border:2px dashed rgba(255,255,255,.25);
-      border-radius:18px;padding:18px;text-align:center;color:var(--text);
-      font-weight:900;background:transparent;cursor:pointer
-    }
+  /* Round dialog (scrollable on small screens) */
+  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
+  .grid-rows{ display:grid; gap:6px }
+  .round-row{ display:grid; grid-template-columns: 1fr 120px 64px; gap:8px; align-items:center;
+    padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
+  .round-row input[type="number"]{ height:34px; padding:6px 8px; }
+  .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
+  .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-    /* ===== Modal ===== */
-    dialog{border:0;background:transparent}
-    .modal{
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      border-radius:18px;padding:18px;min-width:min(560px,94vw);color:var(--text);
-      box-shadow:var(--shadow);max-height:80vh;overflow:auto
-    }
-    .modal .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-    .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
-    .btn.ghost{background:rgba(255,255,255,.08);color:var(--text)}
-    .btn.primary{background:var(--ok);color:#0b1222}
-    .grid{display:grid;gap:10px}
-    .rowInput{
-      display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;
-      background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.15);
-      border-radius:12px;padding:10px
-    }
-    .rowInput .nm{font-weight:900}
-    .rowInput input[type="number"]{
-      width:120px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);
-      background:#0f1a2a;color:var(--text);font-weight:800
-    }
-    .minus10{
-      display:flex;align-items:center;gap:8px;border-radius:10px;padding:8px 10px;
-      background:#16243f;border:1px dashed rgba(255,255,255,.18);cursor:pointer
-    }
-    .footerRow{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+  /* Win overlay (compact) */
+  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
+  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
+  .win-head{ display:flex; align-items:center; gap:12px}
+  .win-photo{ width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)}
+  .win-photo img{ width:100%; height:100%; object-fit:cover}
+  .win-name{ font-size:20px; font-weight:900}
+  #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
 
-    /* Make sure the three chips stay on the same row even in ES */
-    @media (max-width:420px){
-      .chip{padding:12px 10px;font-size:14px}
-      .rowInput input[type="number"]{width:100px}
-    }
-  </style>
+  /* Responsive: hide pill if it would crowd the header; tools must remain 1 row */
+  @media (max-width: 410px){
+    .lang-pill{ display:none; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <header class="header" id="hdr">
-      <div class="title-wrap">
+<div class="app" id="app">
+  <header>
+    <div class="brand-wrap">
+      <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="stage" id="appStage">STAGE v3.5.9</div>
+        <div class="ver" id="verLine">STAGE v3.5.4</div>
       </div>
+    </div>
 
-      <div class="lang" id="langWrap" role="group" aria-label="Language">
-        <button id="langEN" class="active" type="button">EN</button>
-        <span style="opacity:.4">|</span>
-        <button id="langES" type="button">ES</button>
-      </div>
+    <div class="lang-pill" id="langPill" aria-label="Language">
+      <button data-lang="en" id="pillEn" class="active">EN</button>
+      <span>/</span>
+      <button data-lang="es" id="pillEs">ES</button>
+    </div>
 
-      <button class="icon-btn" id="btnSettings" title="Settings">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
-                stroke="currentColor" stroke-width="2"/>
-          <path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.2a1 1 0 0 1-.2 1.4l-1.1.9a1 1 0 0 1-1.2.1l-1.1-.6a1 1 0 0 0-1.1.1l-.3.2a1 1 0 0 0-.4 1.1l.2 1.3a1 1 0 0 1-1 .9h-1.4a1 1 0 0 1-1-.9l.2-1.3a1 1 0 0 0-.4-1.1l-.3-.2a1 1 0 0 0-1.1-.1l-1.1.6a1 1 0 0 1-1.2-.1l-1.1-.9a1 1 0 0 1-.2-1.4l.1-.2a1 1 0 0 0 .2-1.1l-.1-.3a1 1 0 0 0-1-.7l-1.3-.1a1 1 0 0 1-.9-1v-1.4a1 1 0 0 1 .9-1l1.3-.1a1 1 0 0 0 1-.7l.1-.3a1 1 0 0 0-.2-1.1l-.1-.2a1 1 0 0 1 .2-1.4l1.1-.9a1 1 0 0 1 1.2-.1l1.1.6a1 1 0 0 0 1.1-.1l.3-.2a1 1 0 0 0 .4-1.1l-.2-1.3a1 1 0 0 1 1-.9h1.4a1 1 0 0 1 1 .9l-.2 1.3a1 1 0 0 0 .4 1.1l.3.2a1 1 0 0 0 1.1.1l1.1-.6a1 1 0 0 1 1.2.1l1.1.9a1 1 0 0 1 .2 1.4l-.1.2a1 1 0 0 0-.2 1.1l.1.3a1 1 0 0 0 1 .7l1.3.1a1 1 0 0 1 .9 1v1.4a1 1 0 0 1-.9 1l-1.3.1a1 1 0 0 0-1 .7l-.1.3Z"
-                stroke="currentColor" stroke-width="1.4"/>
-        </svg>
-      </button>
-    </header>
+    <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
+  </header>
 
-    <!-- Controls row -->
-    <section class="controls">
-      <div class="chip-row">
-        <button id="btnReorder" class="chip" type="button">
-          <i class="lock" aria-hidden="true"></i>
-          <span data-i18n="reorder">Reorder</span>
-        </button>
-        <button id="btnHistory" class="chip" type="button">
-          <span data-i18n="history">History</span>
-        </button>
-        <button id="btnNewRound" class="chip solid" type="button">
-          <span data-i18n="newRound">New round</span>
-        </button>
-      </div>
-    </section>
+  <section class="card" style="padding:10px; margin-bottom:8px">
+    <div class="tools">
+      <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
+      <button id="historyBtn" class="btn"> <span data-i18n="history">History</span></button>
+      <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
+    </div>
+  </section>
 
-    <!-- Players -->
-    <h3 class="section-title" id="playersLabel">Players</h3>
-    <div id="players" class="players" aria-live="polite"></div>
+  <section class="players">
+    <header><div data-i18n="players">Players</div></header>
+    <div id="playersList" aria-live="polite"></div>
+    <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
+  </section>
+</div>
 
-    <button id="addPlayer" class="add-player" type="button">
-      <span id="addPlayerLbl">+ Add player</span>
-    </button>
+<!-- SETTINGS -->
+<dialog id="settingsDialog" aria-labelledby="settingsTitle">
+  <div class="modal-head">
+    <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
+    <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
   </div>
+  <div class="modal-body" style="display:grid; gap:14px">
+    <div style="display:flex; gap:8px; align-items:center">
+      <label style="margin:0;min-width:120px" data-i18n="language">Language</label>
+      <select id="langSelect" style="max-width:160px">
+        <option value="en">English (EN)</option>
+        <option value="es">Español (ES)</option>
+      </select>
+    </div>
+    <div>
+      <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
+      <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
+    </div>
+    <label class="switch" style="display:flex; align-items:center; gap:10px">
+      <input id="autoAdvance" type="checkbox" />
+      <span data-i18n="autoAdvance">Auto-advance dealer after round</span>
+    </label>
+    <label class="switch" style="display:flex; align-items:center; gap:10px">
+      <input id="lockOrderSwitch" type="checkbox" />
+      <span data-i18n="lockOrder">Lock player reordering</span>
+    </label>
+    <div style="display:flex; gap:8px; flex-wrap:wrap">
+      <button class="btn" id="exportBtn" data-i18n="exportCsv">Export CSV</button>
+      <button class="btn" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
+      <button class="btn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn success" onclick="settingsDialog.close()" data-i18n="done">Done</button>
+  </div>
+</dialog>
 
-  <!-- ===== New round modal ===== -->
-  <dialog id="roundDlg">
-    <div class="modal" role="dialog" aria-labelledby="roundTitle">
-      <div class="hd">
-        <strong id="roundTitle">New Round</strong>
-        <button class="btn ghost" id="roundClose">Close</button>
-      </div>
-      <p style="margin:0 0 10px;color:var(--sub)" id="roundHint">
-        Enter points (negatives OK). “−10” selects exactly one player and sets that input to −10.
-      </p>
+<!-- Round dialog -->
+<dialog id="roundDialog" aria-labelledby="roundTitle">
+  <div class="modal-head">
+    <div>
+      <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
+      <div class="hint" data-i18n="roundHint">Enter points (negatives OK). “−10” changes the input.</div>
+    </div>
+    <button class="btn" onclick="roundDialog.close()" style="padding:6px 10px">Close</button>
+  </div>
+  <form id="roundForm" method="dialog">
+    <div class="modal-body">
+      <div class="grid-rows" id="roundRows"></div>
+    </div>
+    <div class="modal-foot">
+      <div id="roundError" class="error" style="display:none"></div>
+      <button type="button" class="btn" onclick="roundDialog.close()" data-i18n="cancel">Cancel</button>
+      <button id="applyRoundBtn" type="submit" class="btn success" data-i18n="apply">Apply</button>
+    </div>
+  </form>
+</dialog>
 
-      <div id="roundForm" class="grid"></div>
+<!-- Edit player dialog -->
+<dialog id="editDialog" aria-labelledby="editTitle">
+  <div class="modal-head">
+    <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
+    <button class="btn" onclick="editDialog.close()" style="padding:6px 10px">Close</button>
+  </div>
+  <form id="editForm" method="dialog">
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+      <div style="display:grid; gap:10px">
+        <div>
+          <label for="editName" data-i18n="name">Name</label>
+          <input id="editName" type="text" required />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+          <div>
+            <label for="editScore" data-i18n="score">Score</label>
+            <input id="editScore" type="number" step="1" />
+          </div>
+          <div>
+            <label for="editReeng" data-i18n="reenganches">Reenganches</label>
+            <input id="editReeng" type="number" step="1" min="0" />
+          </div>
+        </div>
 
-      <div class="footerRow">
-        <button class="btn ghost" id="roundCancel">Cancel</button>
-        <button class="btn primary" id="roundApply">Apply</button>
+        <div style="display:grid; gap:10px; margin-top:6px">
+          <div>
+            <label data-i18n="photo">Photo</label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <button type="button" class="btn" id="changePhotoBtn" data-i18n="changePhoto">Change photo</button>
+              <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
+            </div>
+          </div>
+          <label class="switch" style="display:flex; align-items:center; gap:10px">
+            <input id="setDealerSwitch" type="checkbox">
+            <span data-i18n="setDealer">Set as next dealer</span>
+          </label>
+          <div>
+            <button type="button" class="btn" id="deletePlayerBtn" data-i18n="deletePlayer">Delete player</button>
+          </div>
+        </div>
       </div>
     </div>
-  </dialog>
-
-  <!-- ===== Settings (only language passthrough) ===== -->
-  <dialog id="settings">
-    <div class="modal" role="dialog" aria-labelledby="sH">
-      <div class="hd">
-        <strong id="sH">Settings</strong>
-        <button class="btn ghost" id="sClose">Close</button>
-      </div>
-      <p style="margin:0 0 6px;color:var(--sub)">Language</p>
-      <div class="lang">
-        <button id="setEN" class="active" type="button">EN</button>
-        <span style="opacity:.4">|</span>
-        <button id="setES" type="button">ES</button>
-      </div>
-      <div style="height:10px"></div>
-      <button class="btn primary" id="sDone">Done</button>
+    <div class="modal-foot">
+      <button class="btn" type="button" onclick="editDialog.close()" data-i18n="cancel">Cancel</button>
+      <button class="btn success" type="submit" data-i18n="save">Save</button>
     </div>
-  </dialog>
+  </form>
+</dialog>
 
-  <script>
-    /**********************
-     * i18n
-     *********************/
-    const STRINGS = {
-      en:{
-        title:"Conga by Alanis",
-        stage:"STAGE v3.5.9",
-        players:"Players",
-        reorder:"Reorder",
-        history:"History",
-        newRound:"New round",
-        addPlayer:"+ Add player",
-        newRoundT:"New Round",
-        newRoundHint:"Enter points (negatives OK). “−10” selects exactly one player and sets that input to −10.",
-        current:"Current",
-        close:"Close", cancel:"Cancel", apply:"Apply",
-        p:"P"
-      },
-      es:{
-        title:"Conga por Alanis",
-        stage:"ETAPA v3.5.9",
-        players:"Jugadores",
-        reorder:"Reordenar",
-        history:"Historial",
-        newRound:"Nueva ronda",
-        addPlayer:"+ Agregar jugador",
-        newRoundT:"Nueva ronda",
-        newRoundHint:"Ingresa puntos (se permiten negativos). “−10” selecciona exactamente un jugador y fija ese valor en −10.",
-        current:"Actual",
-        close:"Cerrar", cancel:"Cancelar", apply:"Aplicar",
-        p:"J"
-      }
-    };
+<!-- Win overlay -->
+<div class="win-overlay" id="winOverlay" aria-live="polite">
+  <div class="win-card">
+    <canvas id="confettiCanvas"></canvas>
+    <div class="win-head">
+      <div class="win-photo"><img id="winPhoto" alt=""></div>
+      <div>
+        <div class="win-name" id="winName">Winner</div>
+        <div class="win-sub" id="winSubtitle" data-i18n="winner">WINNER</div>
+      </div>
+    </div>
+    <div class="win-actions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap">
+      <button class="btn success" id="newGameBtn2" data-i18n="newGame">New game</button>
+      <button class="btn" id="winCloseBtn" data-i18n="close">Close</button>
+    </div>
+  </div>
+</div>
 
-    /**********************
-     * State & storage
-     *********************/
-    const STORAGE_KEY = "conga_state_v2";
-    const LANG_KEY = "conga_lang";
-    const defaultState = () => ({
-      players: [],
-      nextDealer: 0
+<audio id="winSound" preload="auto">
+  <source type="audio/mp3"
+    src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAQAAABgAABcAAABWAAACAAACAQAAAC4AAABfAAAAdwAAAIQAAACkAAAAvwAAAN4AAAD///8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAAAgP8AAP//AP//AP8AAP//AAAAAP8AAP//AP//AP//AP//AP//AP//AAAAAAA="/>
+</audio>
+
+<!-- Hidden inputs -->
+<input id="photoInput" type="file" accept="image/*" hidden>
+
+<!-- Player row template -->
+<template id="playerRowTpl">
+  <div class="row" draggable="true" aria-grabbed="false" title="Long-press to Edit">
+    <div class="drag" aria-hidden="true">≡</div>
+    <div class="avatar" aria-hidden="true"><span class="initials">P</span></div>
+    <strong class="playerName">Player</strong>
+    <div class="scorewrap">
+      <span class="stars" aria-label="Reenganches"></span>
+      <span class="score" aria-label="Score"><span class="scoreVal">0</span></span>
+    </div>
+  </div>
+</template>
+
+<script>
+(() => {
+  "use strict";
+  /* ===== utils ===== */
+  const $ = s => document.querySelector(s);
+  const bind = (sel, prop, fn) => { const el = $(sel); if (el) el[prop] = fn; };
+  const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
+  const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
+  const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
+  const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
+  const csv=s=>(/[",\n]/.test(s)?'"'+String(s).replace(/"/g,'""')+'"':String(s));
+  const todayStr=()=> new Date().toISOString().slice(0,10);
+
+  const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
+    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
+    document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
+
+  /* ===== i18n ===== */
+  const STR = {
+    en:{
+      reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
+      settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
+      lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
+      done:"Done", roundHint:"Enter points (negatives OK). “−10” changes the input.",
+      cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
+      photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
+      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
+    },
+    es:{
+      reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
+      settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
+      lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
+      done:"Listo", roundHint:"Ingresa puntos (negativos ok). “−10” cambia el campo.",
+      cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
+      photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
+      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
+    }
+  };
+  const storageLangKey = "conga_lang";
+  let LANG = localStorage.getItem(storageLangKey) || "en";
+  function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.en[k] || k; }
+  function applyI18n(){
+    document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
+    $("#pillEn")?.classList.toggle("active", LANG==="en");
+    $("#pillEs")?.classList.toggle("active", LANG==="es");
+    const sel=$("#langSelect"); if(sel) sel.value=LANG;
+  }
+
+  /* ===== state ===== */
+  const storageKey="conga_state_stage_v354";
+  let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
+  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
+
+  const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
+  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
+  const load=()=>{ try{
+      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+      players = Array.isArray(s.players)? s.players : [];
+      // Always start with at least two players if empty
+      if(!players.length){ players=[{id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},{id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}]; }
+      limit = Number.isFinite(s.limit)? s.limit : 100;
+      autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
+      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
+      gameOver = !!s.gameOver;
+      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
+      roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
+      rounds = Array.isArray(s.rounds)? s.rounds : [];
+      winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
+      lockOrder = !!s.lockOrder; pruneWins();
+    }catch(e){ players=[]; } };
+
+  /* ===== render ===== */
+  const list=$("#playersList"), rowTpl=$("#playerRowTpl");
+  function render(){
+    $("#limitInput").value=limit;
+    $("#autoAdvance").checked=autoAdvanceDealer;
+    $("#lockOrderSwitch").checked=lockOrder;
+    $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
+    $("#lockToggle").title = t("reorder");
+    if(list) list.innerHTML="";
+    for(let i=0;i<players.length;i++){
+      const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
+      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
+      if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
+      attachLongPress(n, ()=>openEdit(p.id));
+      if(p.id===nextDealerId) n.classList.add("dealer");
+      const avatarBox=n.querySelector(".avatar");
+      if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
+      n.querySelector(".playerName").textContent=p.name||"—";
+      const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
+      const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
+      const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
+      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
+      list && list.appendChild(n);
+    }
+    $("#newRoundBtn").disabled=gameOver || players.length===0;
+    applyI18n();
+    save();
+  }
+
+  function attachLongPress(el, cb){
+    let tmr, moved=false;
+    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const end = ()=>{ clearTimeout(tmr); };
+    el.addEventListener('touchstart', start, {passive:true});
+    el.addEventListener('mousedown', start);
+    el.addEventListener('touchmove', ()=>{ moved=true; }, {passive:true});
+    ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
+  }
+
+  /* drag */
+  let dragIdx=null; const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
+  const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
+  const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; arr.splice(to,0,m); const keep=nextDealerId; players=arr; nextDealerId=keep; render(); }};
+  const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
+
+  /* edit */
+  const editDlg=$("#editDialog"), editForm=$("#editForm"), photoInput=$("#photoInput");
+  function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
+    $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
+    const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
+    bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
+    bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
+    bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
+    editDlg && editDlg.showModal();
+  }
+  if(editForm) editForm.addEventListener("submit", (e)=>{
+    e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
+    p.name=String($("#editName").value||"").trim()||p.name; p.score=clampInt($("#editScore").value, p.score); p.reenganches=Math.max(0, clampInt($("#editReeng").value, p.reenganches));
+    const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
+  });
+
+  /* photo -> simple square cropper (existing behavior preserved) */
+  if(photoInput){
+    photoInput.removeAttribute('capture');
+    photoInput.addEventListener("change", async()=>{
+      if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
+      const file=photoInput.files[0];
+      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+      // use offscreen canvas to letterbox to square using center crop (stable + fast)
+      const img=new Image(); img.onload=()=>{
+        const side=Math.min(img.width,img.height);
+        const sx=(img.width-side)/2, sy=(img.height-side)/2;
+        const out=document.createElement('canvas'); out.width=512; out.height=512;
+        const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,512,512);
+        const dataOut=out.toDataURL('image/png',0.92);
+        const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); save(); }
+        window._photoTarget=null;
+      }; img.src=dataUrl;
     });
+  }
 
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
+  /* round dialog */
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
+  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
+    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
+      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
+      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
+      r.append(name,inp,minus); rows.appendChild(r);
+    });
+    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal();
+  };
+  const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
 
-    function loadState(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return defaultState();
-        const s = JSON.parse(raw);
-        if(!Array.isArray(s.players)) s.players = [];
-        return s;
-      }catch(e){ return defaultState(); }
-    }
-    function saveState(s){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-    }
+  function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
-    function ensureTwoPlayers(s){
-      const baseNames = ["Player 1","Player 2"];
-      if(currentLang()==="es") baseNames.splice(0,2,"Jugador 1","Jugador 2");
-      while(s.players.length<2){
-        const i = s.players.length;
-        s.players.push({
-          id: crypto?.randomUUID?.() || `${Date.now()}_${Math.random()}`,
-          name: baseNames[i] || (currentLang()==="es" ? `Jugador ${i+1}` : `Player ${i+1}`),
-          score: 0,
-          avatar:null, eliminated:false
-        });
-      }
-    }
+  function applyRound(inputs){
+    const snapshotInputs = JSON.parse(JSON.stringify(inputs));
+    const roundNo = roundCounter + 1;
+    const proj=new Map(); players.forEach(p=>proj.set(p.id, clampInt(p.score||0)+clampInt(inputs[p.id]||0)));
+    roundCounter += 1;
 
-    /**********************
-     * Language helpers
-     *********************/
-    function currentLang(){ return localStorage.getItem(LANG_KEY) || "en"; }
-    function setLang(l){ localStorage.setItem(LANG_KEY,l); render(); }
+    const under = players.filter(p => (proj.get(p.id) <= limit));
+    const over  = players.filter(p => (proj.get(p.id) >= (limit+1)));
 
-    function applyI18n(){
-      const d = STRINGS[currentLang()];
-      $("#appTitle").textContent = d.title;
-      $("#appStage").textContent = d.stage;
-      $("#playersLabel").textContent = d.players;
-      $("[data-i18n='reorder']").textContent = d.reorder;
-      $("[data-i18n='history']").textContent = d.history;
-      $("[data-i18n='newRound']").textContent = d.newRound;
-      $("#addPlayerLbl").textContent = d.addPlayer;
-
-      // modal text
-      $("#roundTitle").textContent = d.newRoundT;
-      $("#roundHint").textContent = d.newRoundHint;
-
-      // lang pill active
-      $("#langEN").classList.toggle("active", currentLang()==="en");
-      $("#langES").classList.toggle("active", currentLang()==="es");
-      $("#setEN").classList.toggle("active", currentLang()==="en");
-      $("#setES").classList.toggle("active", currentLang()==="es");
-    }
-
-    /**********************
-     * Render players
-     *********************/
-    const playersEl = $("#players");
-    let reorderUnlocked = false;
-
-    function renderPlayers(){
-      const s = loadState();
-      ensureTwoPlayers(s);
-      saveState(s);
-
-      playersEl.innerHTML = "";
-      s.players.forEach((p, idx)=>{
-        const row = document.createElement("div");
-        row.className = "row" + (idx===s.nextDealer ? " active" : "");
-        row.draggable = reorderUnlocked;
-        row.dataset.id = p.id;
-
-        const body = document.createElement("div");
-        body.className = "row-body";
-
-        const handle = document.createElement("div");
-        handle.className = "handle";
-        handle.textContent = "≡";
-        handle.title = "Drag";
-        body.appendChild(handle);
-
-        const badge = document.createElement("div");
-        badge.className = "badge";
-        badge.textContent = (STRINGS[currentLang()].p) + (idx+1);
-        body.appendChild(badge);
-
-        const nm = document.createElement("div");
-        nm.className = "pname";
-        nm.textContent = p.name;
-        body.appendChild(nm);
-
-        const sc = document.createElement("div");
-        sc.className = "score";
-        sc.textContent = p.score;
-        body.appendChild(sc);
-
-        row.appendChild(body);
-        playersEl.appendChild(row);
-
-        if(reorderUnlocked){
-          row.addEventListener("dragstart", onDragStart);
-          row.addEventListener("dragover", onDragOver);
-          row.addEventListener("dragleave", onDragLeave);
-          row.addEventListener("drop", onDrop);
+    // Reenganche ONLY at == limit+1 => set to max≤limit
+    if (under.length >= 2 && over.length){
+      const maxUnderVal = Math.max.apply(null, under.map(p => proj.get(p.id)));
+      players.forEach(p=>{
+        let val = proj.get(p.id);
+        if (val >= (limit+1)){
+          proj.set(p.id, maxUnderVal);
+          p.reenganches = (p.reenganches||0) + 1;
         }
       });
     }
 
-    function render(){ applyI18n(); renderPlayers(); }
+    players.forEach(p=>{ p.score=proj.get(p.id); });
 
-    /**********************
-     * Drag reorder (when unlocked)
-     *********************/
-    let dragId = null;
-    function onDragStart(e){
-      dragId = e.currentTarget.dataset.id;
-      e.dataTransfer.effectAllowed = "move";
+    // Dealer auto-advance (kept by id if reordered)
+    if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
+
+    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
+    gameOver=false;
+
+    // Winner check (lowest score, everyone else >= limit+1 OR someone exactly lowest <= limit when others > limit ?)
+    const alive = players.filter(p=>p.score<=limit);
+    if(alive.length===1){
+      gameOver=true;
+      const winner=alive[0];
+      winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
+      showWinOverlay(winner);
     }
-    function onDragOver(e){
-      e.preventDefault();
-      e.currentTarget.classList.add("drag-hint");
-    }
-    function onDragLeave(e){
-      e.currentTarget.classList.remove("drag-hint");
-    }
-    function onDrop(e){
-      e.preventDefault();
-      const targetId = e.currentTarget.dataset.id;
-      e.currentTarget.classList.remove("drag-hint");
-      if(!dragId || dragId===targetId) return;
-      const s = loadState();
-      const from = s.players.findIndex(p=>p.id===dragId);
-      const to = s.players.findIndex(p=>p.id===targetId);
-      if(from<0||to<0) return;
-      const [moved] = s.players.splice(from,1);
-      s.players.splice(to,0,moved);
-      saveState(s);
-      renderPlayers();
-    }
+    render();
+  }
 
-    /**********************
-     * New round dialog
-     *********************/
-    const roundDlg = $("#roundDlg");
-    const roundForm = $("#roundForm");
-    $("#btnNewRound").addEventListener("click", openRound);
-    $("#roundClose").addEventListener("click", ()=>roundDlg.close());
-    $("#roundCancel").addEventListener("click", ()=>roundDlg.close());
-    $("#roundApply").addEventListener("click", applyRound);
+  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
-    function openRound(){
-      const d = STRINGS[currentLang()];
-      const s = loadState();
-      ensureTwoPlayers(s);
-      saveState(s);
-
-      roundForm.innerHTML = "";
-      const radioName = "minusTen";
-      s.players.forEach((p, idx)=>{
-        const row = document.createElement("div");
-        row.className = "rowInput";
-
-        const nm = document.createElement("div");
-        nm.className = "nm";
-        nm.textContent = `${p.name}  ·  ${d.current}: ${p.score}`;
-        row.appendChild(nm);
-
-        const input = document.createElement("input");
-        input.type="number";
-        input.inputMode="numeric";
-        input.placeholder="0";
-        input.dataset.pid = p.id;
-        row.appendChild(input);
-
-        const m10 = document.createElement("label");
-        m10.className="minus10";
-        const r = document.createElement("input");
-        r.type="radio"; r.name=radioName; r.value=p.id; r.style.accentColor="#64efb2";
-        const span = document.createElement("span");
-        span.textContent="−10";
-        m10.appendChild(r); m10.appendChild(span);
-        row.appendChild(m10);
-
-        roundForm.appendChild(row);
-      });
-
-      roundDlg.showModal();
-    }
-
-    function applyRound(){
-      const s = loadState();
-      const chosen = roundForm.querySelector('input[type="radio"][name="minusTen"]:checked');
-      if(!chosen){
-        alert(currentLang()==="es" ? "Debes elegir exactamente un −10." : "You must choose exactly one −10.");
-        return;
-      }
-      const minusId = chosen.value;
-
-      // collect points
-      const inputs = roundForm.querySelectorAll('input[type="number"]');
-      const points = {};
-      inputs.forEach(inp=>{
-        const id = inp.dataset.pid;
-        let val = inp.value.trim()==="" ? 0 : Number(inp.value);
-        if(id===minusId) val = -10;
-        if(Number.isNaN(val)) val = 0;
-        points[id] = Math.trunc(val);
-      });
-
-      // apply
-      s.players = s.players.map(p => ({...p, score: p.score + (points[p.id] ?? 0)}));
-      // advance dealer
-      s.nextDealer = (s.nextDealer + 1) % s.players.length;
-      saveState(s);
-      roundDlg.close();
-      render();
-    }
-
-    /**********************
-     * Add player
-     *********************/
-    $("#addPlayer").addEventListener("click", ()=>{
-      const s = loadState();
-      ensureTwoPlayers(s);
-      const idx = s.players.length + 1;
-      s.players.push({
-        id: crypto?.randomUUID?.() || `${Date.now()}_${Math.random()}`,
-        name: currentLang()==="es" ? `Jugador ${idx}` : `Player ${idx}`,
-        score: 0,
-        avatar:null, eliminated:false
-      });
-      saveState(s);
-      renderPlayers();
+  /* history modal */
+  function openRoundsTable(){
+    const dlg=document.createElement('dialog');
+    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
+    const twrap=dlg.querySelector(".table-wrap");
+    const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
+    trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name}</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
+    const tbody=document.createElement('tbody');
+    rounds.forEach(r=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:""}</td>`).join("");
+      tbody.appendChild(tr);
     });
+    table.appendChild(tbody); twrap.appendChild(table);
+    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); dlg.showModal();
+  }
 
-    /**********************
-     * Reorder lock/unlock
-     *********************/
-    $("#btnReorder").addEventListener("click", ()=>{
-      reorderUnlocked = !reorderUnlocked;
-      // subtle visual change: when unlocked, change border to solid highlight
-      $("#btnReorder").style.borderStyle = reorderUnlocked ? "solid" : "dashed";
-      renderPlayers();
-    });
+  /* wire-up */
+  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
+  bind("#historyBtn","onclick", openRoundsTable);
+  bind("#newRoundBtn","onclick", openRound);
+  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
+  bind("#exportBtn","onclick", exportCSV);
+  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
+  bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
+  on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
+  on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
+  on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
 
-    /**********************
-     * History/Settings (stubs)
-     *********************/
-    $("#btnHistory").addEventListener("click", ()=>{
-      alert(currentLang()==="es" ? "Historial (pendiente)" : "History (todo)");
-    });
+  const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
+  const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-    const settingsDlg = $("#settings");
-    $("#btnSettings").addEventListener("click", ()=>settingsDlg.showModal());
-    $("#sClose").addEventListener("click", ()=>settingsDlg.close());
-    $("#sDone").addEventListener("click", ()=>settingsDlg.close());
-    $("#setEN").addEventListener("click", ()=>setLang("en"));
-    $("#setES").addEventListener("click", ()=>setLang("es"));
+  /* win overlay */
+  function showWinOverlay(winner){
+    const ov=$("#winOverlay"); if(!ov) return;
+    $("#winName").textContent = winner?.name || 'Winner';
+    $("#winPhoto").src = winner?.avatar || '';
+    ov.style.display='flex';
+    try{ $("#winSound").play().catch(()=>{});}catch{}
+    startConfetti();
+  }
+  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; });
+  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
 
-    /**********************
-     * Header language
-     *********************/
-    $("#langEN").addEventListener("click", ()=>setLang("en"));
-    $("#langES").addEventListener("click", ()=>setLang("es"));
+  function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
+    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
+    const N=120; const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2}));
+    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H);
+      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
+      raf=requestAnimationFrame(tick);
+    }; cancelAnimationFrame(raf); tick();
+  }
 
-    /**********************
-     * Boot
-     *********************/
-    (function init(){
-      // Make sure there are always 2 players at minimum
-      const s = loadState();
-      ensureTwoPlayers(s);
-      saveState(s);
-      render();
-    })();
-  </script>
+  /* CSV */
+  const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
+
+  /* language controls (header pill + settings) */
+  $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+  $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+  $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+
+  // init
+  load();
+  applyI18n();
+  render();
+})();
+</script>
 </body>
 </html>
