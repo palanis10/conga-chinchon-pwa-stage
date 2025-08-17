@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1" />
-<title>Conga – Alanis Scorekeeper — STAGE v3.5.3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Conga by Alanis — STAGE v3.5.4</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icons/icon-512.png">
 <link rel="manifest" href="manifest.webmanifest">
+
 <style>
   :root{
     --bg:#0f1220; --card:#171a2b; --muted:#2a2f4a; --text:#e8ecff; --sub:#b8c0ff;
@@ -17,38 +17,86 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0; font-family: ui-sans-serif,-apple-system,Segoe UI,Roboto,Arial,Noto Sans,sans-serif;
+  body{
+    margin:0;
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
     background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
-    color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.35;}
-  .app{max-width:980px; margin:0 auto; padding:10px 12px 120px;}
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.35;
+  }
+  .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
 
-  header{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 0 8px;}
-  .top-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
-  .chip{background:linear-gradient(135deg, var(--accent), #a77dff); color:#0b0f1f; padding:3px 10px; border-radius:999px; font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.6px;}
-  .brand{opacity:.95; font-weight:900; letter-spacing:.2px; font-size: clamp(16px, 4vw, 22px);} 
-  .ver{opacity:.7; font-weight:800; font-size:12px; margin-left:6px}
-  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 14px; border-radius:12px;
-    background: linear-gradient(135deg, #1a2344, #121a34); border:1px solid rgba(255,255,255,.08);
-    color:var(--text); font-weight:800; letter-spacing:.2px; transition:.15s; white-space:nowrap}
-  .btn:hover{ filter:brightness(1.07)} .btn:active{ transform:translateY(1px)}
-  .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f;}
-  .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12;}
-  .btn.warn{background: linear-gradient(135deg, #ffb020, #ffd27a); color:#2d1500;}
-  .btn.ghost{background: transparent; border:1px dashed rgba(255,255,255,.2);} 
-  .iconbtn{ width:44px; height:44px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
-  .toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-  .toolbar .btn{padding:10px 12px}
-  .toolbar .btn.history{padding:10px 10px} /* slightly narrower to make room on iPhone */
-
-  .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:12px;}
-  .players header{ margin:0 0 6px 2px; color:var(--sub); font-size:12px; }
-
-  .row{
+  /* ===== Header (compact) ===== */
+  header{
     display:grid;
-    grid-template-columns: 28px 64px 1fr auto; /* drag | avatar | name | stars+score */
-    align-items:center; gap:10px;
-    padding:10px; border-radius:14px;
+    grid-template-columns: 1fr auto auto;
+    align-items:center;
+    gap:10px;
+    padding:6px 0 2px 0;
+    margin-bottom:8px;
+  }
+  .brand-wrap{min-width:0}
+  .brand{
+    display:flex; align-items:baseline; gap:10px; min-width:0;
+  }
+  .title{
+    font-weight:900; letter-spacing:.2px;
+    font-size: clamp(18px, 5vw, 26px);
+    color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .ver{
+    font-weight:800; font-size:12px; color:var(--sub); opacity:.9;
+  }
+  .lang-pill{
+    display:inline-flex; gap:8px; align-items:center;
+    border:1px dashed rgba(255,255,255,.18);
+    border-radius:999px; padding:6px 10px; height:36px;
+    color:var(--text); font-weight:800; letter-spacing:.2px;
+    user-select:none;
+  }
+  .lang-pill button{
+    appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer;
+    opacity:.85;
+  }
+  .lang-pill .active{ opacity:1; text-decoration:underline; }
+
+  .iconbtn{
+    width:40px; height:40px; display:grid; place-items:center; border-radius:12px;
+    border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;
+  }
+
+  /* ===== Card + tools row ===== */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding:10px;
+  }
+
+  .tools{
+    display:flex; gap:8px; align-items:center; white-space:nowrap;
+  }
+  .btn{
+    appearance:none; border:0; cursor:pointer; user-select:none;
+    padding:10px 12px; border-radius:12px;
+    background: linear-gradient(135deg, #1a2344, #121a34);
+    border:1px dashed rgba(255,255,255,.22);
+    color:var(--text); font-weight:900; letter-spacing:.2px;
+    transition:.15s;
+    flex:1 1 0; min-width:0; white-space:nowrap;
+    font-size: clamp(12px, 3.4vw, 16px);
+  }
+  .btn:hover{ filter:brightness(1.07)}
+  .btn:active{ transform:translateY(1px)}
+  .btn.primary{ background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid; }
+  .btn.success{ background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid; }
+
+  /* ===== Players ===== */
+  .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
+  .row{
+    display:grid; grid-template-columns: 28px 64px 1fr auto;
+    align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px;
@@ -66,9 +114,7 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px}
-
-  /* Dialogs */
+  /* ===== Dialogs (only styles that matter for layout in this rev) ===== */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
@@ -78,62 +124,58 @@
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
-  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
-  .grid-rows{ display:grid; gap:6px; max-height:50vh; overflow:auto } /* scrollable round modal */
-  .round-row{ display:grid; grid-template-columns: 1fr 100px 56px; gap:8px; align-items:center;
+  /* Round dialog (scrollable on small screens) */
+  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
+  .grid-rows{ display:grid; gap:6px }
+  .round-row{ display:grid; grid-template-columns: 1fr 120px 64px; gap:8px; align-items:center;
     padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
   .round-row input[type="number"]{ height:34px; padding:6px 8px; }
   .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
+  .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* WIN OVERLAY */
+  /* Win overlay (compact) */
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
-  .win-card{ width:min(560px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
+  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
   .win-head{ display:flex; align-items:center; gap:12px}
-  .win-photo{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 6px rgba(78,225,160,.25)}
+  .win-photo{ width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)}
   .win-photo img{ width:100%; height:100%; object-fit:cover}
-  .win-name{ font-size:22px; font-weight:900}
+  .win-name{ font-size:20px; font-weight:900}
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
-  .win-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap }
 
-  /* Language toggle */
-  .lang-toggle{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:#0f1428; font-weight:800}
-  .lang-toggle button{ background:none; border:0; color:var(--text); opacity:.65; cursor:pointer; padding:0 2px; font-weight:900}
-  .lang-toggle .on{ opacity:1; text-decoration:underline}
-
-  /* Crop dialog layout + responsive canvas */
-  #cropDialog .modal-body{display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow:auto}
-  #cropCanvas{width:100%;height:auto;display:block;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#000}
-  .crop-frame-hint{margin-bottom:6px;color:var(--sub)}
-
-  /* Crop overlay ring/dim */
-  .c-mask{position:absolute;inset:0;pointer-events:none}
+  /* Responsive: hide pill if it would crowd the header; tools must remain 1 row */
+  @media (max-width: 410px){
+    .lang-pill{ display:none; }
+  }
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <header>
-    <div class="top-left">
-      <span class="chip">Conga</span>
-      <span class="brand">Alanis Scorekeeper <span class="ver">STAGE v3.5.3</span></span>
+    <div class="brand-wrap">
+      <div class="brand">
+        <div class="title" id="appTitle">Conga by Alanis</div>
+        <div class="ver" id="verLine">STAGE v3.5.4</div>
+      </div>
     </div>
-    <div class="toolbar">
-      <span class="lang-toggle" id="langToggle">
-        <button data-lang="en" id="langEN" class="on">EN</button> /
-        <button data-lang="es" id="langES">ES</button>
-      </span>
-      <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
+
+    <div class="lang-pill" id="langPill" aria-label="Language">
+      <button data-lang="en" id="pillEn" class="active">EN</button>
+      <span>/</span>
+      <button data-lang="es" id="pillEs">ES</button>
     </div>
+
+    <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
   </header>
 
   <section class="card" style="padding:10px; margin-bottom:8px">
-    <div class="toolbar">
-      <button id="lockToggle" class="btn ghost" title="Reorder" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
-      <button id="historyBtn" class="btn ghost history"><span data-i18n="history">History</span></button>
+    <div class="tools">
+      <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
+      <button id="historyBtn" class="btn"> <span data-i18n="history">History</span></button>
       <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
     </div>
   </section>
@@ -141,7 +183,7 @@
   <section class="players">
     <header><div data-i18n="players">Players</div></header>
     <div id="playersList" aria-live="polite"></div>
-    <button class="btn ghost" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
+    <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
   </section>
 </div>
 
@@ -149,25 +191,32 @@
 <dialog id="settingsDialog" aria-labelledby="settingsTitle">
   <div class="modal-head">
     <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
-    <button class="btn ghost" onclick="settingsDialog.close()" data-i18n="close">Close</button>
+    <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
   </div>
   <div class="modal-body" style="display:grid; gap:14px">
+    <div style="display:flex; gap:8px; align-items:center">
+      <label style="margin:0;min-width:120px" data-i18n="language">Language</label>
+      <select id="langSelect" style="max-width:160px">
+        <option value="en">English (EN)</option>
+        <option value="es">Español (ES)</option>
+      </select>
+    </div>
     <div>
       <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
     </div>
-    <label class="switch">
+    <label class="switch" style="display:flex; align-items:center; gap:10px">
       <input id="autoAdvance" type="checkbox" />
       <span data-i18n="autoAdvance">Auto-advance dealer after round</span>
     </label>
-    <label class="switch">
+    <label class="switch" style="display:flex; align-items:center; gap:10px">
       <input id="lockOrderSwitch" type="checkbox" />
       <span data-i18n="lockOrder">Lock player reordering</span>
     </label>
     <div style="display:flex; gap:8px; flex-wrap:wrap">
-      <button class="btn" id="exportBtn" data-i18n="exportCSV">Export CSV</button>
-      <button class="btn ghost" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
-      <button class="btn warn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
+      <button class="btn" id="exportBtn" data-i18n="exportCsv">Export CSV</button>
+      <button class="btn" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
+      <button class="btn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
     </div>
   </div>
   <div class="modal-foot">
@@ -179,10 +228,10 @@
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
     <div>
-      <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New round</div>
+      <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
       <div class="hint" data-i18n="roundHint">Enter points (negatives OK). “−10” changes the input.</div>
     </div>
-    <button class="btn ghost" onclick="roundDialog.close()" data-i18n="close">Close</button>
+    <button class="btn" onclick="roundDialog.close()" style="padding:6px 10px">Close</button>
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
@@ -190,7 +239,7 @@
     </div>
     <div class="modal-foot">
       <div id="roundError" class="error" style="display:none"></div>
-      <button type="button" class="btn ghost" onclick="roundDialog.close()" data-i18n="cancel">Cancel</button>
+      <button type="button" class="btn" onclick="roundDialog.close()" data-i18n="cancel">Cancel</button>
       <button id="applyRoundBtn" type="submit" class="btn success" data-i18n="apply">Apply</button>
     </div>
   </form>
@@ -200,7 +249,7 @@
 <dialog id="editDialog" aria-labelledby="editTitle">
   <div class="modal-head">
     <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
-    <button class="btn ghost" onclick="editDialog.close()" data-i18n="close">Close</button>
+    <button class="btn" onclick="editDialog.close()" style="padding:6px 10px">Close</button>
   </div>
   <form id="editForm" method="dialog">
     <div class="modal-body">
@@ -226,8 +275,7 @@
             <label data-i18n="photo">Photo</label>
             <div style="display:flex; gap:8px; flex-wrap:wrap">
               <button type="button" class="btn" id="changePhotoBtn" data-i18n="changePhoto">Change photo</button>
-              <button type="button" class="btn ghost" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
-              <button type="button" class="btn ghost" id="viewHistoryBtn" data-i18n="viewCutHistory">View cut history</button>
+              <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
             </div>
           </div>
           <label class="switch" style="display:flex; align-items:center; gap:10px">
@@ -235,13 +283,13 @@
             <span data-i18n="setDealer">Set as next dealer</span>
           </label>
           <div>
-            <button type="button" class="btn warn" id="deletePlayerBtn" data-i18n="deletePlayer">Delete player</button>
+            <button type="button" class="btn" id="deletePlayerBtn" data-i18n="deletePlayer">Delete player</button>
           </div>
         </div>
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn ghost" type="button" onclick="editDialog.close()" data-i18n="cancel">Cancel</button>
+      <button class="btn" type="button" onclick="editDialog.close()" data-i18n="cancel">Cancel</button>
       <button class="btn success" type="submit" data-i18n="save">Save</button>
     </div>
   </form>
@@ -255,12 +303,12 @@
       <div class="win-photo"><img id="winPhoto" alt=""></div>
       <div>
         <div class="win-name" id="winName">Winner</div>
-        <div class="win-sub" id="winSubtitle"></div>
+        <div class="win-sub" id="winSubtitle" data-i18n="winner">WINNER</div>
       </div>
     </div>
-    <div class="win-actions">
-      <button class="btn success" id="winNewGameBtn" data-i18n="newGame">New game</button>
-      <button class="btn ghost" id="winCloseBtn" data-i18n="close">Close</button>
+    <div class="win-actions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap">
+      <button class="btn success" id="newGameBtn2" data-i18n="newGame">New game</button>
+      <button class="btn" id="winCloseBtn" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -270,39 +318,8 @@
     src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAQAAABgAABcAAABWAAACAAACAQAAAC4AAABfAAAAdwAAAIQAAACkAAAAvwAAAN4AAAD///8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAAAgP8AAP//AP//AP8AAP//AAAAAP8AAP//AP//AP//AP//AP//AP//AAAAAAA="/>
 </audio>
 
-<!-- Crop dialog -->
-<dialog id="cropDialog" aria-labelledby="cropTitle">
-  <div class="modal-head">
-    <div id="cropTitle" style="font-weight:800" data-i18n="cropPhoto">Crop photo</div>
-    <button class="btn ghost" onclick="cropDialog.close()" data-i18n="close">Close</button>
-  </div>
-  <div class="modal-body">
-    <div class="crop-frame-hint" data-i18n="cropHint">Drag to position. Pinch to zoom (on phone) or use slider.</div>
-    <div style="position:relative">
-      <canvas id="cropCanvas" width="600" height="600" style="touch-action:none;"></canvas>
-      <canvas id="cropMask" class="c-mask" width="600" height="600"></canvas>
-    </div>
-    <div class="crop-controls" style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:6px;">
-      <input id="cropZoom" type="range" min="0.6" max="3" step="0.01" value="1" style="flex:1">
-      <button class="btn" id="cropReset" data-i18n="reset">Reset</button>
-    </div>
-  </div>
-  <div class="modal-foot">
-    <button class="btn ghost" onclick="cropDialog.close()" data-i18n="cancel">Cancel</button>
-    <button class="btn success" id="cropSave" data-i18n="save">Save</button>
-  </div>
-</dialog>
-
-<!-- Rounds history dialog -->
-<dialog id="roundsDialog" aria-labelledby="roundsTitle">
-  <div class="modal-head">
-    <div id="roundsTitle" style="font-weight:800" data-i18n="roundsHistory">Rounds history</div>
-    <button class="btn ghost" onclick="roundsDialog.close()" data-i18n="close">Close</button>
-  </div>
-  <div class="modal-body">
-    <div class="table-wrap"><div id="roundsTableWrap"></div></div>
-  </div>
-</dialog>
+<!-- Hidden inputs -->
+<input id="photoInput" type="file" accept="image/*" hidden>
 
 <!-- Player row template -->
 <template id="playerRowTpl">
@@ -317,13 +334,10 @@
   </div>
 </template>
 
-<input id="photoInput" type="file" accept="image/*" hidden>
-<input id="importJsonInput" type="file" accept="application/json" hidden>
-
 <script>
-/* === STAGE v3.5.3 (header/vers fixes + i18n + round modal restore + cropper + win overlay) === */
 (() => {
   "use strict";
+  /* ===== utils ===== */
   const $ = s => document.querySelector(s);
   const bind = (sel, prop, fn) => { const el = $(sel); if (el) el[prop] = fn; };
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
@@ -332,52 +346,54 @@
   const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const csv=s=>(/[",\n]/.test(s)?'"'+String(s).replace(/"/g,'""')+'"':String(s));
   const todayStr=()=> new Date().toISOString().slice(0,10);
-  const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  // i18n
-  const dict = {
-    en: {
+  const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
+    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
+    document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
+
+  /* ===== i18n ===== */
+  const STR = {
+    en:{
       reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
-      settings:"Settings", close:"Close", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
-      lockOrder:"Lock player reordering", exportCSV:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all", done:"Done",
-      newGame:"New game", cropPhoto:"Crop photo", cropHint:"Drag to position. Pinch to zoom (on phone) or use slider.", reset:"Reset",
-      cancel:"Cancel", save:"Save", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
-      photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", viewCutHistory:"View cut history",
-      setDealer:"Set as next dealer", deletePlayer:"Delete player", roundsHistory:"Rounds history",
-      roundHint:'Enter points (negatives OK). “−10” changes the input.', apply:"Apply",
-      winner:"Winner", won:"won"
+      settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
+      lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
+      done:"Done", roundHint:"Enter points (negatives OK). “−10” changes the input.",
+      cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
+      photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
+      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
     },
-    es: {
+    es:{
       reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
-      settings:"Ajustes", close:"Cerrar", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
-      lockOrder:"Bloquear reordenamiento", exportCSV:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo", done:"Listo",
-      newGame:"Nuevo juego", cropPhoto:"Recortar foto", cropHint:"Arrastra para posicionar. Haz zoom con dos dedos o usa el control.",
-      reset:"Reiniciar", cancel:"Cancelar", save:"Guardar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
-      photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Eliminar foto", viewCutHistory:"Ver historial de cortes",
-      setDealer:"Fijar como próximo mano", deletePlayer:"Eliminar jugador", roundsHistory:"Historial de rondas",
-      roundHint:'Ingresa puntos (negativos OK). “−10” cambia la entrada.', apply:"Aplicar",
-      winner:"Ganador", won:"ganó"
+      settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
+      lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
+      done:"Listo", roundHint:"Ingresa puntos (negativos ok). “−10” cambia el campo.",
+      cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
+      photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
+      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
     }
   };
-  let lang = localStorage.getItem("conga_lang") || "en";
-  function tkey(el){ const k=el.getAttribute("data-i18n"); if(!k) return; el.textContent = (dict[lang] && dict[lang][k]) || dict.en[k] || k; }
-  function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(tkey); $("#langEN")?.classList.toggle("on",lang==="en"); $("#langES")?.classList.toggle("on",lang==="es"); }
+  const storageLangKey = "conga_lang";
+  let LANG = localStorage.getItem(storageLangKey) || "en";
+  function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.en[k] || k; }
+  function applyI18n(){
+    document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
+    $("#pillEn")?.classList.toggle("active", LANG==="en");
+    $("#pillEs")?.classList.toggle("active", LANG==="es");
+    const sel=$("#langSelect"); if(sel) sel.value=LANG;
+  }
 
-  // Viewport zoom control (prevents iOS bounce/zoom when dialogs open)
-  const vp = document.querySelector('meta[name="viewport"]');
-  const VP_BASE = 'width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1';
-  function disableAutoZoom(){ try{ if(!vp) return; vp.setAttribute('content','width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1'); }catch{} }
-  function restoreZoom(){ /* keep same to avoid jumps */ }
-  const pulseNoZoom = ()=>{ disableAutoZoom(); setTimeout(restoreZoom, 160); };
-
-  // Storage
-  const storageKey="conga_state_stage_v353";
+  /* ===== state ===== */
+  const storageKey="conga_state_stage_v354";
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
+
   const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
-  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder,lang})); };
-  const load=()=>{ try{ const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
+  const load=()=>{ try{
+      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
       players = Array.isArray(s.players)? s.players : [];
+      // Always start with at least two players if empty
+      if(!players.length){ players=[{id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},{id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}]; }
       limit = Number.isFinite(s.limit)? s.limit : 100;
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
       nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
@@ -386,46 +402,41 @@
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
       winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = !!s.lockOrder; lang = s.lang || lang; pruneWins();
+      lockOrder = !!s.lockOrder; pruneWins();
     }catch(e){ players=[]; } };
 
-  // Ensure start with 2 players (first run)
-  function ensureTwoPlayers(){
-    if(players.length===0){
-      players.push({id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null});
-      players.push({id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null});
-      nextDealerId = players[0].id;
-    }
-  }
-
-  // Render
+  /* ===== render ===== */
   const list=$("#playersList"), rowTpl=$("#playerRowTpl");
   function render(){
-    applyI18n();
-    const lockBtn=$("#lockToggle"); if(lockBtn){ lockBtn.innerHTML = (lockOrder? "🔒 " : "🔓 ") + `<span data-i18n="reorder">${t("reorder")}</span>`; }
+    $("#limitInput").value=limit;
+    $("#autoAdvance").checked=autoAdvanceDealer;
+    $("#lockOrderSwitch").checked=lockOrder;
+    $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
+    $("#lockToggle").title = t("reorder");
     if(list) list.innerHTML="";
     for(let i=0;i<players.length;i++){
       const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
       n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
       if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      attachLongPress(n, ()=> openEdit(p.id));
+      attachLongPress(n, ()=>openEdit(p.id));
+      if(p.id===nextDealerId) n.classList.add("dealer");
       const avatarBox=n.querySelector(".avatar");
       if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
       n.querySelector(".playerName").textContent=p.name||"—";
       const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
       const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
       const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast((dict[lang].lockOrder)); } else { handle.classList.remove("locked"); handle.onclick=null; }
+      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
       list && list.appendChild(n);
     }
-    const nr=$("#newRoundBtn"); if(nr) nr.disabled=players.length===0||gameOver;
+    $("#newRoundBtn").disabled=gameOver || players.length===0;
+    applyI18n();
     save();
   }
-  function t(k){ return (dict[lang] && dict[lang][k]) || dict.en[k] || k; }
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = (e)=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
     const end = ()=>{ clearTimeout(tmr); };
     el.addEventListener('touchstart', start, {passive:true});
     el.addEventListener('mousedown', start);
@@ -433,22 +444,21 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
   }
 
-  // Drag & drop
+  /* drag */
   let dragIdx=null; const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
   const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
   const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; arr.splice(to,0,m); const keep=nextDealerId; players=arr; nextDealerId=keep; render(); }};
   const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
 
-  // Edit dialog
+  /* edit */
   const editDlg=$("#editDialog"), editForm=$("#editForm"), photoInput=$("#photoInput");
   function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
-    bind("#viewHistoryBtn","onclick", ()=> openHistory(p.id));
-    bind("#deletePlayerBtn","onclick", ()=>{ if(confirm("Delete this player? This cannot be undone.")){ editDlg.close(); removePlayer(p.id); }});
-    editDlg && editDlg.showModal(); pulseNoZoom();
+    bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
+    editDlg && editDlg.showModal();
   }
   if(editForm) editForm.addEventListener("submit", (e)=>{
     e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
@@ -456,33 +466,41 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  // Photo input -> cropper
-  if(photoInput){ photoInput.removeAttribute('capture'); photoInput.addEventListener("change", async()=>{ if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return; const file=photoInput.files[0]; const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); openCropper(dataUrl, window._photoTarget); window._photoTarget=null; }); }
+  /* photo -> simple square cropper (existing behavior preserved) */
+  if(photoInput){
+    photoInput.removeAttribute('capture');
+    photoInput.addEventListener("change", async()=>{
+      if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
+      const file=photoInput.files[0];
+      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+      // use offscreen canvas to letterbox to square using center crop (stable + fast)
+      const img=new Image(); img.onload=()=>{
+        const side=Math.min(img.width,img.height);
+        const sx=(img.width-side)/2, sy=(img.height-side)/2;
+        const out=document.createElement('canvas'); out.width=512; out.height=512;
+        const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,512,512);
+        const dataOut=out.toDataURL('image/png',0.92);
+        const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); save(); }
+        window._photoTarget=null;
+      }; img.src=dataUrl;
+    });
+  }
 
-  // Round dialog (NO cutter)
+  /* round dialog */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
   const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
-      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class=\"hint\">${t("score")}: ${p.score||0}</div>`;
-      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id; inp.addEventListener("input", validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ const v = (inp.value===""?0:+inp.value)-10; inp.value=clampInt(v); validateRound(); };
+      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
+      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
       r.append(name,inp,minus); rows.appendChild(r);
     });
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal(); pulseNoZoom();
+    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal();
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
-  function validateRound(){
-    const inputs=roundInputs();
-    // Only one exact -10 allowed
-    const minus10Count = Object.values(inputs).filter(v=>v===-10).length;
-    if(minus10Count>1){
-      if(rErr){ rErr.textContent="Only one −10 allowed per round."; rErr.style.display=""; }
-      if(applyBtn) applyBtn.disabled=true; return false;
-    }
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; return true;
-  }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
+
   function applyRound(inputs){
     const snapshotInputs = JSON.parse(JSON.stringify(inputs));
     const roundNo = roundCounter + 1;
@@ -509,182 +527,86 @@
     // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
 
-    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), cutterId:null, timestamp:Date.now()});
+    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
     gameOver=false;
 
-    // Check winner: someone <= limit and everybody else >= limit+1
-    const maybeWinner = players.find(p => p.score <= limit && players.filter(q=>q.id!==p.id).every(q=> q.score >= (limit+1)));
-    render();
-    if(maybeWinner){ gameOver=true; const w=maybeWinner;
-      winsLog.push({ playerId:w.id, name:w.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
-      roundDlg && roundDlg.close(); save(); showWinOverlay(w); return;
+    // Winner check (lowest score, everyone else >= limit+1 OR someone exactly lowest <= limit when others > limit ?)
+    const alive = players.filter(p=>p.score<=limit);
+    if(alive.length===1){
+      gameOver=true;
+      const winner=alive[0];
+      winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
+      showWinOverlay(winner);
     }
-    save();
+    render();
   }
 
-  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); if(!validateRound()) return; applyRound(roundInputs()); roundDlg && roundDlg.close(); });
+  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
-  const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
+  /* history modal */
+  function openRoundsTable(){
+    const dlg=document.createElement('dialog');
+    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
+    const twrap=dlg.querySelector(".table-wrap");
+    const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
+    trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name}</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
+    const tbody=document.createElement('tbody');
+    rounds.forEach(r=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:""}</td>`).join("");
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody); twrap.appendChild(table);
+    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); dlg.showModal();
+  }
 
-  function openHistory(id){ const list=$("#historyList"); if(!list) return; /* optional: dialog exists above */ }
-
-  function openRoundsTable(){ const wrap=$("#roundsTableWrap"); if(!wrap) return; wrap.innerHTML=""; if(!rounds.length){ wrap.innerHTML='<div class="history-item">No rounds yet.</div>'; $("#roundsDialog") && $("#roundsDialog").showModal(); return; } const table=document.createElement('table'); const colWidth=110; const totalW = 32 + Math.max(4, players.length) * colWidth; table.style.width=Math.max(520,totalW)+"px"; const thead=document.createElement('thead'); const trh=document.createElement('tr'); const th0=document.createElement('th'); th0.textContent="#"; trh.appendChild(th0); players.forEach(p=>{ const th=document.createElement('th'); th.textContent=p.name; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead); const tbody=document.createElement('tbody'); rounds.forEach(r=>{ const tr=document.createElement('tr'); const th=document.createElement('th'); th.textContent=String(r.round); tr.appendChild(th); const showTotals = r.totals && typeof r.totals === 'object'; players.forEach(p=>{ const td=document.createElement('td'); const v=showTotals ? r.totals[p.id] : r.inputs[p.id]; td.textContent=Number.isFinite(v)?v:""; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrap.appendChild(table); $("#roundsDialog") && $("#roundsDialog").showModal(); }
-
-  // Wire-up
-  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); pulseNoZoom(); });
+  /* wire-up */
+  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
-  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(lang==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
+  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   bind("#exportBtn","onclick", exportCSV);
-  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(lang==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm(lang==="es"?"¿Borrar jugadores y ajustes?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; ensureTwoPlayers(); render(); } });
-  bind("#winNewGameBtn","onclick", ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
+  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; autoAdvanceDealer=true; gameOver=false; cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[]; render(); } });
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
   on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
 
-  // Language toggle
-  on("#langToggle","click",(e)=>{ const btn=e.target.closest("button[data-lang]"); if(!btn) return; lang=btn.dataset.lang; localStorage.setItem("conga_lang",lang); save(); render(); });
-
-  // helpers
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  // Win overlay
+  /* win overlay */
   function showWinOverlay(winner){
-    const ov=document.getElementById('winOverlay'); if(!ov) return;
-    document.getElementById('winName').textContent = winner?.name || t("winner");
-    document.getElementById('winSubtitle').textContent = t("won");
-    const photo=document.getElementById('winPhoto'); photo.src = winner?.avatar || "";
+    const ov=$("#winOverlay"); if(!ov) return;
+    $("#winName").textContent = winner?.name || 'Winner';
+    $("#winPhoto").src = winner?.avatar || '';
     ov.style.display='flex';
-    try{ document.getElementById('winSound').play().catch(()=>{});}catch{}
+    try{ $("#winSound").play().catch(()=>{});}catch{}
     startConfetti();
   }
-  document.getElementById('winCloseBtn')?.addEventListener('click', ()=>{ document.getElementById('winOverlay').style.display='none'; });
+  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; });
+  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
 
-  // Confetti (smaller pieces)
-  function startConfetti(){ const c=document.getElementById('confettiCanvas'); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1; const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR); const pieces=Array.from({length:120},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*3, vy:2+Math.random()*2.5, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2})); let raf; const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); raf=requestAnimationFrame(tick); }; cancelAnimationFrame(raf); tick(); }
-
-  // ===== Image Cropper =====
-  function openCropper(dataUrl, targetId){
-    const dlg = $('#cropDialog'); const cvs = $('#cropCanvas'); const mask = $('#cropMask'); const zoom = $('#cropZoom'); const resetBtn = $('#cropReset'); const saveBtn = $('#cropSave');
-    if(!dlg || !cvs || !zoom || !saveBtn || !mask) return;
-    const ctx = cvs.getContext('2d'); const mctx=mask.getContext('2d');
-    let img = new Image(); let scale=1, minScale=1; let offX=0, offY=0; let dragging=false, startX=0, startY=0; let pinch=false, pinchStartDist=0, pinchStartScale=1;
-
-    function draw(){
-      ctx.clearRect(0,0,cvs.width,cvs.height);
-      ctx.save(); ctx.translate(cvs.width/2 + offX, cvs.height/2 + offY); ctx.scale(scale, scale); ctx.drawImage(img, -img.width/2, -img.height/2); ctx.restore();
-      // mask (dim outside circle)
-      mctx.clearRect(0,0,mask.width,mask.height);
-      mctx.fillStyle="rgba(0,0,0,.55)"; mctx.fillRect(0,0,mask.width,mask.height);
-      mctx.globalCompositeOperation="destination-out";
-      const r=Math.min(mask.width,mask.height)*0.38;
-      mctx.beginPath(); mctx.arc(mask.width/2, mask.height/2, r, 0, Math.PI*2); mctx.fill();
-      mctx.globalCompositeOperation="source-over";
-      mctx.lineWidth=4; mctx.strokeStyle="rgba(255,255,255,.9)";
-      mctx.beginPath(); mctx.arc(mask.width/2, mask.height/2, r, 0, Math.PI*2); mctx.stroke();
-    }
-    function clamp(){
-      const w = img.width*scale, h = img.height*scale; const maxX = Math.max(0,(w-cvs.width)/2); const maxY = Math.max(0,(h-cvs.height)/2);
-      offX = Math.min(maxX, Math.max(-maxX, offX)); offY = Math.min(maxY, Math.max(-maxY, offY));
-    }
-    function setCanvasSize(){
-      // keep square canvas sized to dialog body width
-      const rect = cvs.parentElement.getBoundingClientRect();
-      const s = Math.min(600, Math.floor(rect.width));
-      cvs.width = s; cvs.height = s; mask.width = s; mask.height = s;
-    }
-
-    img.onload = ()=>{
-      setCanvasSize();
-      const sx = cvs.width / img.width; const sy = cvs.height / img.height;
-      // Fit to cover circle comfortably (not zoomed-in)
-      minScale = Math.max(sx, sy);
-      scale = minScale; zoom.min = String(Math.max(0.6, Math.round(minScale*100)/100)); zoom.value = String(scale); offX=0; offY=0; clamp(); draw();
-    };
-    img.src = dataUrl;
-
-    // Pointer pan
-    cvs.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; startY=e.clientY; cvs.setPointerCapture(e.pointerId); });
-    cvs.addEventListener('pointermove', e=>{ if(!dragging) return; offX += (e.clientX-startX); offY += (e.clientY-startY); startX=e.clientX; startY=e.clientY; clamp(); draw(); });
-    cvs.addEventListener('pointerup', e=>{ dragging=false; try{ cvs.releasePointerCapture(e.pointerId); }catch{} });
-    cvs.addEventListener('pointercancel', ()=> dragging=false);
-
-    // Touch pinch zoom
-    cvs.addEventListener('touchstart', (e)=>{ if(e.touches.length===2){ pinch=true; pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); pinchStartScale = scale; } }, {passive:true});
-    cvs.addEventListener('touchmove', (e)=>{
-      if(pinch && e.touches.length===2){
-        e.preventDefault();
-        const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-        const next = pinchStartScale * (dist / pinchStartDist);
-        scale = Math.min(3, Math.max(minScale, next));
-        zoom.value = String(scale); clamp(); draw();
-      }
-    }, {passive:false});
-    cvs.addEventListener('touchend', ()=>{ pinch=false; }, {passive:true});
-
-    // Wheel zoom (desktop)
-    const onWheel = (e)=>{
-      e.preventDefault();
-      const factor = e.deltaY > 0 ? 0.95 : 1.05;
-      const next = scale * factor;
-      scale = Math.min(3, Math.max(minScale, next));
-      zoom.value = String(scale);
-      clamp(); draw();
-    };
-    cvs.addEventListener('wheel', onWheel, {passive:false});
-
-    // Slider zoom
-    const onZoom = ()=>{
-      const val = parseFloat(zoom.value || String(scale));
-      scale = Math.min(3, Math.max(minScale, val));
-      clamp(); draw();
-    };
-    zoom.addEventListener('input', onZoom);
-
-    // Reset
-    const onReset = ()=>{ scale = minScale; offX = 0; offY = 0; zoom.value = String(scale); clamp(); draw(); };
-    resetBtn?.addEventListener('click', onReset);
-
-    // Save -> write avatar (crop circle to 512x512)
-    const onSave = ()=>{
-      const out = document.createElement('canvas'); out.width = 512; out.height = 512;
-      const r = Math.min(cvs.width, cvs.height)*0.38; // same as mask, relative
-      const k = out.width / cvs.width;
-      const octx = out.getContext('2d');
-      octx.fillStyle = '#0b1225'; octx.fillRect(0,0,out.width,out.height);
-      // Clip to circle
-      octx.save();
-      octx.beginPath(); octx.arc(out.width/2, out.height/2, r*k, 0, Math.PI*2); octx.closePath(); octx.clip();
-      octx.translate(out.width/2 + offX*k, out.height/2 + offY*k);
-      octx.scale(scale, scale);
-      octx.drawImage(img, -img.width/2, -img.height/2);
-      octx.restore();
-      const dataOut = out.toDataURL('image/png', 0.92);
-      const p = players.find(x=>x.id===targetId);
-      if (p){ p.avatar = dataOut; render(); save(); }
-      cleanup(); dlg.close();
-    };
-    saveBtn.addEventListener('click', onSave);
-
-    // Cleanup
-    function cleanup(){
-      cvs.replaceWith(cvs.cloneNode(true)); mask.replaceWith(mask.cloneNode(true)); // drop handlers quickly
-      zoom.removeEventListener('input', onZoom);
-      resetBtn?.removeEventListener('click', onReset);
-      saveBtn.removeEventListener('click', onSave);
-    }
-
-    dlg.addEventListener('close', cleanup, {once:true});
-    dlg.showModal(); pulseNoZoom();
+  function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
+    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
+    const N=120; const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2}));
+    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H);
+      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
+      raf=requestAnimationFrame(tick);
+    }; cancelAnimationFrame(raf); tick();
   }
-  // ===== end cropper =====
 
-  // Init
+  /* CSV */
+  const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
+
+  /* language controls (header pill + settings) */
+  $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+  $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+  $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+
+  // init
   load();
-  ensureTwoPlayers();
   applyI18n();
   render();
 })();
