@@ -1,583 +1,613 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Conga Alanis — STAGE v3.2</title>
-<!-- Version 3.2: Fix mobile layout (name wrapping), restore full app, disable SW in sandbox -->
-<link rel="manifest" href="data:application/manifest+json,{\n  \"name\": \"Conga Alanis\",\n  \"short_name\": \"Conga\",\n  \"display\": \"standalone\",\n  \"start_url\": \".\",\n  \"theme_color\": \"#0f172a\",\n  \"background_color\": \"#0f172a\",\n  \"icons\": []\n}" />
-<style>
-  :root{
-    --bg:#0b1220; /* deep navy */
-    --card:#121a2b; /* slate */
-    --muted:#93a4c8; /* muted text */
-    --text:#e6ecff;
-    --accent:#7c9cff; /* periwinkle */
-    --good:#22c55e; --bad:#ef4444; --warn:#f59e0b;
-    --shadow:0 8px 24px rgba(10,14,28,.35);
-    --radius:18px;
-  }
-  html,body{height:100%;}
-  body{margin:0;font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 70% -10%, rgba(124,156,255,.15), transparent), var(--bg); color:var(--text); -webkit-text-size-adjust:100%;}
-  .app{max-width:820px;margin:0 auto;padding:20px 16px 140px;}
-  header{display:flex;align-items:center;gap:12px;}
-  .badge{background:linear-gradient(135deg, #1f2a44, #0f172a); padding:8px 14px; border-radius:999px; font-weight:700; box-shadow:var(--shadow);} 
-  .title{font-size:20px;font-weight:800;letter-spacing:.2px;}
-  .topbar{display:flex;align-items:center;gap:10px;margin-left:auto;}
-  button, .btn{background:#1b2440;border:1px solid rgba(255,255,255,.08); color:var(--text); padding:10px 14px; border-radius:14px; font-weight:700; cursor:pointer; box-shadow:var(--shadow); transition:.2s transform,.2s background,.2s opacity; font-size:14px;}
-  button:active{transform:scale(.98)}
-  .iconbtn{display:inline-flex;align-items:center;gap:8px; white-space:nowrap}
-  .icon{width:22px;height:22px;display:inline-grid;place-items:center;}
-  .gear{font-size:18px}
-  .row{display:flex;align-items:center;gap:10px}
-  .stack{display:flex;flex-direction:column;gap:10px}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
-  .players{display:flex;flex-direction:column; gap:10px}
-
-  /* Player Row */
-  .player{display:grid; grid-template-columns: minmax(0,1fr) auto auto auto auto auto; align-items:center; gap:8px; padding:10px 12px; border-radius:16px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06);} 
-  .handle{cursor:grab; user-select:none; padding:6px 8px; opacity:.7}
-  .name{font-size:18px; font-weight:800; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .muted{color:var(--muted); font-weight:600}
-  .tag{display:inline-flex;align-items:center; gap:6px; font-weight:800; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
-  .star{filter: drop-shadow(0 2px 4px rgba(255,215,0,.35));}
-  .score{min-width:56px; text-align:right; font-weight:900; font-size:18px}
-  .edit{padding:10px 12px; font-size:15px}
-  .lock{padding:10px 12px; font-size:15px}
-  .lock[data-locked="true"]{background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.3)}
-  .dealer{padding:8px 10px; border-radius:12px; background:rgba(124,156,255,.12); border:1px solid rgba(124,156,255,.25); font-weight:800}
-  .dealer.isDealer{background:rgba(34,197,94,.15); border-color:rgba(34,197,94,.35)}
-
-  .sectionbar{display:flex; align-items:center; justify-content:space-between; gap:10px}
-  .sectionbar h2{margin:0; font-size:16px; letter-spacing:.2px}
-
-  /* History Table */
-  table{width:100%; border-collapse:collapse;}
-  th,td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.08); text-align:right}
-  th:first-child, td:first-child{text-align:left}
-
-  /* New Round Modal */
-  dialog{border:none; border-radius:18px; padding:0; background:transparent}
-  .modal{background:var(--card); border:1px solid rgba(255,255,255,.1); border-radius:18px; max-width:720px; width:92vw; box-shadow: var(--shadow);} 
-  .modal header{padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.08)}
-  .modal .content{padding:12px 12px 6px; max-height:65vh; overflow:auto}
-  .formrow{display:grid; grid-template-columns: 1fr auto auto auto; gap:8px; align-items:center; padding:8px; border-radius:12px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.02)}
-  .formrow .pname{font-weight:800}
-  .num{width:86px; font-size:18px; padding:10px 10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#0d1426; color:var(--text)}
-  .num::-webkit-outer-spin-button, .num::-webkit-inner-spin-button{appearance:none;margin:0}
-  .quick{padding:10px 12px}
-  .cutter{display:flex; align-items:center; gap:6px; justify-content:flex-end}
-  .actions{display:flex; gap:10px; padding:14px; border-top:1px solid rgba(255,255,255,.08); justify-content:flex-end}
-
-  /* Banner */
-  .banner{margin:12px 0; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04)}
-  .pill{padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); font-weight:800}
-
-  /* Win overlay */
-  #overlay{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45); z-index:60}
-  #overlay.show{display:grid}
-  .win{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)), #0d1426; border:1px solid rgba(255,255,255,.14); padding:26px; border-radius:22px; text-align:center; box-shadow: var(--shadow)}
-  .win h1{margin:0 0 6px; font-size:26px}
-  .win p{margin:0 0 14px; color:var(--muted)}
-  .win .big{font-size:40px; font-weight:900}
-  canvas#confetti{position:fixed; inset:0; pointer-events:none}
-
-  /* Utilities */
-  .hidden{display:none}
-  .grow{flex:1}
-  .right{margin-left:auto}
-
-  /* Avoid iOS zoom */
-  input, select, textarea, button {font-size:16px}
-
-  /* Small-screen tweaks */
-  @media (max-width: 480px){
-    .topbar span{display:none;} /* keep buttons compact */
-    .player{grid-template-columns:minmax(0,1fr) auto auto auto auto;}
-    .edit{display:none;} /* save space on narrow phones; tap name to edit */
-    .player .muted{display:none;}
-    .score{min-width:44px; font-size:16px}
-  }
-
-  /* Diagnostics */
-  details{background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:10px 12px}
-  summary{cursor:pointer; font-weight:800}
-</style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5" />
+    <title>Conga Score Tracker STAGE</title>
+    <meta name="theme-color" content="#0f1220" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 <body>
-<canvas id="confetti"></canvas>
-<div class="app">
-  <header>
-    <span class="badge">Conga <span class="muted">Alanis</span> — <span class="muted">STAGE v3.2</span></span>
-    <div class="topbar">
-      <button id="btnNewRound" class="iconbtn" title="Add scores (New Round)">➕ <span>New Round</span></button>
-      <button id="btnHistory" class="iconbtn">📜 <span>History</span></button>
-      <button id="btnReset" class="iconbtn" title="Reset game">🗑️ Reset</button>
-      <button id="btnSettings" class="iconbtn" title="Settings"><span class="gear">⚙️</span> Settings</button>
-    </div>
-  </header>
+    <div id="root"></div>
 
-  <div class="banner row">
-    <strong>Next dealer:</strong>
-    <span id="nextDealerName" class="pill">—</span>
-    <span class="muted">(Tap 🎴 on a player to set dealer • Auto‑advance ON)</span>
-  </div>
+    <!-- React and ReactDOM libraries -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script type="text/babel">
+        // Version: 1.0.0 (STAGE)
+        // Created by Gemini
 
-  <section class="card stack" id="playersSection">
-    <div class="sectionbar">
-      <h2>Players</h2>
-      <div class="row" style="gap:8px">
-        <button id="btnAddPlayer" class="iconbtn">👤➕ Add Player</button>
-      </div>
-    </div>
-    <div class="players" id="players"></div>
-  </section>
-
-  <section class="card stack" id="historySection" style="margin-top:14px">
-    <div class="sectionbar">
-      <h2>History (Totals per round)</h2>
-      <span class="muted">Tap a row to expand</span>
-    </div>
-    <div id="history"></div>
-  </section>
-
-  <section class="card stack" style="margin-top:14px">
-    <div class="sectionbar">
-      <h2>Diagnostics</h2>
-      <div class="row">
-        <button id="runTests" class="iconbtn" title="Run built‑in test cases">🧪 Run Tests</button>
-        <span id="testResult" class="muted"></span>
-      </div>
-    </div>
-    <details>
-      <summary>What the tests cover</summary>
-      <ul>
-        <li>Reenganche only at <strong>101</strong></li>
-        <li>No reenganche at <strong>100</strong></li>
-        <li><strong>Cutter</strong> must project ≤ 100</li>
-        <li>Instant‑win when cutter ≤ 100 and everyone else &gt; 100</li>
-        <li>Dealer auto‑advances (kept by id when reordering)</li>
-      </ul>
-    </details>
-  </section>
-</div>
-
-<!-- New Round Modal -->
-<dialog id="roundDialog">
-  <div class="modal">
-    <header class="row">
-      <strong class="title">New Round</strong>
-      <span class="muted">Enter scores. Cutter cannot exceed 100.</span>
-      <span class="right"></span>
-      <button class="btn" id="closeRound">✖</button>
-    </header>
-    <div class="content" id="roundForm"></div>
-    <div class="actions">
-      <button class="btn" id="cancelRound">Cancel</button>
-      <button class="btn" id="applyRound" style="background:linear-gradient(180deg, rgba(34,197,94,.15), rgba(34,197,94,.08)); border-color:rgba(34,197,94,.35)">Apply</button>
-    </div>
-  </div>
-</dialog>
-
-<div id="overlay"><div class="win">
-  <div class="big">🎉</div>
-  <h1 id="winTitle">Winner!</h1>
-  <p id="winSubtitle">—</p>
-  <audio id="winSound" preload="auto">
-    <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQAA" type="audio/mpeg" />
-  </audio>
-  <div class="row" style="justify-content:center; gap:10px; margin-top:12px">
-    <button id="closeWin" class="btn">Close</button>
-    <button id="resetWin" class="btn" style="background:rgba(124,156,255,.18); border-color:rgba(124,156,255,.35)">New Game</button>
-  </div>
-</div></div>
-
-<script>
-/** ==========================
- * Conga Alanis — STAGE Build v3.2
- * Single-file, no frameworks. PWA-friendly.
- * ========================== */
-const $ = (sel, el=document) => el.querySelector(sel);
-const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
-const uid = () => Math.random().toString(36).slice(2,9);
-
-const STORAGE_KEY = 'conga-alanis-stage-v32';
-
-/** State */
-let state = load() || {
-  limit: 100,
-  players: [
-    {id: uid(), name: 'Player 1', score: 0, reenganches: 0, locked: false},
-    {id: uid(), name: 'Player 2', score: 0, reenganches: 0, locked: false},
-  ],
-  nextDealerId: null,
-  autoAdvanceDealer: true,
-  rounds: [] // each: {id, inputs: {playerId: value}, cutterId, totals:{playerId: newScore}}
-};
-if(!state.nextDealerId && state.players[0]) state.nextDealerId = state.players[0].id;
-
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch{ return null; } }
-function reset(){ localStorage.removeItem(STORAGE_KEY); location.reload(); }
-
-/** ==========================
- *  PURE RULES ENGINE (for app + tests)
- * ========================== */
-function computeRound(prevState, inputs, cutterId){
-  // Deep-ish copy
-  const players = prevState.players.map(p=> ({...p}));
-  const limit = prevState.limit;
-  const idToIndex = Object.fromEntries(players.map((p,i)=>[p.id,i]));
-
-  // Projected
-  const projected = Object.fromEntries(players.map(p=> [p.id, p.score + (inputs[p.id]||0)]));
-
-  // Validation: cutter cannot exceed limit
-  if(cutterId && projected[cutterId] > limit){
-    return {error: 'CUTTER_EXCEEDS_LIMIT'};
-  }
-
-  // Apply deltas
-  players.forEach(p=>{ p.score = projected[p.id]; });
-
-  // Reenganche ONLY at == limit+1
-  players.forEach(p=>{
-    if(p.score === limit+1){
-      const elig = players.map(x=>x.score).filter(s=> s<=limit);
-      const maxLE = elig.length? Math.max(...elig) : 0; // tie resolved by value only
-      p.score = maxLE;
-      p.reenganches = (p.reenganches||0) + 1;
-    }
-  });
-
-  // Instant win
-  let winnerId = null, reason = '';
-  if(cutterId){
-    const cutterScore = players[idToIndex[cutterId]].score;
-    const others = players.filter(p=>p.id!==cutterId);
-    if(cutterScore <= limit && others.every(o=> o.score > limit)){
-      winnerId = cutterId; reason = 'Cutter ≤100 and all others >100 (instant win).';
-    }
-  }
-
-  // Dealer advance (always on)
-  let nextDealerId = prevState.nextDealerId;
-  if(prevState.autoAdvanceDealer && players.length){
-    const idx = players.findIndex(p=> p.id === prevState.nextDealerId);
-    const next = players[(idx+1) % players.length];
-    if(next) nextDealerId = next.id;
-  }
-
-  const totals = Object.fromEntries(players.map(p=> [p.id, p.score]));
-  return {players, totals, nextDealerId, winnerId, reason};
-}
-
-/** UI Rendering */
-function render(){
-  renderPlayers();
-  renderDealerBanner();
-  renderHistory();
-}
-
-function renderDealerBanner(){
-  const dealer = state.players.find(p=>p.id===state.nextDealerId);
-  $('#nextDealerName').textContent = dealer? dealer.name : '—';
-}
-
-function playerRow(p){
-  const row = document.createElement('div');
-  row.className = 'player';
-  row.draggable = true;
-  row.dataset.id = p.id;
-  row.innerHTML = `
-    <div class="row" style="gap:8px; min-width:0">
-      <span class="handle" title="Drag to reorder">≡</span>
-      <div class="stack" style="gap:4px; min-width:0">
-        <div class="name" contenteditable="${!p.locked}" spellcheck="false">${escapeHTML(p.name)}</div>
-        <div class="muted" style="font-size:12px;">Tap 🎴 to set dealer • Drag ≡ to reorder</div>
-      </div>
-    </div>
-    <button class="dealer ${p.id===state.nextDealerId?'isDealer':''}" title="Set next dealer" data-role="dealer">🎴</button>
-    <span class="tag" title="Reenganche count"><span class="star">⭐</span><span class="count">${p.reenganches}</span></span>
-    <div class="score" title="Total score">${p.score}</div>
-    <button class="edit" data-role="edit" title="Edit player">✏️ Edit</button>
-    <button class="lock" data-role="lock" title="${p.locked?'Unlock name':'Lock name'}" data-locked="${p.locked}">${p.locked?'🔒':'🔓'}</button>
-  `;
-
-  // Edit handling (bigger hit target)
-  row.querySelector('[data-role="edit"]').addEventListener('click', ()=>{
-    const nameEl = row.querySelector('.name');
-    const locked = row.querySelector('[data-role="lock"]').dataset.locked === 'true';
-    if(locked) return; // locked
-    nameEl.focus();
-    selectAllContent(nameEl);
-  });
-  row.querySelector('.name').addEventListener('blur', (e)=>{
-    const newName = e.currentTarget.textContent.trim() || 'Player';
-    p.name = newName; save(); renderDealerBanner();
-  });
-
-  // Lock toggle
-  row.querySelector('[data-role="lock"]').addEventListener('click', (e)=>{
-    const btn = e.currentTarget; const locked = btn.dataset.locked === 'true';
-    p.locked = !locked; btn.dataset.locked = String(p.locked); btn.textContent = p.locked?'🔒':'🔓';
-    btn.title = p.locked? 'Unlock name':'Lock name';
-    const nameEl = row.querySelector('.name');
-    nameEl.setAttribute('contenteditable', String(!p.locked));
-    save();
-  });
-
-  // Dealer set
-  row.querySelector('[data-role="dealer"]').addEventListener('click', ()=>{
-    state.nextDealerId = p.id; save(); renderDealerBanner(); renderPlayers();
-  });
-
-  // Drag & Drop
-  row.addEventListener('dragstart', (e)=>{
-    e.dataTransfer.setData('text/plain', p.id);
-    row.style.opacity = .5;
-  });
-  row.addEventListener('dragend', ()=> row.style.opacity = 1);
-  row.addEventListener('dragover', (e)=>{ e.preventDefault(); row.style.outline='1px dashed rgba(255,255,255,.25)'; });
-  row.addEventListener('dragleave', ()=> row.style.outline='none');
-  row.addEventListener('drop', (e)=>{
-    e.preventDefault(); row.style.outline='none';
-    const fromId = e.dataTransfer.getData('text/plain');
-    const toId = p.id;
-    reorderPlayers(fromId, toId);
-  });
-
-  return row;
-}
-
-function renderPlayers(){
-  const wrap = $('#players');
-  wrap.innerHTML = '';
-  state.players.forEach(p=> wrap.appendChild(playerRow(p)) );
-}
-
-function reorderPlayers(fromId, toId){
-  const list = state.players.slice();
-  const fromIndex = list.findIndex(p=>p.id===fromId);
-  const toIndex = list.findIndex(p=>p.id===toId);
-  if(fromIndex<0 || toIndex<0) return;
-  const [moved] = list.splice(fromIndex,1);
-  list.splice(toIndex,0,moved);
-  // keep dealer by id (no change to nextDealerId)
-  state.players = list; save(); render();
-}
-
-/** History */
-function renderHistory(){
-  const host = $('#history');
-  if(state.rounds.length===0){ host.innerHTML = `<div class="muted">No rounds yet.</div>`; return; }
-  const table = document.createElement('table');
-  const thead = document.createElement('thead');
-  const hdr = document.createElement('tr');
-  hdr.innerHTML = `<th>#</th>` + state.players.map(p=>`<th>${escapeHTML(p.name)}</th>`).join('');
-  thead.appendChild(hdr); table.appendChild(thead);
-  const tb = document.createElement('tbody');
-  state.rounds.forEach((r,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td>` + state.players.map(p=>`<td>${r.totals[p.id] ?? ''}</td>`).join('');
-    tr.title = `Cutter: ${playerName(r.cutterId) || '—'}`;
-    tb.appendChild(tr);
-  });
-  table.appendChild(tb);
-  host.innerHTML = ''; host.appendChild(table);
-}
-
-/** New Round */
-function openRound(){
-  const form = $('#roundForm');
-  form.innerHTML = '';
-  state.players.forEach(p=>{
-    const row = document.createElement('div'); row.className='formrow'; row.dataset.id=p.id;
-    row.innerHTML = `
-      <div class="pname">${escapeHTML(p.name)}</div>
-      <input class="num" inputmode="numeric" pattern="[0-9\\-]*" placeholder="0" />
-      <button class="quick">−10</button>
-      <label class="cutter"><input type="radio" name="cutter" value="${p.id}"> Cutter</label>
-    `;
-    row.querySelector('.quick').addEventListener('click', (e)=>{
-      e.preventDefault(); const inp=row.querySelector('.num');
-      const v=parseInt(inp.value||'0',10); inp.value = String(v-10); inp.dispatchEvent(new Event('input'));
-    });
-    form.appendChild(row);
-  });
-  $('#applyRound').disabled=false;
-  $('#roundDialog').showModal();
-}
-
-function getRoundInputs(){
-  const map = {}; const rows = $$('.formrow', $('#roundForm'));
-  rows.forEach(row=>{
-    const id = row.dataset.id; const raw = row.querySelector('.num').value.trim();
-    const v = raw==='' ? 0 : Number(raw);
-    map[id] = isFinite(v)? v : 0;
-  });
-  const cutter = $('#roundForm input[name="cutter"]:checked');
-  return {inputs:map, cutterId: cutter? cutter.value : null};
-}
-
-function applyRound(){
-  const {inputs, cutterId} = getRoundInputs();
-  const preview = computeRound(state, inputs, cutterId);
-  if(preview.error === 'CUTTER_EXCEEDS_LIMIT'){
-    alert('Cutter cannot exceed 100.');
-    return;
-  }
-
-  // Commit results
-  state.players = preview.players;
-  state.nextDealerId = preview.nextDealerId;
-  state.rounds.push({id: uid(), inputs, cutterId, totals: preview.totals});
-  save(); render();
-  $('#roundDialog').close();
-
-  if(preview.winnerId){
-    announceWinner(preview.winnerId, preview.reason);
-  }
-}
-
-/** Winner Overlay + Confetti */
-function announceWinner(playerId, reason){
-  const name = playerName(playerId) || 'Unknown';
-  $('#winTitle').textContent = `${name} wins!`;
-  $('#winSubtitle').textContent = reason || '';
-  $('#overlay').classList.add('show');
-  try{ $('#winSound').play().catch(()=>{});}catch{}
-  startConfetti();
-}
-
-function playerName(id){ return state.players.find(p=>p.id===id)?.name || null; }
-
-/** Helpers */
-function escapeHTML(s){ return s.replace(/[&<>\"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
-function selectAllContent(el){ const r = document.createRange(); r.selectNodeContents(el); const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-
-/** Confetti / Fireworks (simple) */
-let confettiTimer;
-function startConfetti(){
-  const cvs = $('#confetti');
-  const ctx = cvs.getContext('2d');
-  const DPR = window.devicePixelRatio||1; const W=window.innerWidth, H=window.innerHeight; cvs.width=W*DPR; cvs.height=H*DPR; ctx.scale(DPR,DPR);
-  const pieces = Array.from({length: 220}, ()=>({
-    x: Math.random()*W, y: -10 - Math.random()*H, r: 2+Math.random()*4, vy: 2+Math.random()*3, vx: -1+Math.random()*2, a: Math.random()*Math.PI*2
-  }));
-  cancelAnimationFrame(confettiTimer);
-  function tick(){
-    ctx.clearRect(0,0,W,H);
-    pieces.forEach(p=>{
-      p.x+=p.vx; p.y+=p.vy; p.a+=0.1;
-      if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; }
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a);
-      ctx.fillStyle = `hsl(${Math.floor(Math.random()*360)},90%,60%)`;
-      ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2);
-      ctx.restore();
-    });
-    confettiTimer = requestAnimationFrame(tick);
-  }
-  tick();
-}
-
-/** Events */
-$('#btnAddPlayer').addEventListener('click', ()=>{
-  state.players.push({id:uid(), name:`Player ${state.players.length+1}`, score:0, reenganches:0, locked:false});
-  save(); render();
-});
-$('#btnNewRound').addEventListener('click', openRound);
-$('#btnHistory').addEventListener('click', ()=>{
-  window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
-});
-$('#btnReset').addEventListener('click', ()=>{
-  if(confirm('Reset game and clear all data?')) reset();
-});
-$('#btnSettings').addEventListener('click', ()=>{
-  alert('Auto‑advance dealer is always ON in this STAGE build. Drag to reorder; tap 🎴 to set the next dealer. Reenganche only at 101. Cutter cannot exceed 100.');
-});
-$('#closeRound').addEventListener('click', ()=> $('#roundDialog').close());
-$('#cancelRound').addEventListener('click', ()=> $('#roundDialog').close());
-$('#applyRound').addEventListener('click', applyRound);
-
-$('#closeWin').addEventListener('click', ()=>{ $('#overlay').classList.remove('show'); cancelAnimationFrame(confettiTimer); });
-$('#resetWin').addEventListener('click', ()=>{ cancelAnimationFrame(confettiTimer); reset(); });
-
-window.addEventListener('beforeunload', ()=> cancelAnimationFrame(confettiTimer));
-
-// Initial render
-render();
-
-// IMPORTANT: Service Worker disabled in sandbox (blob: URLs unsupported).
-// To enable PWA in production, host sw.js over HTTPS and use:
-// if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
-//   navigator.serviceWorker.register('/sw.js');
-// }
-
-/** ==========================
- * Built-in Test Suite (run via UI button)
- * ========================== */
-function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
-function makeState(players, nextDealerId){
-  return { limit:100, players:deepClone(players), nextDealerId: nextDealerId||players[0].id, autoAdvanceDealer:true, rounds:[] };
-}
-function assert(name, cond){ if(!assert.results) assert.results=[]; assert.results.push({name, pass: !!cond}); if(!cond) console.error('❌', name); else console.log('✅', name); }
-function runTests(){
-  assert.results=[];
-
-  // 1) Instant win: cutter ≤100, others >100
-  (function(){
-    const A={id:'A',name:'A',score:95,reenganches:0}, B={id:'B',name:'B',score:100,reenganches:0}, C={id:'C',name:'C',score:99,reenganches:0};
-    const st=makeState([A,B,C],'A');
-    const out=computeRound(st,{A:5,B:10,C:5},'A'); // A=100, B=110, C=104
-    assert('Instant win triggers for cutter A', out.winnerId==='A');
-  })();
-
-  // 2) Reenganche only at 101
-  (function(){
-    const A={id:'A',name:'A',score:100,reenganches:0}, B={id:'B',name:'B',score:95,reenganches:0}, C={id:'C',name:'C',score:40,reenganches:0};
-    const st=makeState([A,B,C],'A');
-    const out=computeRound(st,{B:6},null); // B -> 101 => reenganche to max <=100 which is 100
-    const b = out.players.find(p=>p.id==='B');
-    assert('Reenganche at 101 sets score to max<=100', b.score===100 && b.reenganches===1);
-  })();
-
-  // 3) No reenganche at 100
-  (function(){
-    const A={id:'A',name:'A',score:80,reenganches:0}, B={id:'B',name:'B',score:95,reenganches:0};
-    const st=makeState([A,B],'A');
-    const out=computeRound(st,{B:5},null); // B -> 100
-    const b = out.players.find(p=>p.id==='B');
-    assert('No reenganche at exactly 100', b.score===100 && (b.reenganches||0)===0);
-  })();
-
-  // 4) Dealer auto-advances
-  (function(){
-    const A={id:'A',name:'A',score:0,reenganches:0}, B={id:'B',name:'B',score:0,reenganches:0}, C={id:'C',name:'C',score:0,reenganches:0};
-    const st=makeState([A,B,C],'B');
-    const out=computeRound(st,{A:0,B:0,C:0},null);
-    assert('Dealer advances from B to C', out.nextDealerId==='C');
-  })();
-
-  // 5) Cutter validation blocks >100
-  (function(){
-    const A={id:'A',name:'A',score:100,reenganches:0}, B={id:'B',name:'B',score:0,reenganches:0};
-    const st=makeState([A,B],'A');
-    const out=computeRound(st,{A:1},'A'); // A would be 101 as cutter
-    assert('Cutter >100 yields error', out.error==='CUTTER_EXCEEDS_LIMIT');
-  })();
-
-  const passed = assert.results.filter(r=>r.pass).length;
-  const total = assert.results.length;
-  $('#testResult').textContent = `${passed}/${total} tests passed`;
-  return assert.results;
-}
-
-$('#runTests').addEventListener('click', ()=>{
-  $('#testResult').textContent = 'Running...';
-  const results = runTests();
-  console.table(results);
-});
-</script>
+        // === HELPER FUNCTIONS ===
+        const uid = () => `p${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+        const clampInt = (v, d = 0) => Number.isFinite(+v) ? Math.trunc(+v) : d;
+        const getInitials = (name) => (name || " ").trim().split(/\s+/).map(s => s[0]).join("").slice(0, 2).toUpperCase();
+        const createCSV = (players, nextDealerId) => {
+          const header = ["name", "score", "reenganches", "isDealer"];
+          const rows = players.map(p => [
+            `"${String(p.name || "").replace(/"/g, '""')}"`,
+            String(clampInt(p.score || 0)),
+            String(clampInt(p.reenganches || 0)),
+            String(p.id === nextDealerId)
+          ]);
+          const allRows = [header].concat(rows).map(r => r.join(",")).join("\n");
+          const blob = new Blob(["\ufeff", allRows], { type: "text/csv;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "conga_scores.csv";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+        };
+        
+        const App = () => {
+          const [players, setPlayers] = React.useState(() => {
+            const savedState = localStorage.getItem('conga_state_react');
+            if (savedState) {
+              const state = JSON.parse(savedState);
+              return state.players || [];
+            }
+            return [{ id: uid(), name: "Player 1", score: 0, reenganches: 0, avatar: null }, { id: uid(), name: "Player 2", score: 0, reenganches: 0, avatar: null }];
+          });
+        
+          const [gameState, setGameState] = React.useState(() => {
+            const savedState = localStorage.getItem('conga_state_react');
+            if (savedState) {
+              const state = JSON.parse(savedState);
+              return {
+                limit: Number.isFinite(state.limit) ? state.limit : 100,
+                nextDealerId: state.nextDealerId || (state.players && state.players[0] ? state.players[0].id : null),
+                autoAdvanceDealer: typeof state.autoAdvanceDealer === 'boolean' ? state.autoAdvanceDealer : true,
+                gameOver: !!state.gameOver,
+                cutsHistory: Array.isArray(state.cutsHistory) ? state.cutsHistory : [],
+                rounds: Array.isArray(state.rounds) ? state.rounds : [],
+                roundCounter: Number.isFinite(state.roundCounter) ? state.roundCounter : 0,
+                lockOrder: !!state.lockOrder,
+                winsLog: Array.isArray(state.winsLog) ? state.winsLog : [],
+              };
+            }
+            return {
+              limit: 100,
+              nextDealerId: null,
+              autoAdvanceDealer: true,
+              gameOver: false,
+              cutsHistory: [],
+              rounds: [],
+              roundCounter: 0,
+              lockOrder: false,
+              winsLog: [],
+            };
+          });
+        
+          const [showRoundModal, setShowRoundModal] = React.useState(false);
+          const [showEditModal, setShowEditModal] = React.useState(false);
+          const [showSettingsModal, setShowSettingsModal] = React.useState(false);
+          const [showHistoryModal, setShowHistoryModal] = React.useState(false);
+          const [showCutsHistoryModal, setShowCutsHistoryModal] = React.useState(false);
+          const [showWinOverlay, setShowWinOverlay] = React.useState(false);
+        
+          const [editPlayerId, setEditPlayerId] = React.useState(null);
+          const [editPlayerName, setEditPlayerName] = React.useState('');
+          const [editPlayerScore, setEditPlayerScore] = React.useState(0);
+          const [editPlayerReeng, setEditPlayerReeng] = React.useState(0);
+          const [editPlayerIsDealer, setEditPlayerIsDealer] = React.useState(false);
+          const [editPlayerPhoto, setEditPlayerPhoto] = React.useState(null);
+        
+          const [roundScores, setRoundScores] = React.useState({});
+          const [roundCutterId, setRoundCutterId] = React.useState(null);
+          const [roundError, setRoundError] = React.useState('');
+        
+          const dragItem = React.useRef(null);
+          const dragOverItem = React.useRef(null);
+        
+          React.useEffect(() => {
+            const stateToSave = { players, ...gameState };
+            localStorage.setItem('conga_state_react', JSON.stringify(stateToSave));
+          }, [players, gameState]);
+        
+          React.useEffect(() => {
+            if (!gameState.nextDealerId && players.length > 0) {
+              setGameState(prev => ({ ...prev, nextDealerId: players[0].id }));
+            }
+          }, [players, gameState.nextDealerId]);
+        
+          const addPlayer = (name = "") => {
+            const newPlayer = { id: uid(), name: name || `Player ${players.length + 1}`, score: 0, reenganches: 0, avatar: null };
+            setPlayers(prev => [...prev, newPlayer]);
+            setGameState(prev => ({ ...prev, gameOver: false }));
+          };
+        
+          const removePlayer = (id) => {
+            setPlayers(prev => {
+              const newPlayers = prev.filter(p => p.id !== id);
+              if (id === gameState.nextDealerId) {
+                setGameState(prev => ({ ...prev, nextDealerId: newPlayers[0]?.id || null }));
+              }
+              return newPlayers;
+            });
+          };
+        
+          const handleDragStart = (e, index) => {
+            dragItem.current = index;
+          };
+        
+          const handleDragEnter = (e, index) => {
+            dragOverItem.current = index;
+          };
+        
+          const handleDragEnd = () => {
+            if (dragItem.current === null || dragOverItem.current === null) return;
+            const dragIndex = dragItem.current;
+            const dropIndex = dragOverItem.current;
+        
+            const newPlayers = [...players];
+            const draggedPlayer = newPlayers[dragIndex];
+            newPlayers.splice(dragIndex, 1);
+            newPlayers.splice(dropIndex, 0, draggedPlayer);
+        
+            setPlayers(newPlayers);
+            dragItem.current = null;
+            dragOverItem.current = null;
+          };
+        
+          const openRoundModal = () => {
+            if (players.length === 0 || gameState.gameOver) return;
+            setRoundScores({});
+            setRoundCutterId(null);
+            setRoundError('');
+            setShowRoundModal(true);
+          };
+        
+          const validateRound = (scores, cutterId) => {
+            const cutter = players.find(p => p.id === cutterId);
+            if (!cutter) {
+              setRoundError('Invalid cutter selected.');
+              return false;
+            }
+            const projectedScore = clampInt(cutter.score) + clampInt(scores[cutterId] || 0);
+            if (projectedScore > gameState.limit) {
+              setRoundError(`Cutter's projected score cannot exceed ${gameState.limit}. (Projected: ${projectedScore})`);
+              return false;
+            }
+            setRoundError('');
+            return true;
+          };
+        
+          const saveRound = (e) => {
+            e.preventDefault();
+            if (roundCutterId && !validateRound(roundScores, roundCutterId)) return;
+        
+            const roundNo = gameState.roundCounter + 1;
+            const newPlayers = players.map(p => {
+              const score = clampInt(p.score) + clampInt(roundScores[p.id] || 0);
+              return { ...p, score };
+            });
+        
+            let newGameOver = false;
+            let newWinsLog = [...gameState.winsLog];
+            let newCutsHistory = [...gameState.cutsHistory];
+            const winningPlayer = newPlayers.find(p => p.score >= gameState.limit);
+        
+            if (winningPlayer) {
+              const playersUnderLimit = newPlayers.filter(p => p.score <= gameState.limit);
+              if (playersUnderLimit.length === 1) {
+                newGameOver = true;
+                const winner = playersUnderLimit[0];
+                newWinsLog.push({ playerId: winner.id, name: winner.name, date: new Date().toISOString().slice(0, 10), timestamp: Date.now() });
+                if (roundCutterId) {
+                  const cutterEntry = { id: roundCutterId, name: players.find(p => p.id === roundCutterId)?.name || '—', round: roundNo, timestamp: Date.now(), result: roundCutterId === winner.id ? "cut_win" : "normal" };
+                  newCutsHistory.push(cutterEntry);
+                }
+                setPlayers(newPlayers);
+                setGameState(prev => ({
+                  ...prev,
+                  gameOver: newGameOver,
+                  winsLog: newWinsLog,
+                  cutsHistory: newCutsHistory,
+                  roundCounter: roundNo,
+                  rounds: [...prev.rounds, { round: roundNo, inputs: roundScores, totals: newPlayers.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {}), cutterId: roundCutterId, timestamp: Date.now() }],
+                }));
+                setShowRoundModal(false);
+                setShowWinOverlay(true);
+                return;
+              }
+            }
+        
+            const playersOverLimit = newPlayers.filter(p => p.score > gameState.limit);
+            if (playersOverLimit.length > 0) {
+              const playersUnderLimit = newPlayers.filter(p => p.score <= gameState.limit);
+              if (playersUnderLimit.length > 0) {
+                const maxUnderVal = Math.max(...playersUnderLimit.map(p => p.score));
+                newPlayers.forEach(p => {
+                  if (p.score > gameState.limit) {
+                    p.score = maxUnderVal;
+                    p.reenganches = clampInt(p.reenganches) + 1;
+                  }
+                });
+              }
+            }
+            
+            setPlayers(newPlayers);
+        
+            if (roundCutterId) {
+              newCutsHistory.push({ id: roundCutterId, name: players.find(p => p.id === roundCutterId)?.name || '—', round: roundNo, timestamp: Date.now(), result: "normal" });
+            }
+        
+            let newDealerId = gameState.nextDealerId;
+            if (gameState.autoAdvanceDealer && players.length > 1) {
+              const currentIndex = players.findIndex(p => p.id === gameState.nextDealerId);
+              newDealerId = players[(currentIndex + 1) % players.length].id;
+            }
+        
+            setGameState(prev => ({
+              ...prev,
+              nextDealerId: newDealerId,
+              cutsHistory: newCutsHistory,
+              roundCounter: roundNo,
+              rounds: [...prev.rounds, { round: roundNo, inputs: roundScores, totals: newPlayers.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {}), cutterId: roundCutterId, timestamp: Date.now() }],
+            }));
+            setShowRoundModal(false);
+          };
+        
+          const handleEditPlayer = (id) => {
+            const player = players.find(p => p.id === id);
+            if (!player) return;
+            setEditPlayerId(id);
+            setEditPlayerName(player.name);
+            setEditPlayerScore(player.score);
+            setEditPlayerReeng(player.reenganches);
+            setEditPlayerIsDealer(player.id === gameState.nextDealerId);
+            setEditPlayerPhoto(player.avatar);
+            setShowEditModal(true);
+          };
+        
+          const saveEditPlayer = (e) => {
+            e.preventDefault();
+            setPlayers(prev => prev.map(p => {
+              if (p.id === editPlayerId) {
+                return {
+                  ...p,
+                  name: editPlayerName,
+                  score: clampInt(editPlayerScore),
+                  reenganches: Math.max(0, clampInt(editPlayerReeng)),
+                  avatar: editPlayerPhoto,
+                };
+              }
+              return p;
+            }));
+            setGameState(prev => ({ ...prev, nextDealerId: editPlayerIsDealer ? editPlayerId : (prev.nextDealerId === editPlayerId ? null : prev.nextDealerId) }));
+            setShowEditModal(false);
+          };
+        
+          const resetGame = () => {
+            setPlayers(prev => prev.map(p => ({ ...p, score: 0, reenganches: 0 })));
+            setGameState(prev => ({ ...prev, gameOver: false, rounds: [], roundCounter: 0 }));
+          };
+        
+          const clearAllData = () => {
+            setPlayers([]);
+            setGameState({
+              limit: 100,
+              nextDealerId: null,
+              autoAdvanceDealer: true,
+              gameOver: false,
+              cutsHistory: [],
+              rounds: [],
+              roundCounter: 0,
+              lockOrder: false,
+              winsLog: [],
+            });
+          };
+          
+          const getWinner = () => {
+              return players.find(p => p.score >= gameState.limit);
+          }
+        
+          return (
+            <div className="min-h-screen bg-[#0f1220] text-gray-100 p-4 font-sans flex flex-col items-center">
+              <div className="w-full max-w-2xl bg-[#171a2b] shadow-xl rounded-2xl p-6 md:p-8 flex flex-col space-y-6">
+                <header className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-gradient-to-br from-[#7aa2ff] to-[#a77dff] text-[#0b0f1f] py-1 px-3 rounded-full font-extrabold text-xs uppercase tracking-wider">Conga / Chinchón</span>
+                    <span className="text-xl md:text-2xl font-black tracking-wide">Alanis Scorekeeper</span>
+                  </div>
+                  <button onClick={() => setShowSettingsModal(true)} className="w-11 h-11 grid place-items-center rounded-xl border border-white/10 bg-[#0f1428] text-gray-100 hover:brightness-110 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.78 1.35a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.73v.5a2 2 0 0 1-1 1.73l-.15.08a2 2 0 0 0-.73 2.73l.78 1.35a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2-2h.44a2 2 0 0 0 2 2v.18a2 2 0 0 1 1 1.73l.43.25a2 2 0 0 1 2 0l.15-.08a2 2 0 0 0 2.73-.73l.78-1.35a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.5a2 2 0 0 1 1-1.73l.15-.08a2 2 0 0 0 .73-2.73l-.78-1.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2-2V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </header>
+        
+                <section className="bg-gray-800/50 border border-white/10 rounded-2xl p-4 mb-2 flex flex-col md:flex-row items-center gap-4">
+                  <div className="flex-1 text-sm text-gray-300">
+                    <strong>Next dealer:</strong> <span className="font-semibold text-white">{players.find(p => p.id === gameState.nextDealerId)?.name || '—'}</span>
+                    <div className="text-xs text-gray-400 mt-1">Long-press player row to Edit.</div>
+                  </div>
+                  <div className="flex gap-2 w-full md:w-auto">
+                    <button onClick={() => setGameState(prev => ({ ...prev, lockOrder: !prev.lockOrder }))} className="w-11 h-11 grid place-items-center rounded-xl border border-white/10 bg-gray-800/50 text-gray-100 hover:brightness-110 transition-all" title={gameState.lockOrder ? "Unlock player order" : "Lock player order"}>
+                      {gameState.lockOrder ? '🔒' : '🔓'}
+                    </button>
+                    <button onClick={() => setShowHistoryModal(true)} className="flex-1 p-3 bg-gray-700/50 hover:bg-gray-700/80 rounded-lg text-white font-bold transition-all">History</button>
+                    <button onClick={openRoundModal} className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-bold transition-all" disabled={players.length === 0 || gameState.gameOver}>New round</button>
+                  </div>
+                </section>
+        
+                <section className="space-y-2">
+                  <h2 className="text-sm text-gray-400 ml-1">Players</h2>
+                  <div className="space-y-3" onDragOver={(e) => e.preventDefault()}>
+                    {players.map((player, index) => (
+                      <div
+                        key={player.id}
+                        draggable={!gameState.lockOrder}
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDragEnter={(e) => handleDragEnter(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onClick={() => handleEditPlayer(player.id)}
+                        className={`relative group flex items-center gap-3 p-3 rounded-xl border-2 transition-all cursor-pointer hover:bg-white/5
+                          ${player.id === gameState.nextDealerId ? 'border-green-400 bg-green-900/20' : 'border-transparent bg-white/5'}
+                          ${gameState.lockOrder ? 'cursor-not-allowed' : ''}
+                        `}
+                      >
+                        <div className={`text-xl text-gray-400 transition-opacity ${gameState.lockOrder ? 'opacity-50' : ''}`}>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21.25a.75.75 0 0 1-.75-.75V3.5a.75.75 0 0 1 1.5 0v17a.75.75 0 0 1-.75.75z"/><path d="M16 16.25a.75.75 0 0 1-.75-.75v-8a.75.75 0 0 1 1.5 0v8a.75.75 0 0 1-.75.75zM8 16.25a.75.75 0 0 1-.75-.75v-8a.75.75 0 0 1 1.5 0v8a.75.75 0 0 1-.75.75z"/></svg>
+                        </div>
+                        <div className={`w-14 h-14 rounded-full flex-shrink-0 bg-[#0f1428] border border-white/20 overflow-hidden grid place-items-center font-bold text-xl transition-all ${player.id === gameState.nextDealerId ? 'border-4 border-green-400' : ''}`}>
+                          {player.avatar ? <img src={player.avatar} alt={player.name} className="w-full h-full object-cover" /> : getInitials(player.name)}
+                        </div>
+                        <div className="flex-1 truncate">
+                          <h3 className="text-xl font-bold truncate">{player.name}</h3>
+                        </div>
+                        <div className="text-right font-bold text-lg">
+                          <div className="text-sm text-red-400">{player.reenganches > 0 && `★ ${player.reenganches}`}</div>
+                          <div className={`text-2xl ${player.score > gameState.limit ? 'text-red-400' : ''}`}>{player.score}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => addPlayer()} className="w-full p-3 border border-white/20 border-dashed rounded-lg text-white/70 hover:bg-white/5 transition-all">+ Add player</button>
+                </section>
+        
+                {gameState.gameOver && (
+                  <section className="p-4 rounded-xl border border-white/20 bg-gradient-to-r from-green-600/30 to-blue-600/30 text-white flex items-center justify-between gap-4 flex-wrap">
+                    <strong>Game over!</strong>
+                    <span className="bg-gray-900/50 text-white/80 py-1 px-3 rounded-full text-xs font-semibold">Game over</span>
+                    <div className="flex gap-2 ml-auto">
+                      <button onClick={resetGame} className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold transition-all">New game</button>
+                    </div>
+                  </section>
+                )}
+              </div>
+        
+              {showSettingsModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-[#111827] w-full max-w-xl rounded-2xl border border-white/20 shadow-xl">
+                    <div className="p-4 border-b border-white/20 flex justify-between items-center">
+                      <h3 className="text-lg font-bold">Settings</h3>
+                      <button onClick={() => setShowSettingsModal(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-2">Limit (default 100)</label>
+                        <input
+                          type="number"
+                          value={gameState.limit}
+                          onChange={(e) => setGameState(prev => ({ ...prev, limit: clampInt(e.target.value) }))}
+                          className="w-full p-2 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={gameState.autoAdvanceDealer}
+                          onChange={(e) => setGameState(prev => ({ ...prev, autoAdvanceDealer: e.target.checked }))}
+                          className="w-5 h-5 accent-blue-500"
+                        />
+                        <span className="text-sm">Auto-advance dealer after round</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={gameState.lockOrder}
+                          onChange={(e) => setGameState(prev => ({ ...prev, lockOrder: e.target.checked }))}
+                          className="w-5 h-5 accent-blue-500"
+                        />
+                        <span className="text-sm">Lock player reordering</span>
+                      </label>
+                      <div className="flex gap-2 justify-end mt-4">
+                        <button onClick={() => createCSV(players, gameState.nextDealerId)} className="p-2 bg-gray-600 rounded-lg text-white font-bold">Export CSV</button>
+                        <button onClick={() => { if (window.confirm("Are you sure you want to reset all scores?")) { resetGame(); setShowSettingsModal(false); } }} className="p-2 bg-yellow-500 rounded-lg text-white font-bold">Reset Scores</button>
+                        <button onClick={() => { if (window.confirm("Are you sure you want to clear all players and data?")) { clearAllData(); setShowSettingsModal(false); } }} className="p-2 bg-red-500 rounded-lg text-white font-bold">Clear All</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+        
+              {showRoundModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-[#111827] w-full max-w-xl rounded-2xl border border-white/20 shadow-xl">
+                    <div className="p-4 border-b border-white/20 flex justify-between items-center">
+                      <h3 className="text-lg font-bold">New Round</h3>
+                      <button onClick={() => setShowRoundModal(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                    <form onSubmit={saveRound}>
+                      <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                        {players.map(p => (
+                          <div key={p.id} className="flex items-center gap-2">
+                            <span className="w-1/4 truncate">{p.name}</span>
+                            <input
+                              type="number"
+                              value={roundScores[p.id] || ''}
+                              onChange={(e) => setRoundScores(prev => ({ ...prev, [p.id]: clampInt(e.target.value) }))}
+                              placeholder="Score"
+                              className="flex-1 p-2 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <label className="flex items-center gap-1 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="cutter"
+                                value={p.id}
+                                checked={roundCutterId === p.id}
+                                onChange={(e) => {
+                                  const newCutterId = e.target.value;
+                                  setRoundCutterId(newCutterId);
+                                  validateRound(roundScores, newCutterId);
+                                }}
+                                className="w-4 h-4 accent-blue-500"
+                              />
+                              <span className="text-sm">✂️</span>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-4 border-t border-white/20 flex items-center justify-between">
+                        {roundError && <span className="text-red-400 text-sm font-bold">{roundError}</span>}
+                        <button type="button" onClick={() => setShowRoundModal(false)} className="p-2 text-gray-400 hover:text-white transition-colors">Cancel</button>
+                        <button type="submit" className="p-3 bg-green-500 hover:bg-green-600 rounded-lg text-white font-bold" disabled={roundError}>Apply</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+        
+              {showEditModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-[#111827] w-full max-w-xl rounded-2xl border border-white/20 shadow-xl">
+                    <div className="p-4 border-b border-white/20 flex justify-between items-center">
+                      <h3 className="text-lg font-bold">Edit Player</h3>
+                      <button onClick={() => setShowEditModal(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                    <form onSubmit={saveEditPlayer}>
+                      <div className="p-6 space-y-4">
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Name</label>
+                          <input
+                            type="text"
+                            value={editPlayerName}
+                            onChange={(e) => setEditPlayerName(e.target.value)}
+                            required
+                            className="w-full p-2 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Score</label>
+                          <input
+                            type="number"
+                            value={editPlayerScore}
+                            onChange={(e) => setEditPlayerScore(e.target.value)}
+                            className="w-full p-2 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-400 mb-2">Reenganches</label>
+                          <input
+                            type="number"
+                            value={editPlayerReeng}
+                            onChange={(e) => setEditPlayerReeng(e.target.value)}
+                            min="0"
+                            className="w-full p-2 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={editPlayerIsDealer}
+                            onChange={(e) => setEditPlayerIsDealer(e.target.checked)}
+                            className="w-5 h-5 accent-blue-500"
+                          />
+                          <span className="text-sm">Set as next dealer</span>
+                        </label>
+                        <div className="flex gap-2 flex-wrap">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => setEditPlayerPhoto(reader.result);
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          <button type="button" onClick={() => setEditPlayerPhoto(null)} className="p-2 bg-gray-600 rounded-lg text-white font-bold">Remove Photo</button>
+                          <button type="button" onClick={() => setShowCutsHistoryModal(true)} className="p-2 bg-gray-600 rounded-lg text-white font-bold">View Cut History</button>
+                          <button type="button" onClick={() => removePlayer(editPlayerId)} className="p-2 bg-red-500 rounded-lg text-white font-bold">Delete Player</button>
+                        </div>
+                      </div>
+                      <div className="p-4 border-t border-white/20 flex justify-end gap-2">
+                        <button type="button" onClick={() => setShowEditModal(false)} className="p-2 text-gray-400 hover:text-white transition-colors">Cancel</button>
+                        <button type="submit" className="p-3 bg-green-500 hover:bg-green-600 rounded-lg text-white font-bold">Save</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+        
+              {showHistoryModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-[#111827] w-full max-w-3xl rounded-2xl border border-white/20 shadow-xl">
+                    <div className="p-4 border-b border-white/20 flex justify-between items-center">
+                      <h3 className="text-lg font-bold">Rounds History</h3>
+                      <button onClick={() => setShowHistoryModal(false)} className="p-2 text-gray-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                    <div className="p-6 overflow-x-auto">
+                      {gameState.rounds.length === 0 ? (
+                        <p className="text-gray-400">No rounds yet.</p>
+                      ) : (
+                        <table className="min-w-full text-left table-auto border-collapse">
+                          <thead className="sticky top-0 bg-[#121633]">
+                            <tr>
+                              <th className="p-2 font-bold">Round #</th>
+                              {players.map(p => <th key={p.id} className="p-2 font-bold">{p.name}</th>)}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {gameState.rounds.map((round, index) => (
+                              <tr key={index} className="border-t border-white/10">
+                                <td className="p-2">{round.round}</td>
+                                {players.map(p => (
+                                  <td key={p.id} className="p-2">{round.totals[p.id]}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+        
+              {showWinOverlay && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-[#111827] w-full max-w-xl rounded-2xl border border-white/20 shadow-xl text-center p-8">
+                    <h3 className="text-4xl font-extrabold text-white mb-4">You have a winner!</h3>
+                    <p className="text-xl font-semibold mb-6">Congratulations to <span className="text-green-400">{getWinner()?.name}</span>!</p>
+                    <button onClick={() => setShowWinOverlay(false)} className="p-3 bg-green-500 hover:bg-green-600 rounded-lg text-white font-bold transition-all">Close</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+    <!-- End of React application -->
 </body>
 </html>
