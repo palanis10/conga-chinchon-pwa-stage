@@ -2,574 +2,557 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.5</title>
-<meta name="theme-color" content="#0f1220" />
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Conga by Alanis — STAGE v3.5.6</title>
+
+<!-- Prevent double-tap zoom / weird text scaling on iOS -->
+<style>
+  html,body{ -webkit-text-size-adjust:100%; }
+  button,.btn,.chip,a,input,select,label{ touch-action:manipulation; }
+</style>
+<script>
+(function(){
+  // Soft block double-tap zoom without breaking tap events
+  let last = 0;
+  document.addEventListener('touchend', function(e){
+    const now = Date.now();
+    if (now - last <= 300) { e.preventDefault(); }
+    last = now;
+  }, {passive:false});
+})();
+</script>
 
 <style>
   :root{
-    --bg:#0f1220; --card:#171a2b; --muted:#2a2f4a; --text:#e8ecff; --sub:#b8c0ff;
-    --accent:#7aa2ff; --accent-2:#4ee1a0; --danger:#ff6b6b;
-    --shadow: 0 8px 24px rgba(0,0,0,.35); --radius:16px;
+    --bg:#0b1020;
+    --panel:#121933;
+    --panel-2:#0e142b;
+    --border:#314063;
+    --chip:#1a2242;
+    --chip-dash:#2a365b;
+    --text:#e8edf8;
+    --text-sub:#a9b6d7;
+    --accent-a:#7aa7ff;
+    --accent-b:#b39bff;
+    --ok:#91f5be;
+    --warn:#ffb86c;
+    --bad:#ff6b6b;
+    --ring:#2ad7a3;
+    --shadow:0 24px 48px rgba(0,0,0,.35);
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
-    background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, sans-serif;
     color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    line-height:1.35;
+    background: radial-gradient(1200px 800px at 20% -10%, #162040, #0d1020 60%) fixed, var(--bg);
   }
-  .app{max-width:980px; margin:0 auto; padding:8px 12px 120px;}
 
-  /* ===== Header (taller title, version underneath) ===== */
-  header{
+  .wrap{max-width:980px;margin:0 auto;padding:20px 16px 120px}
+
+  /* Header */
+  .header{
     display:grid;
     grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      "title lang gear"
+      "stage stage stage";
     align-items:center;
-    column-gap:10px;
-    row-gap:4px;
-    padding:6px 0 2px 0;
-    margin-bottom:8px;
+    gap:10px 16px;
+    margin-bottom:10px;
   }
-  .brand{
-    display:flex; flex-direction:column; min-width:0;
+  .title{ grid-area:title; font-size:32px; font-weight:900; letter-spacing:.3px }
+  .stage{ grid-area:stage; color:var(--text-sub); font-weight:800; letter-spacing:.08em; margin-top:-2px }
+  .gear{ grid-area:gear }
+  .lang{ grid-area:lang }
+
+  .icon-btn{
+    display:inline-grid; place-items:center;
+    width:44px;height:44px;border-radius:12px;
+    background:var(--panel); border:1px solid var(--border); cursor:pointer;
+    box-shadow:var(--shadow);
   }
-  .title{
-    font-weight:1000; letter-spacing:.2px;
-    font-size: clamp(22px, 6.2vw, 34px);   /* bigger */
-    line-height:1.05;
-    color:var(--text);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  .icon{width:22px;height:22px;filter:invert(92%) sepia(6%) saturate(245%) hue-rotate(188deg) brightness(104%) contrast(93%)}
+
+  /* Controls row */
+  .controls{
+    margin-top:8px;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    display:flex; gap:14px; align-items:center; flex-wrap:nowrap;
+    overflow:hidden;
   }
-  .ver{
-    margin-top:2px;
-    font-weight:900; font-size:13px; color:var(--sub); opacity:.95;
+  .chip{
+    display:inline-flex; align-items:center; gap:10px;
+    border:1px dashed var(--chip-dash);
+    background:var(--chip);
+    padding:12px 16px; border-radius:14px; white-space:nowrap;
+    font-weight:800;
+  }
+  .chip.solid{
+    background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+    border:0; color:#0b0f1b; padding:12px 18px;
+  }
+  .chip .lock{
+    width:20px;height:20px;border-radius:4px;background:
+      linear-gradient(#ffe8a6,#d6b65a);
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,.2);
   }
 
-  .lang-pill{
-    display:inline-flex; gap:6px; align-items:center;
-    border:1px dashed rgba(255,255,255,.18);
-    border-radius:999px; padding:5px 9px; height:34px;
-    color:var(--text); font-weight:900; letter-spacing:.2px;
-    user-select:none; white-space:nowrap;
+  /* Language toggle */
+  .lang-wrap{
+    display:inline-flex; gap:10px; align-items:center;
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:6px 10px; box-shadow:var(--shadow);
   }
-  .lang-pill button{
-    appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer;
-    opacity:.85; padding:0;
-  }
-  .lang-pill .active{ opacity:1; text-decoration:underline; }
-  @media (max-width:390px){ .lang-pill{ padding:4px 8px; height:32px; font-size:13px } }
+  .lang-chip{ padding:6px 8px; border-radius:10px; cursor:pointer; opacity:.6; font-weight:800 }
+  .lang-chip.is-active{ background:#243056; opacity:1 }
 
-  .iconbtn{
-    width:40px; height:40px; display:grid; place-items:center; border-radius:12px;
-    border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;
-  }
+  /* Section label */
+  .section-h{ margin:18px 6px 8px; color:var(--text-sub); font-weight:700 }
 
-  /* ===== Card + tools row ===== */
+  /* Player list */
   .card{
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding:10px;
+    background:linear-gradient(180deg, #111833, #0e1430);
+    border:1px solid var(--border); border-radius:18px;
+    padding:12px 14px; box-shadow:var(--shadow);
   }
-  .tools{
-    display:flex; gap:8px; align-items:center; white-space:nowrap;
-  }
-  .btn{
-    appearance:none; border:0; cursor:pointer; user-select:none;
-    padding:10px 12px; border-radius:12px;
-    background: linear-gradient(135deg, #1a2344, #121a34);
-    border:1px dashed rgba(255,255,255,.22);
-    color:var(--text); font-weight:900; letter-spacing:.2px;
-    transition:.15s;
-    flex:1 1 0; min-width:0; white-space:nowrap;
-    font-size: clamp(12px, 3.4vw, 16px);
-  }
-  .btn.primary{ background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid; }
-  .btn.success{ background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid; }
+  .players{ display:flex; flex-direction:column; gap:12px }
 
-  /* ===== Players ===== */
-  .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
   .row{
-    display:grid; grid-template-columns: 28px 64px 1fr auto;
-    align-items:center; gap:10px; padding:10px; border-radius:14px;
-    border:1px solid rgba(255,255,255,.06);
-    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-    margin-bottom:8px;
+    display:grid; grid-template-columns: 30px 74px 1fr auto; align-items:center;
+    gap:12px; padding:10px 12px; border-radius:14px;
+    outline:1px solid transparent; transition:box-shadow .15s, outline-color .15s;
   }
-  .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
-  .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
-  .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset; }
-  .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
-    background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800;}
-  .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25); }
-  .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:22px; font-weight:900; }
-  .scorewrap{ display:flex; align-items:center; gap:8px; min-width:86px; justify-content:flex-end; }
-  .stars{ color:#ffb020; font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
-  .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
-  .score.over{ color:var(--danger) }
+  .row.active{ outline-color:#1dbb91; box-shadow:0 0 0 3px rgba(29,187,145,.25) inset; }
+  .handle{ width:30px;text-align:center; font-weight:900; color:var(--text-sub); cursor:grab }
+  .avatar{
+    width:64px;height:64px;border-radius:50%; display:grid; place-items:center;
+    background:#0b132a;border:6px solid #213552; position:relative;
+  }
+  .ring{ position:absolute; inset:-6px; border-radius:50%; border:5px solid var(--ring); opacity:.9 }
+  .initials{ font-weight:900; color:#cfe3ff }
+  .name{ font-size:28px; font-weight:900 }
+  .score{ font-size:28px; font-weight:900 }
+  .score.bad{ color:var(--bad) }
 
-  /* ===== Dialogs (layout essentials) ===== */
-  dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
-    box-shadow: 0 24px 64px rgba(0,0,0,.55); }
-  dialog::backdrop{ background: rgba(2,6,23,.55) }
-  .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
-  label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
-  input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
-    color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
-  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
+  .add{
+    display:flex; align-items:center; justify-content:center;
+    height:64px; border-radius:16px; border:1px dashed var(--chip-dash); background:#0e1430;
+    color:#dfe8ff; font-weight:800; cursor:pointer;
+  }
 
-  /* Round dialog (scrollable on small screens) */
-  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
-  .grid-rows{ display:grid; gap:6px }
-  .round-row{ display:grid; grid-template-columns: 1fr 120px 64px; gap:8px; align-items:center;
-    padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
-  .round-row input[type="number"]{ height:34px; padding:6px 8px; }
-  .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
+  /* Dialogs */
+  dialog{
+    background:linear-gradient(180deg, #141b36, #101633);
+    border:1px solid var(--border); border-radius:20px; color:var(--text);
+    padding:16px; box-shadow:var(--shadow); width:min(580px, calc(100vw - 32px));
+  }
+  dialog::backdrop{ background:rgba(0,0,0,.6) }
+  .modal-h{ display:flex; align-items:center; justify-content:space-between; gap:12px }
+  .modal-title{ font-weight:900; font-size:20px }
+  .btn{ background:#243056; border:1px dashed var(--chip-dash); border-radius:14px; padding:10px 14px; color:var(--text); font-weight:800; cursor:pointer }
+  .btn.primary{ background:var(--ok); color:#0b1020; border:0 }
+  .btn.danger{ background:#ff8989; color:#0b0f15; border:0 }
+  .row-grid{ display:grid; gap:10px }
+  .input{ width:100%; background:#0b132b; border:1px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text) }
+  .inline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
 
-  /* Win overlay (kept minimal) */
-  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
-  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
-  .win-head{ display:flex; align-items:center; gap:12px}
-  .win-photo{ width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)}
-  .win-photo img{ width:100%; height:100%; object-fit:cover}
-  .win-name{ font-size:20px; font-weight:900}
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
+  /* Responsive tightening for the control chips so they stay on one line */
+  @media (max-width:420px){
+    .chip{ padding:10px 12px; font-size:15px }
+    .chip.solid{ padding:10px 12px }
+    .name,.score{ font-size:24px }
+    .avatar{ width:58px;height:58px }
+  }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-  <header>
-    <div class="brand">
-      <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.5.5</div>
-    </div>
+<div class="wrap">
 
-    <div class="lang-pill" id="langPill" aria-label="Language">
-      <button data-lang="en" id="pillEn" class="active">EN</button>
-      <span>|</span>
-      <button data-lang="es" id="pillEs">ES</button>
+  <!-- Header -->
+  <header class="header">
+    <div class="title">Conga by Alanis</div>
+    <div class="lang">
+      <div id="langToggleHeader" class="lang-wrap">
+        <span class="lang-chip is-active" data-lang="en">EN</span>
+        <span style="opacity:.45">|</span>
+        <span class="lang-chip" data-lang="es">ES</span>
+      </div>
     </div>
-
-    <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
+    <button id="settingsBtn" class="icon-btn gear" aria-label="Settings">
+      <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14,12.94a7.43,7.43,0,0,0,.05-1,7.43,7.43,0,0,0-.05-1l2.11-1.65a.5.5,0,0,0,.12-.64l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.28,7.28,0,0,0-1.73-1L13.5,2.5a.5.5,0,0,0-.5-.5H11a.5.5,0,0,0-.5.5L10,4.97a7.28,7.28,0,0,0-1.73,1l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.64L3.86,10a7.43,7.43,0,0,0-.05,1,7.43,7.43,0,0,0,.05,1L1.75,13.65a.5.5,0,0,0-.12.64l2,3.46a.5.5,0,0,0,.6.22l2.49-1a7.28,7.28,0,0,0,1.73,1L10,21.5a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5l.5-2.47a7.28,7.28,0,0,0,1.73-1l2.49,1a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0-.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
+    </button>
+    <div class="stage">STAGE v3.5.6</div>
   </header>
 
-  <section class="card" style="padding:10px; margin-bottom:8px">
-    <div class="tools">
-      <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
-      <button id="historyBtn" class="btn"><span data-i18n="history">History</span></button>
-      <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
-    </div>
-  </section>
+  <!-- Controls -->
+  <div class="controls">
+    <button id="lockBtn" class="chip"><span class="lock"></span><span data-i18n="reorder">Reorder</span></button>
+    <button id="historyBtn" class="chip" title="History"><span data-i18n="history">History</span></button>
+    <button id="newRoundBtn" class="chip solid"><span data-i18n="newRound">New round</span></button>
+  </div>
 
-  <section class="players">
-    <header><div data-i18n="players">Players</div></header>
-    <div id="playersList" aria-live="polite"></div>
-    <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
-  </section>
+  <div class="section-h" data-i18n="players">Players</div>
+
+  <!-- Players -->
+  <div id="playersCard" class="card">
+    <div id="playersList" class="players"></div>
+    <div id="addPlayerBtn" class="add" role="button">+ <span data-i18n="addPlayer">Add player</span></div>
+  </div>
+
 </div>
 
-<!-- SETTINGS -->
+<!-- Settings dialog -->
 <dialog id="settingsDialog" aria-labelledby="settingsTitle">
-  <div class="modal-head">
-    <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
-    <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
+  <div class="modal-h">
+    <div id="settingsTitle" class="modal-title" data-i18n="settings">Settings</div>
+    <button class="btn" id="settingsCloseBtn" data-i18n="close">Close</button>
   </div>
-  <div class="modal-body" style="display:grid; gap:14px">
-    <div style="display:flex; gap:8px; align-items:center">
-      <label style="margin:0;min-width:120px" data-i18n="language">Language</label>
-      <select id="langSelect" style="max-width:160px">
+  <div class="row-grid" style="margin-top:12px">
+    <label class="inline">
+      <span style="min-width:110px" data-i18n="language">Language</span>
+      <select id="settingsLangSelect" class="input">
         <option value="en">English (EN)</option>
         <option value="es">Español (ES)</option>
       </select>
-    </div>
-    <div>
-      <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
-      <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
-    </div>
-    <label class="switch" style="display:flex; align-items:center; gap:10px">
-      <input id="autoAdvance" type="checkbox" />
+    </label>
+
+    <label class="inline" style="justify-content:space-between">
       <span data-i18n="autoAdvance">Auto-advance dealer after round</span>
+      <input id="autoAdvanceChk" type="checkbox" />
     </label>
-    <label class="switch" style="display:flex; align-items:center; gap:10px">
-      <input id="lockOrderSwitch" type="checkbox" />
-      <span data-i18n="lockOrder">Lock player reordering</span>
+
+    <label class="inline" style="justify-content:space-between">
+      <span data-i18n="lockReorder">Lock player reordering</span>
+      <input id="lockReorderChk" type="checkbox" />
     </label>
-    <div style="display:flex; gap:8px; flex-wrap:wrap">
-      <button class="btn" id="exportBtn" data-i18n="exportCsv">Export CSV</button>
-      <button class="btn" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
-      <button class="btn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
+
+    <div class="inline" style="justify-content:flex-start; gap:8px; margin-top:8px">
+      <button id="exportBtn" class="btn" data-i18n="exportCsv">Export CSV</button>
+      <button id="resetBtn" class="btn" data-i18n="resetScores">Reset scores</button>
+      <button id="clearBtn" class="btn danger" data-i18n="clearAll">Clear all</button>
     </div>
-  </div>
-  <div class="modal-foot">
-    <button class="btn success" onclick="settingsDialog.close()" data-i18n="done">Done</button>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:8px">
+      <button id="settingsDoneBtn" class="btn primary" data-i18n="done">Done</button>
+    </div>
   </div>
 </dialog>
 
-<!-- Round dialog -->
+<!-- New Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
-  <div class="modal-head">
-    <div>
-      <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
-      <div class="hint" data-i18n="roundHint">Enter points (negatives OK). “−10” changes the input.</div>
-    </div>
-    <button class="btn" onclick="roundDialog.close()" style="padding:6px 10px">Close</button>
+  <div class="modal-h">
+    <div id="roundTitle" class="modal-title" data-i18n="newRound">New round</div>
+    <button id="roundClose" class="btn" data-i18n="close">Close</button>
   </div>
-  <form id="roundForm" method="dialog">
-    <div class="modal-body">
-      <div class="grid-rows" id="roundRows"></div>
-    </div>
-    <div class="modal-foot">
-      <div id="roundError" class="error" style="display:none"></div>
-      <button type="button" class="btn" onclick="roundDialog.close()" data-i18n="cancel">Cancel</button>
-      <button id="applyRoundBtn" type="submit" class="btn success" data-i18n="apply">Apply</button>
-    </div>
-  </form>
+  <div style="height:10px"></div>
+  <div id="roundForm" class="row-grid"></div>
+  <div style="height:10px"></div>
+  <div class="inline" style="justify-content:flex-end">
+    <button id="roundCancel" class="btn" data-i18n="cancel">Cancel</button>
+    <button id="roundApply" class="btn primary" data-i18n="apply">Apply</button>
+  </div>
 </dialog>
-
-<!-- Edit player dialog -->
-<dialog id="editDialog" aria-labelledby="editTitle">
-  <div class="modal-head">
-    <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
-    <button class="btn" onclick="editDialog.close()" style="padding:6px 10px">Close</button>
-  </div>
-  <form id="editForm" method="dialog">
-    <div class="modal-body">
-      <input type="hidden" id="editId" />
-      <div style="display:grid; gap:10px">
-        <div>
-          <label for="editName" data-i18n="name">Name</label>
-          <input id="editName" type="text" required />
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-          <div>
-            <label for="editScore" data-i18n="score">Score</label>
-            <input id="editScore" type="number" step="1" />
-          </div>
-          <div>
-            <label for="editReeng" data-i18n="reenganches">Reenganches</label>
-            <input id="editReeng" type="number" step="1" min="0" />
-          </div>
-        </div>
-
-        <div style="display:grid; gap:10px; margin-top:6px">
-          <div>
-            <label data-i18n="photo">Photo</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap">
-              <button type="button" class="btn" id="changePhotoBtn" data-i18n="changePhoto">Change photo</button>
-              <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
-            </div>
-          </div>
-          <label class="switch" style="display:flex; align-items:center; gap:10px">
-            <input id="setDealerSwitch" type="checkbox">
-            <span data-i18n="setDealer">Set as next dealer</span>
-          </label>
-          <div>
-            <button type="button" class="btn" id="deletePlayerBtn" data-i18n="deletePlayer">Delete player</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" type="button" onclick="editDialog.close()" data-i18n="cancel">Cancel</button>
-      <button class="btn success" type="submit" data-i18n="save">Save</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- Win overlay -->
-<div class="win-overlay" id="winOverlay" aria-live="polite">
-  <div class="win-card">
-    <canvas id="confettiCanvas"></canvas>
-    <div class="win-head">
-      <div class="win-photo"><img id="winPhoto" alt=""></div>
-      <div>
-        <div class="win-name" id="winName">Winner</div>
-        <div class="win-sub" id="winSubtitle" data-i18n="winner">WINNER</div>
-      </div>
-    </div>
-    <div class="win-actions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap">
-      <button class="btn success" id="newGameBtn2" data-i18n="newGame">New game</button>
-      <button class="btn" id="winCloseBtn" data-i18n="close">Close</button>
-    </div>
-  </div>
-</div>
-
-<audio id="winSound" preload="auto">
-  <source type="audio/mp3"
-    src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAQAAABgAABcAAABWAAACAAACAQAAAC4AAABfAAAAdwAAAIQAAACkAAAAvwAAAN4AAAD///8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAAAgP8AAP//AP//AP8AAP//AAAAAP8AAP//AP//AP//AP//AP//AP//AAAAAAA="/>
-</audio>
-
-<input id="photoInput" type="file" accept="image/*" hidden>
-
-<template id="playerRowTpl">
-  <div class="row" draggable="true" aria-grabbed="false" title="Long-press to Edit">
-    <div class="drag" aria-hidden="true">≡</div>
-    <div class="avatar" aria-hidden="true"><span class="initials">P</span></div>
-    <strong class="playerName">Player</strong>
-    <div class="scorewrap">
-      <span class="stars" aria-label="Reenganches"></span>
-      <span class="score" aria-label="Score"><span class="scoreVal">0</span></span>
-    </div>
-  </div>
-</template>
 
 <script>
-(() => {
-  "use strict";
-  const $ = s => document.querySelector(s);
-  const bind = (sel, prop, fn) => { const el = $(sel); if (el) el[prop] = fn; };
-  const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
-  const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
-  const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
-  const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
-  const csv=s=>(/[",\n]/.test(s)?'"'+String(s).replace(/"/g,'""')+'"':String(s));
-
-  /* i18n */
-  const STR = {
-    en:{ reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
-      settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
-      lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
-      done:"Done", roundHint:"Enter points (negatives OK). “−10” changes the input.",
-      cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
-      photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
-      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game" },
-    es:{ reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
-      settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
-      lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
-      done:"Listo", roundHint:"Ingresa puntos (negativos ok). “−10” cambia el campo.",
-      cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
-      photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
-      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego" }
-  };
-  const storageLangKey = "conga_lang";
-  let LANG = localStorage.getItem(storageLangKey) || "en";
-  function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.en[k] || k; }
-  function applyI18n(){
-    document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
-    $("#pillEn")?.classList.toggle("active", LANG==="en");
-    $("#pillEs")?.classList.toggle("active", LANG==="es");
-    const sel=$("#langSelect"); if(sel) sel.value=LANG;
+/* ===== Simple i18n ===== */
+const I18N = {
+  en:{
+    reorder:"Reorder",
+    history:"History",
+    newRound:"New round",
+    players:"Players",
+    addPlayer:"Add player",
+    settings:"Settings",
+    close:"Close",
+    language:"Language",
+    autoAdvance:"Auto-advance dealer after round",
+    lockReorder:"Lock player reordering",
+    exportCsv:"Export CSV",
+    resetScores:"Reset scores",
+    clearAll:"Clear all",
+    done:"Done",
+    cancel:"Cancel",
+    apply:"Apply",
+    current:"Current",
+    minus10:"–10",
+    onlyOneMinus10:"Only one player may have –10 per round."
+  },
+  es:{
+    reorder:"Reordenar",
+    history:"Historial",
+    newRound:"Nueva ronda",
+    players:"Jugadores",
+    addPlayer:"Agregar jugador",
+    settings:"Ajustes",
+    close:"Cerrar",
+    language:"Idioma",
+    autoAdvance:"Avanzar repartidor automáticamente",
+    lockReorder:"Bloquear reordenamiento",
+    exportCsv:"Exportar CSV",
+    resetScores:"Reiniciar puntajes",
+    clearAll:"Borrar todo",
+    done:"Listo",
+    cancel:"Cancelar",
+    apply:"Aplicar",
+    current:"Actual",
+    minus10:"–10",
+    onlyOneMinus10:"Solo un jugador puede tener –10 por ronda."
   }
+};
 
-  /* state */
-  const storageKey="conga_state_stage_v355";
-  let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let rounds=[]; let roundCounter=0; let winsLog=[]; let lockOrder=false;
+/* ===== State ===== */
+const state = loadState() || {
+  players: [],
+  history: [],
+  settings: { lang:'en', autoAdvance:true, lockReorder:false, limit:100, dealerIndex:0 }
+};
 
-  function pruneWins(){ const cutoff=Date.now()-7*24*3600*1000; winsLog=(winsLog||[]).filter(w=>w.timestamp>=cutoff); }
-  function save(){ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,winsLog,lockOrder})); }
-  function load(){
-    try{
-      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
-      players = Array.isArray(s.players)? s.players : [];
-      /* guarantee 2 defaults on launch if empty */
-      if(!players.length){
-        players=[
-          {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-          {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
-        ];
-      }
-      limit = Number.isFinite(s.limit)? s.limit : 100;
-      autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
-      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
-      gameOver = !!s.gameOver;
-      roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
-      rounds = Array.isArray(s.rounds)? s.rounds : [];
-      winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = !!s.lockOrder; pruneWins();
-    }catch(e){ /* fallback to two fresh players */
-      players=[
-        {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-        {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
-      ];
-      nextDealerId=players[0].id;
-    }
+function saveState(){ localStorage.setItem('conga', JSON.stringify(state)); }
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem('conga')); }catch(e){ return null; }
+}
+
+/* Ensure two default players on first load */
+(function ensureDefaultPlayers(){
+  if (!state.players || state.players.length === 0){
+    state.players = [
+      { id: crypto.randomUUID(), name:"Player 1", score:0 },
+      { id: crypto.randomUUID(), name:"Player 2", score:0 }
+    ];
+    state.settings.dealerIndex = 0;
+    saveState();
   }
+})();
 
-  /* render */
-  const list=$("#playersList"), rowTpl=$("#playerRowTpl");
-  function render(){
-    $("#limitInput") && ($("#limitInput").value=limit);
-    $("#autoAdvance") && ($("#autoAdvance").checked=autoAdvanceDealer);
-    $("#lockOrderSwitch") && ($("#lockOrderSwitch").checked=lockOrder);
-    $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
-    $("#lockToggle").title = t("reorder");
+/* ===== Language plumbing (single source of truth) ===== */
+function setLanguage(lang){
+  lang = (lang==='es')?'es':'en';
+  state.settings.lang = lang;
+  document.documentElement.lang = lang;
 
-    if(list) list.innerHTML="";
-    players.forEach((p,i)=>{
-      const n=rowTpl.content.firstElementChild.cloneNode(true);
-      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-      if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      attachLongPress(n, ()=>openEdit(p.id));
-      if(p.id===nextDealerId) n.classList.add("dealer");
+  // header toggle
+  document.querySelectorAll('.lang-chip').forEach(c => c.classList.toggle('is-active', c.dataset.lang===lang));
+  // settings select
+  const sel = document.getElementById('settingsLangSelect');
+  if (sel) sel.value = lang;
 
-      const avatarBox=n.querySelector(".avatar");
-      avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`;
-      n.querySelector(".playerName").textContent=p.name||"—";
-      const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
-      n.querySelector(".scoreVal").textContent=clampInt(p.score||0);
-      const sc=n.querySelector(".score"); (p.score||0)>=limit+1 ? sc.classList.add("over") : sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); lockOrder?handle.classList.add("locked"):handle.classList.remove("locked");
-      list.appendChild(n);
-    });
-    $("#newRoundBtn").disabled=gameOver || players.length===0;
-    applyI18n();
-    save();
-  }
-
-  function attachLongPress(el, cb){
-    let tmr, moved=false;
-    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
-    const end = ()=>{ clearTimeout(tmr); };
-    el.addEventListener('touchstart', start, {passive:true});
-    el.addEventListener('mousedown', start);
-    el.addEventListener('touchmove', ()=>{ moved=true; }, {passive:true});
-    ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
-  }
-
-  /* drag */
-  let dragIdx=null; const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
-  const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
-  const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; arr.splice(to,0,m); const keep=nextDealerId; players=arr; nextDealerId=keep; render(); }};
-  const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
-
-  /* edit */
-  const editDlg=$("#editDialog"), editForm=$("#editForm"), photoInput=$("#photoInput");
-  function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
-    $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
-    const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
-    bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
-    bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
-    bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
-    editDlg && editDlg.showModal();
-  }
-  if(editForm) editForm.addEventListener("submit", (e)=>{
-    e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
-    p.name=String($("#editName").value||"").trim()||p.name; p.score=clampInt($("#editScore").value, p.score); p.reenganches=Math.max(0, clampInt($("#editReeng").value, p.reenganches));
-    const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
+  // text nodes
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if (I18N[lang][key]) el.textContent = I18N[lang][key];
   });
 
-  /* photo: center square letterbox (fast & stable) */
-  if(photoInput){
-    photoInput.removeAttribute('capture');
-    photoInput.addEventListener("change", async()=>{
-      if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
-      const file=photoInput.files[0];
-      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-      const img=new Image(); img.onload=()=>{
-        const side=Math.min(img.width,img.height);
-        const sx=(img.width-side)/2, sy=(img.height-side)/2;
-        const out=document.createElement('canvas'); out.width=512; out.height=512;
-        const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,512,512);
-        const dataOut=out.toDataURL('image/png',0.92);
-        const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); save(); }
-        window._photoTarget=null;
-      }; img.src=dataUrl;
-    });
-  }
+  saveState();
+}
+function wireHeaderLang(){
+  const wrap = document.getElementById('langToggleHeader');
+  if (!wrap || wrap._wired) return;
+  wrap._wired = true;
+  wrap.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-lang]');
+    if (!btn) return;
+    setLanguage(btn.dataset.lang);
+  });
+}
+function wireSettingsLang(){
+  const sel = document.getElementById('settingsLangSelect');
+  if (!sel || sel._wired) return;
+  sel._wired = true;
+  sel.addEventListener('change', e => setLanguage(e.target.value));
+}
 
-  /* round dialog */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows");
-  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
-    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
-      const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
-      const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
-      r.append(name,inp,minus); rows.appendChild(r);
+/* ===== UI rendering ===== */
+const playersList = document.getElementById('playersList');
+const addPlayerBtn = document.getElementById('addPlayerBtn');
+
+function renderPlayers(){
+  playersList.innerHTML = '';
+  state.players.forEach((p, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'row' + (idx===state.settings.dealerIndex ? ' active' : '');
+    row.dataset.id = p.id;
+
+    row.innerHTML = `
+      <div class="handle">≡</div>
+      <div class="avatar"><div class="ring"></div><div class="initials">${abbr(p.name)}</div></div>
+      <div class="name">${escapeHtml(p.name)}</div>
+      <div class="score ${p.score>=state.settings.limit ? 'bad':''}">${p.score}</div>
+    `;
+
+    // basic inline rename on name tap
+    row.querySelector('.name').addEventListener('click', ()=>{
+      const next = prompt('Name:', p.name);
+      if (next && next.trim()){
+        p.name = next.trim();
+        saveState(); render();
+      }
     });
-    roundDlg.showModal();
+
+    playersList.appendChild(row);
+  });
+}
+
+function abbr(name){
+  const parts = name.trim().split(/\s+/);
+  if (parts.length===1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
+}
+
+function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function render(){
+  renderPlayers();
+  // lock visual
+  document.getElementById('lockReorderChk').checked = !!state.settings.lockReorder;
+  document.getElementById('autoAdvanceChk').checked = state.settings.autoAdvance !== false;
+}
+
+/* ===== Add player ===== */
+addPlayerBtn.addEventListener('click', ()=>{
+  const n = state.players.length + 1;
+  state.players.push({ id:crypto.randomUUID(), name:`Player ${n}`, score:0 });
+  saveState(); render();
+});
+
+/* ===== Settings dialog ===== */
+const settingsDialog = document.getElementById('settingsDialog');
+document.getElementById('settingsBtn').addEventListener('click', ()=>{
+  settingsDialog.showModal();
+  wireSettingsLang();
+});
+document.getElementById('settingsCloseBtn').onclick =
+document.getElementById('settingsDoneBtn').onclick = ()=> settingsDialog.close();
+
+document.getElementById('lockReorderChk').addEventListener('change', (e)=>{
+  state.settings.lockReorder = e.target.checked; saveState();
+});
+document.getElementById('autoAdvanceChk').addEventListener('change', (e)=>{
+  state.settings.autoAdvance = e.target.checked; saveState();
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  state.players.forEach(p=>p.score=0);
+  state.history = [];
+  saveState(); render();
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  if (!confirm('Clear all players and history?')) return;
+  localStorage.removeItem('conga'); location.reload();
+});
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const rows = [['Name','Score']].concat(state.players.map(p=>[p.name,p.score]));
+  const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='conga-scores.csv'; a.click();
+});
+
+/* ===== New round dialog ===== */
+const roundDialog = document.getElementById('roundDialog');
+document.getElementById('newRoundBtn').addEventListener('click', openRoundModal);
+document.getElementById('roundClose').onclick =
+document.getElementById('roundCancel').onclick = ()=> roundDialog.close();
+document.getElementById('roundApply').addEventListener('click', applyRound);
+
+function openRoundModal(){
+  const c = document.getElementById('roundForm');
+  c.innerHTML = '';
+  state.players.forEach((p,idx)=>{
+    const wrap = document.createElement('div');
+    wrap.className='row-grid';
+    wrap.innerHTML = `
+      <div style="font-weight:800">${escapeHtml(p.name)} — <span data-i18n="current">${I18N[state.settings.lang].current}</span>: ${p.score}</div>
+      <div class="inline">
+        <input class="input score-input" type="number" step="1" data-idx="${idx}" placeholder="0" />
+        <button class="btn minus10" data-idx="${idx}">${I18N[state.settings.lang].minus10}</button>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--border);opacity:.35">
+    `;
+    c.appendChild(wrap);
+  });
+  c.querySelectorAll('.minus10').forEach(b=>b.onclick=(e)=>{
+    const i = +e.currentTarget.dataset.idx;
+    const inp = c.querySelector(`.score-input[data-idx="${i}"]`);
+    inp.value = -10;
+  });
+  roundDialog.showModal();
+}
+
+function applyRound(){
+  const inputs = Array.from(document.querySelectorAll('#roundForm .score-input'));
+  const values = inputs.map(i=>Number(i.value || 0));
+  // enforce exactly at most one -10
+  const minus10Count = values.filter(v=>v===-10).length;
+  if (minus10Count>1){
+    alert(I18N[state.settings.lang].onlyOneMinus10);
+    return;
+  }
+  // apply
+  values.forEach((delta,idx)=> state.players[idx].score += Number.isFinite(delta)?delta:0 );
+  state.history.push({ t:Date.now(), values });
+  // auto-advance dealer
+  if (state.settings.autoAdvance !== false){
+    state.settings.dealerIndex = (state.settings.dealerIndex + 1) % state.players.length;
+  }
+  saveState(); roundDialog.close(); render();
+  checkWin();
+}
+
+/* ===== Simple win check: if anyone >= limit, lowest score wins ===== */
+function checkWin(){
+  const limit = state.settings.limit || 100;
+  if (!state.players.some(p=>p.score>=limit)) return;
+  const winner = [...state.players].sort((a,b)=>a.score-b.score)[0];
+  const dlg = document.createElement('dialog');
+  dlg.innerHTML = `
+    <div class="modal-h">
+      <div class="modal-title">${escapeHtml(winner.name)} won</div>
+      <button class="btn">Close</button>
+    </div>
+    <div style="margin-top:14px;text-align:right">
+      <button class="btn primary" id="newGameBtn">New game</button>
+    </div>
+  `;
+  dlg.querySelector('.btn').onclick = ()=> dlg.close();
+  dlg.addEventListener('close', ()=> dlg.remove());
+  document.body.appendChild(dlg); dlg.showModal();
+  dlg.querySelector('#newGameBtn').onclick = ()=>{
+    state.players.forEach(p=>p.score=0);
+    state.history=[]; saveState(); render(); dlg.close();
   };
-  const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
-  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
+}
 
-  function applyRound(inputs){
-    const proj=new Map(); players.forEach(p=>proj.set(p.id, clampInt(p.score||0)+clampInt(inputs[p.id]||0)));
-    const under = players.filter(p => (proj.get(p.id) <= limit));
-    const over  = players.filter(p => (proj.get(p.id) >= (limit+1)));
-    if (under.length >= 2 && over.length){
-      const maxUnderVal = Math.max.apply(null, under.map(p => proj.get(p.id)));
-      players.forEach(p=>{
-        let val = proj.get(p.id);
-        if (val >= (limit+1)){
-          proj.set(p.id, maxUnderVal);
-          p.reenganches = (p.reenganches||0) + 1;
-        }
-      });
-    }
-    players.forEach(p=>{ p.score=proj.get(p.id); });
-    if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
-    // winner = only one at/under limit
-    const alive = players.filter(p=>p.score<=limit);
-    if(alive.length===1){ showWinOverlay(alive[0]); }
-    render();
-  }
+/* ===== Reorder lock visual (no drag implementation in this compact build) ===== */
+document.getElementById('lockBtn').addEventListener('click', ()=>{
+  state.settings.lockReorder = !state.settings.lockReorder;
+  saveState(); render();
+});
 
-  function showWinOverlay(winner){
-    const ov=$("#winOverlay"); if(!ov) return;
-    $("#winName").textContent = winner?.name || 'Winner';
-    $("#winPhoto").src = winner?.avatar || '';
-    ov.style.display='flex';
-    try{ $("#winSound").play().catch(()=>{});}catch{}
-  }
-  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; });
-  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+/* ===== History button (quick peek) ===== */
+document.getElementById('historyBtn').addEventListener('click', ()=>{
+  const dlg = document.createElement('dialog');
+  const list = state.history.map(h=>`<li>${new Date(h.t).toLocaleString()} — [${h.values.join(', ')}]</li>`).join('');
+  dlg.innerHTML = `
+    <div class="modal-h"><div class="modal-title">${I18N[state.settings.lang].history}</div>
+      <button class="btn">${I18N[state.settings.lang].close}</button></div>
+    <ul style="margin:12px 0 0 18px">${list || '<li>(empty)</li>'}</ul>`;
+  dlg.querySelector('.btn').onclick = ()=> dlg.close();
+  dlg.addEventListener('close', ()=> dlg.remove());
+  document.body.appendChild(dlg); dlg.showModal();
+});
 
-  /* history (simple) */
-  function openRoundsTable(){
-    const dlg=document.createElement('dialog');
-    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
-    const twrap=dlg.querySelector(".table-wrap");
-    const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
-    trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name}</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
-    const tbody=document.createElement('tbody');
-    rounds.forEach((r,i)=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<th>${i+1}</th>`+players.map(p=>`<td>${r[p.id]??""}</td>`).join("");
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody); twrap.appendChild(table);
-    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); dlg.showModal();
-  }
+/* ===== Boot ===== */
+wireHeaderLang();
+setLanguage(state.settings.lang || 'en');
+render();
 
-  /* controls */
-  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
-  bind("#historyBtn","onclick", openRoundsTable);
-  bind("#newRoundBtn","onclick", openRound);
-  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
-  bind("#exportBtn","onclick", exportCSV);
-  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=[]; limit=100; nextDealerId=null; rounds=[]; roundCounter=0; render(); } });
-  bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
-  on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
-  on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
-  on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
-
-  const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; render(); };
-  const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
-
-  const exportCSV=()=>{ const header=["name","score","reenganches","isDealer"]; const rows=players.map(p=>[csv(p.name||""), String(clampInt(p.score||0)), String(clampInt(p.reenganches||0)), String(p.id===nextDealerId)]); const all=[header].concat(rows).map(r=>r.join(",")).join("\n"); const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="conga_scores.csv"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
-
-  /* language in header + settings */
-  $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
-  $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
-  $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
-
-  load();
-  applyI18n();
-  render();
-})();
 </script>
 </body>
 </html>
