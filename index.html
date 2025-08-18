@@ -169,6 +169,17 @@
   .win-name{ font-size:20px; font-weight:900}
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
+  /* Crop dialog */
+  #cropDialog { width: min(400px, 90vw); height: auto; }
+  #cropContainer { position: relative; margin: 10px auto; width: 100%; height: 300px; overflow: hidden; }
+  #cropCanvas { width: 100%; height: 100%; }
+  #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; }
+  #cropBox .resize-handle { position: absolute; width: 10px; height: 10px; background: var(--accent); border: 1px solid var(--text); }
+  #cropBox .resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
+  #cropBox .resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
   /* Responsive */
   @media (max-width: 410px){
     .lang-pill{ display:none; }
@@ -316,6 +327,29 @@
       <button class="btn success" type="submit" data-i18n="save">Save</button>
     </div>
   </form>
+</dialog>
+
+<!-- Crop dialog (new for interactive crop) -->
+<dialog id="cropDialog" aria-labelledby="cropTitle">
+  <div class="modal-head">
+    <div id="cropTitle" style="font-weight:800">Crop Photo</div>
+    <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px">Close</button>
+  </div>
+  <div class="modal-body">
+    <div id="cropContainer">
+      <canvas id="cropCanvas"></canvas>
+      <div id="cropBox" style="left:20%; top:20%; width:60%; height:60%;">
+        <div class="resize-handle top-left"></div>
+        <div class="resize-handle top-right"></div>
+        <div class="resize-handle bottom-left"></div>
+        <div class="resize-handle bottom-right"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" type="button" onclick="cropDialog.close()" data-i18n="cancel">Cancel</button>
+    <button class="btn success" id="applyCropBtn">Apply</button>
+  </div>
 </dialog>
 
 <!-- Win overlay -->
@@ -496,11 +530,11 @@
   const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
 
   /* edit */
-  const editDlg=$("#editDialog"), editForm=$("#editForm"), photoInput=$("#photoInput");
+  const editDlg=$("#editDialog"), editForm=$("#editForm");
   function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
-    bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
+    bind("#changePhotoBtn","onclick", ()=>{ openCrop(p.id, p.avatar); });
     $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); // Updated to "Edit photo"
     applyI18n();
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
@@ -513,30 +547,156 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* photo -> simple square cropper, with enhanced error handling */
-  if(photoInput){
-    photoInput.removeAttribute('capture');
-    photoInput.addEventListener("change", async()=>{
-      if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
-      const file=photoInput.files[0];
+  /* Interactive crop */
+  const cropDlg = $("#cropDialog"), cropCanvas = $("#cropCanvas"), cropBox = $("#cropBox"), applyCropBtn = $("#applyCropBtn");
+  let cropImage, cropPlayerId, cropCtx = cropCanvas?.getContext('2d');
+  let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
+  let isDragging = false, isResizing = false, resizeHandle = '';
+  let startX, startY, startW, startH;
+
+  function openCrop(id, existingAvatar = null) {
+    cropPlayerId = id;
+    if (existingAvatar) {
+      const img = new Image();
+      img.onload = () => loadCropImage(img);
+      img.src = existingAvatar;
+    } else {
+      const photoInput = $("#photoInput");
+      photoInput.click();
+    }
+    showModalWithLock(cropDlg);
+  }
+
+  if ($("#photoInput")) {
+    $("#photoInput").addEventListener("change", async() => {
+      const file = $("#photoInput").files[0];
+      if (!file) return;
       try {
-        if (file.size > 5 * 1024 * 1024) throw new Error("File too large");
-        const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-        const img=new Image(); img.onload=()=>{
-          const side=Math.min(img.width,img.height);
-          const sx=(img.width-side)/2, sy=(img.height-side)/2;
-          const out=document.createElement('canvas'); out.width=256; out.height=256;
-          const ctx=out.getContext('2d'); if (!ctx) throw new Error("Canvas context failed");
-          ctx.drawImage(img, sx, sy, side, side, 0,0,256,256);
-          const dataOut=out.toDataURL('image/png',0.85);
-          const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); }
-          window._photoTarget=null;
-        }; img.onerror=() => { throw new Error("Image load failed"); }; img.src=dataUrl;
+        const dataUrl = await new Promise((res,rej)=> { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+        const img = new Image();
+        img.onload = () => loadCropImage(img);
+        img.src = dataUrl;
       } catch(e) {
-        toast("Photo error: " + e.message); console.error(e);
+        toast("Photo load error");
       }
     });
   }
+
+  function loadCropImage(img) {
+    cropImage = img;
+    const container = $("#cropContainer");
+    const contW = container.clientWidth;
+    const contH = container.clientHeight;
+    cropCanvas.width = contW;
+    cropCanvas.height = contH;
+
+    const scale = Math.min(contW / img.width, contH / img.height);
+    const drawW = img.width * scale;
+    const drawH = img.height * scale;
+    cropCtx.clearRect(0, 0, contW, contH);
+    cropCtx.drawImage(img, (contW - drawW) / 2, (contH - drawH) / 2, drawW, drawH);
+
+    // Initial crop box (square, center 80% size)
+    const boxSize = Math.min(drawW, drawH) * 0.8;
+    cropX = (contW - boxSize) / 2;
+    cropY = (contH - boxSize) / 2;
+    cropW = boxSize;
+    cropH = boxSize;
+    updateCropBox();
+
+    // Event listeners for drag/resize (touch/mouse)
+    let touchMove = e => e.touches ? e.touches[0] : e;
+    cropBox.addEventListener('touchstart', startDrag);
+    cropBox.addEventListener('mousedown', startDrag);
+    document.addEventListener('touchmove', dragMove, {passive: false});
+    document.addEventListener('mousemove', dragMove);
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('mouseup', endDrag);
+  }
+
+  function updateCropBox() {
+    cropBox.style.left = `${cropX}px`;
+    cropBox.style.top = `${cropY}px`;
+    cropBox.style.width = `${cropW}px`;
+    cropBox.style.height = `${cropH}px`;
+  }
+
+  function startDrag(e) {
+    e.preventDefault();
+    const pos = touchMove(e);
+    const rect = cropBox.getBoundingClientRect();
+    startX = pos.clientX - rect.left;
+    startY = pos.clientY - rect.top;
+    startW = cropW;
+    startH = cropH;
+    if (e.target.classList.contains('resize-handle')) {
+      isResizing = true;
+      resizeHandle = e.target.classList[1];
+    } else {
+      isDragging = true;
+    }
+  }
+
+  function dragMove(e) {
+    if (!isDragging && !isResizing) return;
+    e.preventDefault();
+    const pos = touchMove(e);
+    if (isDragging) {
+      cropX = pos.clientX - startX;
+      cropY = pos.clientY - startY;
+      // Clamp to canvas
+      cropX = Math.max(0, Math.min(cropCanvas.width - cropW, cropX));
+      cropY = Math.max(0, Math.min(cropCanvas.height - cropH, cropY));
+      updateCropBox();
+    } else if (isResizing) {
+      let newW = startW, newH = startH, newX = cropX, newY = cropY;
+      const deltaX = pos.clientX - (cropX + startX);
+      const deltaY = pos.clientY - (cropY + startY);
+      // Keep square by using max delta for both
+      const delta = Math.max(deltaX, deltaY);
+      if (resizeHandle === 'bottom-right') {
+        newW = startW + delta;
+        newH = startH + delta;
+      } else if (resizeHandle === 'bottom-left') {
+        newW = startW - delta;
+        newH = startH + delta;
+        newX = cropX + delta;
+      } else if (resizeHandle === 'top-right') {
+        newW = startW + delta;
+        newH = startH - delta;
+        newY = cropY + delta;
+      } else if (resizeHandle === 'top-left') {
+        newW = startW - delta;
+        newH = startH - delta;
+        newX = cropX + delta;
+        newY = cropY + delta;
+      }
+      // Clamp size
+      newW = Math.max(50, Math.min(cropCanvas.width - newX, newW));
+      newH = newW; // Keep square
+      cropW = newW;
+      cropH = newH;
+      cropX = newX;
+      cropY = newY;
+      updateCropBox();
+    }
+  }
+
+  function endDrag() {
+    isDragging = false;
+    isResizing = false;
+  }
+
+  applyCropBtn.addEventListener('click', () => {
+    const out = document.createElement('canvas');
+    out.width = 256; out.height = 256;
+    const outCtx = out.getContext('2d');
+    outCtx.drawImage(cropCanvas, cropX, cropY, cropW, cropH, 0, 0, 256, 256);
+    const dataOut = out.toDataURL('image/png',0.85);
+    const p = players.find(x => x.id === cropPlayerId);
+    if (p) { p.avatar = dataOut; render(); }
+    cropDlg.close();
+  });
 
   /* round dialog */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
@@ -662,8 +822,6 @@
     }; stopConfetti(); tick();
     setTimeout(stopConfetti, 5000);
   }
-
-  /* CSV removed */
 
   /* language controls */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
