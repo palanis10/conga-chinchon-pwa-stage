@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.6.0</title>
+<title>Conga by Alanis — STAGE v3.7.0</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -72,7 +72,7 @@
   /* ===== Players ===== */
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
   .row{
-    display:grid; grid-template-columns: 28px 44px 1fr auto 36px;
+    display:grid; grid-template-columns: 28px 44px 1fr auto;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
@@ -90,23 +90,25 @@
   .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
-  .editBtn { appearance:none; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text);
-    width:36px; height:36px; border-radius:10px; font-weight:900; cursor:pointer; }
 
   /* ===== Dialogs ===== */
-  dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
+  dialog{
+    width:min(720px, 96vw);
+    border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
-    box-shadow: 0 24px 64px rgba(0,0,0,.55); }
+    box-shadow: 0 24px 64px rgba(0,0,0,.55);
+    overflow: hidden;                /* prevents iOS weird jumps */
+  }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } 
+  .modal-body{ padding:12px 14px; max-height:70vh; overflow:auto; overscroll-behavior:contain; }
   .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
-  /* Inside dialogs we use solid borders for buttons (cleaner look) */
+  /* Inside dialogs use solid borders for buttons */
   dialog .btn { border-style: solid; }
 
   /* Accessible toggle switch */
@@ -123,7 +125,6 @@
   #settingsDialog .btn { width: 100%; }
 
   /* Round dialog */
-  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
   .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; }
   .cut-field legend{ font-size:12px; color:var(--sub); padding:0 6px; }
   .cut-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
@@ -150,16 +151,14 @@
   .win-name{ font-size:20px; font-weight:900}
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
-  /* Crop dialog */
-  #cropDialog { width: min(420px, 92vw); height: auto; }
-  #cropContainer { position: relative; margin: 10px auto; width: 100%; height: 320px; overflow: hidden; }
-  #cropCanvas { width: 100%; height: 100%; background:#0b0f20; border:1px solid rgba(255,255,255,.1); border-radius:12px; }
-  #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; }
-  #cropBox .resize-handle { position: absolute; width: 12px; height: 12px; background: var(--accent); border: 1px solid var(--text); border-radius:2px; }
-  #cropBox .resize-handle.top-left { top: -6px; left: -6px; cursor: nwse-resize; }
-  #cropBox .resize-handle.top-right { top: -6px; right: -6px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-left { bottom: -6px; left: -6px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-right { bottom: -6px; right: -6px; cursor: nwse-resize; }
+  /* ===== Modern Crop dialog ===== */
+  #cropDialog { width: min(460px, 92vw); }
+  #cropStage { position: relative; width: 100%; height: 360px; border-radius: 16px; background:#0b0f20; border:1px solid rgba(255,255,255,.1); overflow:hidden; touch-action:none; }
+  #cropCanvas { position:absolute; inset:0; width:100%; height:100%; }
+  .crop-ring { position:absolute; inset:0; pointer-events:none; }
+  .crop-controls { display:grid; gap:10px; padding-top:10px; }
+  .zoom-row{ display:grid; grid-template-columns: 1fr 60px; align-items:center; gap:10px; }
+  .zoom-row input[type="range"]{ width:100% }
 
   /* Edit dialog extras */
   .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
@@ -186,7 +185,7 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.6.0</div>
+        <div class="ver" id="verLine">STAGE v3.7.0</div>
       </div>
     </div>
 
@@ -260,12 +259,10 @@
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
-      <!-- Cutter selector -->
       <fieldset class="cut-field">
         <legend>Who cut? (optional)</legend>
         <div class="cut-grid" id="cutGrid"></div>
       </fieldset>
-
       <div class="grid-rows" id="roundRows"></div>
     </div>
     <div class="modal-foot">
@@ -331,26 +328,28 @@
   </form>
 </dialog>
 
-<!-- Crop dialog -->
+<!-- Modern circle crop dialog -->
 <dialog id="cropDialog" aria-labelledby="cropTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div id="cropTitle" style="font-weight:800">Crop Photo</div>
     <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
   </div>
   <div class="modal-body">
-    <div id="cropContainer">
+    <div id="cropStage">
       <canvas id="cropCanvas"></canvas>
-      <div id="cropBox" style="left:20%; top:20%; width:60%; height:60%;">
-        <div class="resize-handle top-left"></div>
-        <div class="resize-handle top-right"></div>
-        <div class="resize-handle bottom-left"></div>
-        <div class="resize-handle bottom-right"></div>
+      <!-- overlay ring is drawn in canvas too; this div is kept if we want extra CSS -->
+      <div class="crop-ring" aria-hidden="true"></div>
+    </div>
+    <div class="crop-controls">
+      <div class="zoom-row">
+        <input id="zoomRange" type="range" min="0" max="100" value="0" step="1" aria-label="Zoom">
+        <output id="zoomOut" style="text-align:right; font-variant-numeric:tabular-nums">100%</output>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn" id="pickAnotherBtn">Choose photo</button>
+        <button class="btn success" id="applyCropBtn">Apply</button>
       </div>
     </div>
-  </div>
-  <div class="modal-foot">
-    <button class="btn" type="button" onclick="cropDialog.close()" data-i18n="cancel">Cancel</button>
-    <button class="btn success" id="applyCropBtn">Apply</button>
   </div>
 </dialog>
 
@@ -379,6 +378,7 @@
 
 <input id="photoInput" type="file" accept="image/*" hidden>
 
+<!-- Player row template (no pencil) -->
 <template id="playerRowTpl">
   <div class="row" draggable="true" aria-grabbed="false" title="Long-press to Edit">
     <div class="drag" aria-hidden="true">≡</div>
@@ -388,7 +388,6 @@
       <span class="stars" aria-label="Reenganches"></span>
       <span class="score" aria-label="Score"><span class="scoreVal">0</span></span>
     </div>
-    <button class="editBtn" type="button" aria-label="Edit" title="Edit">✎</button>
   </div>
 </template>
 
@@ -400,7 +399,7 @@
   const APP = {
     NAME: "Conga by Alanis",
     CHANNEL: "STAGE",
-    VERSION: "3.6.0",
+    VERSION: "3.7.0",
     BUILD: "2025-08-18",
     STORAGE_KEY: "conga_state_v2",
     SCHEMA: 2
@@ -420,7 +419,7 @@
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
     t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
-  function touchPoint(e){ return e && e.touches ? e.touches[0] : e; }
+  function point(e){ return e && e.touches ? e.touches[0] : e; }
 
   let saveTimer;
   const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
@@ -554,13 +553,6 @@
         }
         attachLongPress(n, ()=>openEdit(p.id));
 
-        if(!lockOrder && 'PointerEvent' in window){
-          let startIdx=null, overIdx=null;
-          n.addEventListener('pointerdown', (pe)=>{ n.setPointerCapture(pe.pointerId); startIdx=+n.dataset.index; n.style.opacity='.6'; });
-          n.addEventListener('pointermove', (pe)=>{ if(startIdx==null) return; const el=document.elementFromPoint(pe.clientX, pe.clientY); const row=el && el.closest('.row'); if(row && row!==n) overIdx=+row.dataset.index; });
-          n.addEventListener('pointerup', ()=>{ n.style.opacity=''; if(startIdx!=null && overIdx!=null && startIdx!==overIdx){ const keep=nextDealerId; const arr=players.slice(); const m=arr.splice(startIdx,1)[0]; arr.splice(overIdx,0,m); players=arr; nextDealerId=keep; render(); } startIdx=overIdx=null; });
-        }
-
         if(p.id===nextDealerId) n.classList.add("dealer");
         const avatarBox=n.querySelector(".avatar");
         if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -569,7 +561,6 @@
         const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
         const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
         const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
-        n.querySelector('.editBtn')?.addEventListener('click', ()=>openEdit(p.id));
 
         frag.appendChild(n);
       });
@@ -620,7 +611,11 @@
   function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
-    const cp=$("#changePhotoBtn"); if (cp){ cp.setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); cp.textContent = t(p.avatar ? "editPhoto" : "addPhoto"); cp.onclick=()=>openCrop(p.id, p.avatar); }
+    const cp=$("#changePhotoBtn"); if (cp){
+      cp.setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto");
+      cp.textContent = t(p.avatar ? "editPhoto" : "addPhoto");
+      cp.onclick=()=>openCrop(p.id, p.avatar);
+    }
     const prev=$("#editAvatarPreview"); if(prev){ prev.src = p.avatar || ""; prev.style.opacity = p.avatar ? "1" : ".35"; }
     $("#removePhotoBtn").onclick = ()=>{ p.avatar=null; render(); const prev=$("#editAvatarPreview"); if(prev){ prev.src=""; prev.style.opacity=".35"; } };
     $("#deletePlayerBtn").onclick = ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }};
@@ -632,155 +627,245 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* ===== Crop tool (fixed quality & listeners) ===== */
-  const cropDlg = $("#cropDialog"), cropCanvas = $("#cropCanvas"), cropBox = $("#cropBox"), applyCropBtn = $("#applyCropBtn");
-  let cropImage, cropPlayerId, cropCtx = cropCanvas?.getContext('2d');
-  let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
-  let isDragging = false, isResizing = false, resizeHandle = '';
-  let startX, startY, startW, startH;
-  let cropListenersAttached = false;
-  // Mapping from canvas space to original image
-  let imgScale=1, imgDX=0, imgDY=0;
+  /* ===== Modern Circle Crop (pan + slider zoom) ===== */
+  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"), pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
+  const ctx = cropCanvas.getContext('2d');
 
-  function openCrop(id, existingAvatar = null) {
-    cropPlayerId = id;
-    if (existingAvatar) {
-      const img = new Image();
-      img.onload = () => { loadCropImage(img); showModalWithLock(cropDlg); };
-      img.src = existingAvatar;
+  // crop state
+  let cropPlayerId=null;
+  let img = new Image();
+  let imgLoaded=false;
+  let scale=1, minScale=1, maxScale=4; // image scale
+  let offsetX=0, offsetY=0;           // image top-left in canvas coords
+  let startPanX=0, startPanY=0, panning=false;
+  let pinchDist0=null, scale0=null;
+
+  function dprSize(el){ const DPR = window.devicePixelRatio || 1; return [el.clientWidth*DPR, el.clientHeight*DPR, DPR]; }
+
+  function circleSpecs(){
+    // big responsive circle with 12px padding
+    const w = cropCanvas.width, h = cropCanvas.height;
+    const DPR = window.devicePixelRatio || 1;
+    const pad = 12*DPR;
+    const r = Math.min(w, h)/2 - pad;
+    const cx = w/2, cy = h/2;
+    return {cx, cy, r, DPR};
+  }
+
+  function coverMinScale(){
+    // ensure image fully covers the circle
+    const {r} = circleSpecs();
+    const needW = 2*r, needH = 2*r;
+    const s = Math.max(needW / img.width, needH / img.height);
+    return s * 1.001;  // tiny safety
+  }
+
+  function clampPan(){
+    const {cx, cy, r} = circleSpecs();
+    const displayW = img.width * scale;
+    const displayH = img.height * scale;
+
+    // image must cover circle: left<=cx-r, top<=cy-r, right>=cx+r, bottom>=cy+r
+    const minX = cx - r - displayW;
+    const maxX = cx + r - 0;
+    const minY = cy - r - displayH;
+    const maxY = cy + r - 0;
+
+    offsetX = Math.min(Math.max(offsetX, minX), maxX - displayW + displayW); // simplified clamp using inequalities above
+    offsetY = Math.min(Math.max(offsetY, minY), maxY - displayH + displayH);
+
+    // Better, compute exact clamping:
+    if (offsetX > cx - r) offsetX = cx - r;
+    if (offsetY > cy - r) offsetY = cy - r;
+    if (offsetX + displayW < cx + r) offsetX = (cx + r) - displayW;
+    if (offsetY + displayH < cy + r) offsetY = (cy + r) - displayH;
+  }
+
+  function drawCrop(){
+    // size canvas correctly
+    const [cw, ch, DPR] = dprSize(cropStage);
+    if (cropCanvas.width !== cw || cropCanvas.height !== ch){
+      cropCanvas.width = cw; cropCanvas.height = ch;
+    }
+    ctx.clearRect(0,0,cw,ch);
+
+    const {cx, cy, r} = circleSpecs();
+
+    if (imgLoaded){
+      const w = img.width * scale;
+      const h = img.height * scale;
+      ctx.drawImage(img, offsetX, offsetY, w, h);
+    }
+
+    // dark overlay with circular cutout + green ring
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.beginPath(); ctx.rect(0,0,cw,ch);
+    ctx.moveTo(cx+r, cy);
+    ctx.arc(cx, cy, r, 0, Math.PI*2, true);
+    ctx.fill('evenodd');
+    ctx.restore();
+
+    // ring
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-2') || '#4ee1a0';
+    ctx.lineWidth = Math.max(2, r*0.04);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function setZoomBySlider(val){
+    // val 0..100
+    const t = val/100;
+    scale = minScale + (maxScale - minScale)*t;
+    zoomOut.textContent = Math.round(scale/minScale*100) + '%';
+    clampPan();
+    drawCrop();
+  }
+
+  function openCrop(playerId, existingAvatar=null){
+    cropPlayerId = playerId;
+
+    const useImage = (src) => {
+      imgLoaded=false;
+      img = new Image();
+      img.onload = ()=>{
+        imgLoaded = true;
+        // init sizing and center
+        minScale = coverMinScale();
+        maxScale = Math.max(minScale*4, minScale+0.01);
+        scale = minScale * 1.05;
+        const {cx, cy} = circleSpecs();
+        const w = img.width * scale, h = img.height * scale;
+        offsetX = cx - w/2; offsetY = cy - h/2;
+        clampPan();
+        // sync slider
+        const t = (scale - minScale)/(maxScale - minScale);
+        zoomRange.value = Math.round(t*100);
+        zoomOut.textContent = Math.round(scale/minScale*100)+'%';
+        drawCrop();
+        // ensure we see the top of dialog / no jump
+        cropDialog.scrollTop = 0;
+      };
+      img.src = src;
+    };
+
+    if (existingAvatar){
+      // open immediately with current avatar; provide "Choose photo" to replace
+      showModalWithLock(cropDlg);
+      // wait a frame to size canvas before load (avoids 0x0 sizing on iOS)
+      requestAnimationFrame(()=>{ drawCrop(); useImage(existingAvatar); });
     } else {
-      const photoInput = $("#photoInput");
-      photoInput.onchange = async() => {
+      // choose a new photo then open
+      photoInput.onchange = async () => {
         const file = photoInput.files[0];
         if (!file) return;
-        try {
-          const dataUrl = await new Promise((res,rej)=> { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-          const img = new Image();
-          img.onload = () => { loadCropImage(img); showModalWithLock(cropDlg); };
-          img.src = dataUrl;
-        } catch(e) { toast("Photo load error"); }
+        const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+        showModalWithLock(cropDlg);
+        requestAnimationFrame(()=>{ drawCrop(); useImage(dataUrl); });
       };
       photoInput.click();
     }
   }
 
-  function loadCropImage(img) {
-    cropImage = img;
-    const container = $("#cropContainer");
-    const contW = container.clientWidth;
-    const contH = container.clientHeight;
-    cropCanvas.width = contW;
-    cropCanvas.height = contH;
-
-    imgScale = Math.min(contW / img.width, contH / img.height);
-    const drawW = img.width * imgScale;
-    const drawH = img.height * imgScale;
-    imgDX = (contW - drawW) / 2;
-    imgDY = (contH - drawH) / 2;
-
-    cropCtx.clearRect(0, 0, contW, contH);
-    cropCtx.drawImage(img, imgDX, imgDY, drawW, drawH);
-
-    const boxSize = Math.min(drawW, drawH) * 0.8;
-    cropX = imgDX + (drawW - boxSize) / 2;
-    cropY = imgDY + (drawH - boxSize) / 2;
-    cropW = boxSize;
-    cropH = boxSize;
-    updateCropBox();
-
-    if (!cropListenersAttached) {
-      document.addEventListener('touchmove', dragMove, {passive: false});
-      document.addEventListener('mousemove', dragMove);
-      document.addEventListener('touchend', endDrag);
-      document.addEventListener('mouseup', endDrag);
-      cropListenersAttached = true;
+  // pointer handlers (pan + pinch)
+  const activeTouches = new Map();
+  cropStage.addEventListener('pointerdown', (e)=>{
+    cropStage.setPointerCapture(e.pointerId);
+    activeTouches.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if (activeTouches.size===2){
+      // pinch start
+      const pts = [...activeTouches.values()];
+      pinchDist0 = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      scale0 = scale;
+    } else if (activeTouches.size===1){
+      panning = true;
+      startPanX = e.clientX - offsetX;
+      startPanY = e.clientY - offsetY;
     }
-    cropBox.addEventListener('touchstart', startDrag, {passive:false});
-    cropBox.addEventListener('mousedown', startDrag);
-  }
+  });
+  cropStage.addEventListener('pointermove', (e)=>{
+    if (!imgLoaded) return;
+    if (!activeTouches.has(e.pointerId)) return;
+    activeTouches.set(e.pointerId, {x:e.clientX, y:e.clientY});
 
-  function updateCropBox() {
-    cropBox.style.left = `${cropX}px`;
-    cropBox.style.top = `${cropY}px`;
-    cropBox.style.width = `${cropW}px`;
-    cropBox.style.height = `${cropH}px`;
-  }
-
-  function startDrag(e) {
-    e.preventDefault();
-    const pos = touchPoint(e);
-    const rect = cropBox.getBoundingClientRect();
-    startX = pos.clientX - rect.left;
-    startY = pos.clientY - rect.top;
-    startW = cropW;
-    startH = cropH;
-    if (e.target.classList.contains('resize-handle')) {
-      isResizing = true;
-      resizeHandle = e.target.classList[1];
-    } else {
-      isDragging = true;
+    if (activeTouches.size===2){
+      const pts = [...activeTouches.values()];
+      const dist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if (pinchDist0 && scale0){
+        const ratio = dist / pinchDist0;
+        scale = Math.min(maxScale, Math.max(minScale, scale0 * ratio));
+        const t = (scale - minScale)/(maxScale - minScale);
+        zoomRange.value = Math.round(t*100);
+        zoomOut.textContent = Math.round(scale/minScale*100)+'%';
+        clampPan(); drawCrop();
+      }
+    } else if (panning){
+      offsetX = e.clientX - startPanX;
+      offsetY = e.clientY - startPanY;
+      clampPan(); drawCrop();
     }
-  }
-  function dragMove(e) {
-    if (!isDragging && !isResizing) return;
-    e.preventDefault();
-    const pos = touchPoint(e);
-    const canRect = cropCanvas.getBoundingClientRect();
-    if (isDragging) {
-      cropX = pos.clientX - startX - canRect.left;
-      cropY = pos.clientY - startY - canRect.top;
-      cropX = Math.max(0, Math.min(cropCanvas.width - cropW, cropX));
-      cropY = Math.max(0, Math.min(cropCanvas.height - cropH, cropY));
-      updateCropBox();
-    } else if (isResizing) {
-      let newW = startW, newH = startH, newX = cropX, newY = cropY;
-      const curX = pos.clientX - canRect.left;
-      const curY = pos.clientY - canRect.top;
-      const deltaX = curX - (cropX + startX);
-      const deltaY = curY - (cropY + startY);
-      const delta = Math.max(deltaX, deltaY);
-      if (resizeHandle === 'bottom-right') { newW = startW + delta; newH = startH + delta; }
-      else if (resizeHandle === 'bottom-left') { newW = startW - delta; newH = startH + delta; newX = cropX + delta; }
-      else if (resizeHandle === 'top-right') { newW = startW + delta; newH = startH - delta; newY = cropY + delta; }
-      else if (resizeHandle === 'top-left') { newW = startW - delta; newH = startH - delta; newX = cropX + delta; newY = cropY + delta; }
-      newW = Math.max(50, Math.min(cropCanvas.width - newX, newW));
-      newH = newW;
-      cropW = newW; cropH = newH; cropX = newX; cropY = newY;
-      updateCropBox();
-    }
-  }
-  function endDrag() { isDragging = false; isResizing = false; }
+  });
+  function endPointer(e){ activeTouches.delete(e.pointerId); if (activeTouches.size<2){ pinchDist0=null; scale0=null; } if (activeTouches.size===0){ panning=false; } }
+  cropStage.addEventListener('pointerup', endPointer);
+  cropStage.addEventListener('pointercancel', endPointer);
+  cropStage.addEventListener('pointerleave', endPointer);
 
-  $("#applyCropBtn")?.addEventListener('click', () => {
-    // Map cropBox (canvas coords) -> original image coords and crop from ORIGINAL for crispness
-    let sx = (cropX - imgDX) / imgScale;
-    let sy = (cropY - imgDY) / imgScale;
-    let sw = cropW / imgScale;
-    let sh = cropH / imgScale;
-    // clamp to image bounds
-    sx = Math.max(0, Math.min(cropImage.width - 1, sx));
-    sy = Math.max(0, Math.min(cropImage.height - 1, sy));
-    sw = Math.max(1, Math.min(cropImage.width - sx, sw));
-    sh = Math.max(1, Math.min(cropImage.height - sy, sh));
+  // slider zoom
+  zoomRange.addEventListener('input', (e)=> setZoomBySlider(+e.target.value));
 
+  // pick another
+  pickAnotherBtn.addEventListener('click', ()=>{
+    photoInput.onchange = async () => {
+      const file = photoInput.files[0];
+      if (!file) return;
+      try{
+        const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+        imgLoaded=false;
+        requestAnimationFrame(()=>{ drawCrop(); openCrop(cropPlayerId, dataUrl); });
+      }catch{ toast('Photo load error'); }
+    };
+    photoInput.click();
+  });
+
+  // export (hi-res circle)
+  applyCropBtn.addEventListener('click', ()=>{
+    if (!imgLoaded) { cropDlg.close(); return; }
+    const {cx, cy, r} = circleSpecs();
+    // map circle center to original image coordinates
+    const ox = (cx - offsetX) / scale;
+    const oy = (cy - offsetY) / scale;
+    const or = r / scale;
+
+    const size = 512; // output
     const out = document.createElement('canvas');
-    out.width = 256; out.height = 256;
-    const outCtx = out.getContext('2d');
-    outCtx.imageSmoothingQuality = 'high';
-    outCtx.drawImage(cropImage, sx, sy, sw, sh, 0, 0, 256, 256);
-    const dataOut = out.toDataURL('image/png',0.92);
-    const p = players.find(x => x.id === cropPlayerId);
-    if (p) { p.avatar = dataOut; render(); }
+    out.width = size; out.height = size;
+    const octx = out.getContext('2d');
+    octx.clearRect(0,0,size,size);
+    octx.save();
+    // clip circle
+    octx.beginPath(); octx.arc(size/2, size/2, size/2, 0, Math.PI*2); octx.clip();
+    // scale so that radius or maps to size/2
+    const S = (size/2) / or;
+    octx.setTransform(S,0,0,S, size/2 - ox*S, size/2 - oy*S);
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(img, 0,0);
+    octx.restore();
+    const dataOut = out.toDataURL('image/png', 0.95);
+
+    const p = players.find(x=>x.id===cropPlayerId);
+    if (p){ p.avatar = dataOut; render(); }
     cropDlg.close();
   });
 
-  /* ===== Round dialog (with cutter selector) ===== */
+  /* ===== Round dialog (cutter + threshold 101+) ===== */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn"), cutGrid=$("#cutGrid");
-  let selectedCutterId = ""; // "" = none
+  let selectedCutterId = "";
 
   function buildCutterGrid(){
     cutGrid.innerHTML = "";
-    const noneId = "cut_none";
     const makeOpt = (id,label,checked=false)=>{
       const wrap=document.createElement("label");
       wrap.className="cut-opt";
@@ -812,9 +897,15 @@
       r.append(name,inp,minus); frag.appendChild(r);
     });
     rows.appendChild(frag);
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; 
+    rErr.style.display="none"; applyBtn.disabled=false;
+
+    // Open first, then focus without scrolling + force dialog to top (prevents iOS jump)
     showModalWithLock(roundDlg);
-    rows.querySelector('input')?.focus();
+    requestAnimationFrame(()=>{
+      roundDlg.scrollTop = 0;
+      rows.scrollTop = 0;
+      rows.querySelector('input')?.focus({preventScroll:true});
+    });
   };
 
   function roundInputs(){
@@ -828,16 +919,13 @@
     const radios = document.querySelectorAll('input[name="cutter"]');
     radios.forEach(r=>{ if(r.checked) selectedCutterId = r.value; });
     if (!selectedCutterId) { rErr.style.display="none"; applyBtn.disabled=false; return; }
-
     const cutter = players.find(p=>p.id===selectedCutterId);
     if (!cutter){ rErr.style.display="none"; applyBtn.disabled=false; return; }
     const projected = clampInt(cutter.score||0) + clampInt(inputs[cutter.id]||0);
     if (projected > limit){
       rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`;
       rErr.style.display="block"; applyBtn.disabled=true; 
-    } else {
-      rErr.style.display="none"; applyBtn.disabled=false;
-    }
+    } else { rErr.style.display="none"; applyBtn.disabled=false; }
   }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
@@ -846,20 +934,13 @@
     const roundNo = roundCounter + 1;
     const proj = {}; players.forEach(p => proj[p.id] = clampInt(p.score||0) + clampInt(inputs[p.id]||0));
 
-    // Cutter validation (guard double-check)
     if (selectedCutterId){
       const cutterProj = proj[selectedCutterId] || 0;
       if (cutterProj > limit){ validateRound(); return; }
-    }
-
-    // ===== Instant win check (before any reenganches/dealer advance) =====
-    if (selectedCutterId){
-      const cutterProj = proj[selectedCutterId];
       const others = players.filter(p=>p.id!==selectedCutterId);
       const allOthersOver = others.every(p => proj[p.id] > limit);
       const cutterEligible = cutterProj <= limit;
       if (cutterEligible && allOthersOver){
-        // Apply scores, record round, but DO NOT auto-advance dealer and NO reenganche.
         players.forEach(p=>{ p.score = proj[p.id]; });
         roundCounter += 1;
         rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId, instantWin:true});
@@ -870,11 +951,11 @@
       }
     }
 
-    // ===== Normal reenganche path (same as previous build) =====
+    // Reenganche only at limit+1 or higher
     roundCounter += 1;
-
-    const under = players.filter(p => (proj[p.id] <= limit));
-    const over  = players.filter(p => (proj[p.id] >= (limit + 1)));
+    const REENG_THRESHOLD = limit + 1;
+    const under = players.filter(p => proj[p.id] <= limit);
+    const over  = players.filter(p => proj[p.id] >= REENG_THRESHOLD);
 
     if (under.length >= 2 && over.length > 0) {
       const maxUnderVal = Math.max(...under.map(p => proj[p.id]));
