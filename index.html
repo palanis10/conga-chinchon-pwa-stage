@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.8</title>
+<title>Conga by Alanis — STAGE v3.5.9</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -126,7 +126,7 @@
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px; overflow:auto; } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
@@ -139,6 +139,7 @@
   .switch::after { content: ""; position: absolute; width: 18px; height: 18px; left: 1px; bottom: 1px; background: var(--text); transition: .15s; border-radius: 50%; }
   .switch input:checked + ::before { background: var(--accent); }
   .switch input:checked + ::after { transform: translateX(20px); }
+  .switch span { white-space: nowrap; } /* Prevent text wrap */
 
   /* Improved Settings layout: Flex column, no wraps, larger elements */
   #settingsDialog .modal-body { display: flex; flex-direction: column; gap: 12px; }
@@ -173,12 +174,12 @@
   #cropDialog { width: min(400px, 90vw); height: auto; }
   #cropContainer { position: relative; margin: 10px auto; width: 100%; height: 300px; overflow: hidden; }
   #cropCanvas { width: 100%; height: 100%; }
-  #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; }
-  #cropBox .resize-handle { position: absolute; width: 10px; height: 10px; background: var(--accent); border: 1px solid var(--text); }
-  #cropBox .resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
-  #cropBox .resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+  #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; border-radius: 50%; /* Circular visual */ }
+  #cropBox .resize-handle { position: absolute; width: 20px; height: 20px; background: var(--accent); border: 1px solid var(--text); border-radius: 50%; touch-action: none; }
+  #cropBox .resize-handle.top-left { top: -10px; left: -10px; cursor: nwse-resize; }
+  #cropBox .resize-handle.top-right { top: -10px; right: -10px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-left { bottom: -10px; left: -10px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-right { bottom: -10px; right: -10px; cursor: nwse-resize; }
 
   /* Responsive */
   @media (max-width: 410px){
@@ -202,7 +203,7 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.5.8</div>
+        <div class="ver" id="verLine">STAGE v3.5.9</div>
       </div>
     </div>
 
@@ -329,7 +330,7 @@
   </form>
 </dialog>
 
-<!-- Crop dialog (new for interactive crop) -->
+<!-- Crop dialog -->
 <dialog id="cropDialog" aria-labelledby="cropTitle">
   <div class="modal-head">
     <div id="cropTitle" style="font-weight:800">Crop Photo</div>
@@ -415,8 +416,9 @@
   const showModalWithLock = (dlg) => {
     if (dlg) {
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none'; // Extra for iOS
       dlg.showModal();
-      dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true});
+      dlg.addEventListener('close', () => { document.body.style.overflow = ''; document.body.style.touchAction = ''; }, {once: true});
     }
   };
 
@@ -452,7 +454,7 @@
   }
 
   /* ===== state ===== */
-  const storageKey="conga_state_stage_v358"; // bumped for v3.5.8
+  const storageKey="conga_state_stage_v359"; // bumped for v3.5.9
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let roundCounter=0; let rounds=[]; let lockOrder=false;
 
@@ -535,7 +537,7 @@
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     bind("#changePhotoBtn","onclick", ()=>{ openCrop(p.id, p.avatar); });
-    $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); // Updated to "Edit photo"
+    $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); 
     applyI18n();
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
     bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
@@ -547,12 +549,12 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* Interactive crop */
+  /* Interactive crop (fixed drag, circular) */
   const cropDlg = $("#cropDialog"), cropCanvas = $("#cropCanvas"), cropBox = $("#cropBox"), applyCropBtn = $("#applyCropBtn");
   let cropImage, cropPlayerId, cropCtx = cropCanvas?.getContext('2d');
-  let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
+  let cropX = 0, cropY = 0, cropR = 0; // Radius for circle
   let isDragging = false, isResizing = false, resizeHandle = '';
-  let startX, startY, startW, startH;
+  let startX, startY, startR;
 
   function openCrop(id, existingAvatar = null) {
     cropPlayerId = id;
@@ -596,17 +598,16 @@
     cropCtx.clearRect(0, 0, contW, contH);
     cropCtx.drawImage(img, (contW - drawW) / 2, (contH - drawH) / 2, drawW, drawH);
 
-    // Initial crop box (square, center 80% size)
-    const boxSize = Math.min(drawW, drawH) * 0.8;
-    cropX = (contW - boxSize) / 2;
-    cropY = (contH - boxSize) / 2;
-    cropW = boxSize;
-    cropH = boxSize;
+    // Initial crop circle (center, 80% min side)
+    const minSide = Math.min(drawW, drawH) * 0.8 / 2; // Radius
+    cropX = contW / 2;
+    cropY = contH / 2;
+    cropR = minSide;
     updateCropBox();
 
-    // Event listeners for drag/resize (touch/mouse)
-    let touchMove = e => e.touches ? e.touches[0] : e;
-    cropBox.addEventListener('touchstart', startDrag);
+    // Event listeners
+    const touchMove = e => e.touches ? e.touches[0] : e;
+    cropBox.addEventListener('touchstart', startDrag, {passive: false});
     cropBox.addEventListener('mousedown', startDrag);
     document.addEventListener('touchmove', dragMove, {passive: false});
     document.addEventListener('mousemove', dragMove);
@@ -615,20 +616,19 @@
   }
 
   function updateCropBox() {
-    cropBox.style.left = `${cropX}px`;
-    cropBox.style.top = `${cropY}px`;
-    cropBox.style.width = `${cropW}px`;
-    cropBox.style.height = `${cropH}px`;
+    cropBox.style.left = `${cropX - cropR}px`;
+    cropBox.style.top = `${cropY - cropR}px`;
+    cropBox.style.width = `${cropR * 2}px`;
+    cropBox.style.height = `${cropR * 2}px`;
   }
 
   function startDrag(e) {
     e.preventDefault();
     const pos = touchMove(e);
     const rect = cropBox.getBoundingClientRect();
-    startX = pos.clientX - rect.left;
-    startY = pos.clientY - rect.top;
-    startW = cropW;
-    startH = cropH;
+    startX = pos.pageX - rect.left; // Use pageX for absolute positioning
+    startY = pos.pageY - rect.top;
+    startR = cropR;
     if (e.target.classList.contains('resize-handle')) {
       isResizing = true;
       resizeHandle = e.target.classList[1];
@@ -642,42 +642,24 @@
     e.preventDefault();
     const pos = touchMove(e);
     if (isDragging) {
-      cropX = pos.clientX - startX;
-      cropY = pos.clientY - startY;
+      cropX = pos.pageX - startX + cropR; // Adjust for center
+      cropY = pos.pageY - startY + cropR;
       // Clamp to canvas
-      cropX = Math.max(0, Math.min(cropCanvas.width - cropW, cropX));
-      cropY = Math.max(0, Math.min(cropCanvas.height - cropH, cropY));
+      cropX = Math.max(cropR, Math.min(cropCanvas.width - cropR, cropX));
+      cropY = Math.max(cropR, Math.min(cropCanvas.height - cropR, cropY));
       updateCropBox();
     } else if (isResizing) {
-      let newW = startW, newH = startH, newX = cropX, newY = cropY;
-      const deltaX = pos.clientX - (cropX + startX);
-      const deltaY = pos.clientY - (cropY + startY);
-      // Keep square by using max delta for both
-      const delta = Math.max(deltaX, deltaY);
-      if (resizeHandle === 'bottom-right') {
-        newW = startW + delta;
-        newH = startH + delta;
-      } else if (resizeHandle === 'bottom-left') {
-        newW = startW - delta;
-        newH = startH + delta;
-        newX = cropX + delta;
-      } else if (resizeHandle === 'top-right') {
-        newW = startW + delta;
-        newH = startH - delta;
-        newY = cropY + delta;
-      } else if (resizeHandle === 'top-left') {
-        newW = startW - delta;
-        newH = startH - delta;
-        newX = cropX + delta;
-        newY = cropY + delta;
+      let delta = 0;
+      if (resizeHandle === 'bottom-right' || resizeHandle === 'top-left') {
+        delta = (pos.pageX - (cropX + startX - cropR)) + (pos.pageY - (cropY + startY - cropR)); // Average deltas for symmetry
+        delta /= 2;
+      } else if (resizeHandle === 'bottom-left' || resizeHandle === 'top-right') {
+        delta = -(pos.pageX - (cropX + startX - cropR)) + (pos.pageY - (cropY + startY - cropR));
+        delta /= 2;
       }
-      // Clamp size
-      newW = Math.max(50, Math.min(cropCanvas.width - newX, newW));
-      newH = newW; // Keep square
-      cropW = newW;
-      cropH = newH;
-      cropX = newX;
-      cropY = newY;
+      let newR = startR + delta;
+      newR = Math.max(25, Math.min(Math.min(cropCanvas.width, cropCanvas.height) / 2, newR)); // Min 50 diameter
+      cropR = newR;
       updateCropBox();
     }
   }
@@ -691,7 +673,10 @@
     const out = document.createElement('canvas');
     out.width = 256; out.height = 256;
     const outCtx = out.getContext('2d');
-    outCtx.drawImage(cropCanvas, cropX, cropY, cropW, cropH, 0, 0, 256, 256);
+    outCtx.beginPath();
+    outCtx.arc(128, 128, 128, 0, 2 * Math.PI);
+    outCtx.clip();
+    outCtx.drawImage(cropCanvas, cropX - cropR, cropY - cropR, cropR * 2, cropR * 2, 0, 0, 256, 256);
     const dataOut = out.toDataURL('image/png',0.85);
     const p = players.find(x => x.id === cropPlayerId);
     if (p) { p.avatar = dataOut; render(); }
@@ -777,7 +762,7 @@
   }
 
   /* wire-up */
-  bind("#openSettings","onclick", ()=> { showModalWithLock($("#settingsDialog")); });
+  bind("#openSettings","onclick", ()=>{ showModalWithLock($("#settingsDialog")); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
