@@ -78,7 +78,6 @@
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
     padding:10px;
   }
-
   .tools{
     display:flex; gap:8px; align-items:center; white-space:nowrap;
   }
@@ -100,7 +99,7 @@
   /* ===== Players ===== */
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
   .row{
-    display:grid; grid-template-columns: 28px 64px 1fr auto;
+    display:grid; grid-template-columns: 28px 44px 1fr auto 36px;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
@@ -110,15 +109,17 @@
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset; }
-  .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
-    background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800;}
-  .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25); }
+  .avatar{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center;
+    background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:14px;}
+  .row.dealer .avatar{ box-shadow:0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25); }
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:22px; font-weight:900; }
+  .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:20px; font-weight:900; }
   .scorewrap{ display:flex; align-items:center; gap:8px; min-width:86px; justify-content:flex-end; }
   .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
+  .editBtn { appearance:none; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text);
+    width:36px; height:36px; border-radius:10px; font-weight:900; cursor:pointer; }
 
   /* ===== Dialogs ===== */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
@@ -126,25 +127,26 @@
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px; overflow:auto; } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
-  /* Checkbox switch styling */
-  .switch input[type="checkbox"] { opacity: 0; width: 0; height: 0; }
-  .switch { position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0; }
-  .switch::before { content: ""; position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--muted); transition: .15s; border-radius: 20px; }
-  .switch::after { content: ""; position: absolute; width: 18px; height: 18px; left: 1px; bottom: 1px; background: var(--text); transition: .15s; border-radius: 50%; }
-  .switch input:checked + ::before { background: var(--accent); }
-  .switch input:checked + ::after { transform: translateX(20px); }
-  .switch span { white-space: nowrap; } /* Prevent text wrap */
+  /* Accessible toggle switch */
+  .switch {
+    position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px;
+  }
+  .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch .track { width: 40px; height: 20px; background: var(--muted); border-radius: 999px; transition: .15s; }
+  .switch .thumb { position: absolute; width: 18px; height: 18px; left: 1px; top: 1px; border-radius: 50%; background: var(--text); transition: .15s; }
+  .switch input:checked + .track { background: var(--accent); }
+  .switch input:checked + .track + .thumb { transform: translateX(20px); }
+  .switch .switch-label { font-size: 14px; color: var(--text); }
 
-  /* Improved Settings layout: Flex column, no wraps, larger elements */
+  /* Settings layout */
   #settingsDialog .modal-body { display: flex; flex-direction: column; gap: 12px; }
-  #settingsDialog label.switch { display: flex; align-items: center; gap: 10px; font-size: 14px; white-space: nowrap; }
-  #settingsDialog .btn { width: 100%; } /* Full-width buttons on mobile */
+  #settingsDialog .btn { width: 100%; }
 
   /* Round dialog (compact) */
   #roundDialog .modal-body{ display:flex; flex-direction:column; gap:6px; max-height:70vh; overflow:auto }
@@ -174,12 +176,19 @@
   #cropDialog { width: min(400px, 90vw); height: auto; }
   #cropContainer { position: relative; margin: 10px auto; width: 100%; height: 300px; overflow: hidden; }
   #cropCanvas { width: 100%; height: 100%; }
-  #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; border-radius: 50%; /* Circular visual */ }
-  #cropBox .resize-handle { position: absolute; width: 20px; height: 20px; background: var(--accent); border: 1px solid var(--text); border-radius: 50%; touch-action: none; }
-  #cropBox .resize-handle.top-left { top: -10px; left: -10px; cursor: nwse-resize; }
-  #cropBox .resize-handle.top-right { top: -10px; right: -10px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-left { bottom: -10px; left: -10px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-right { bottom: -10px; right: -10px; cursor: nwse-resize; }
+  #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; }
+  #cropBox .resize-handle { position: absolute; width: 10px; height: 10px; background: var(--accent); border: 1px solid var(--text); }
+  #cropBox .resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
+  #cropBox .resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+  /* Table polish for history */
+  dialog table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  dialog th, dialog td { border: 1px solid rgba(255,255,255,.12); padding: 6px 8px; text-align: right; }
+  dialog th:first-child, dialog td:first-child { text-align: left; }
+  dialog thead th { position: sticky; top: 0; background: #12172e; z-index: 1; }
+  dialog tbody tr:nth-child(even) { background: rgba(255,255,255,.02); }
 
   /* Responsive */
   @media (max-width: 410px){
@@ -219,14 +228,15 @@
   <section class="card" style="padding:10px; margin-bottom:8px">
     <div class="tools">
       <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
-      <button id="historyBtn" class="btn"> <span data-i18n="history">History</span></button>
+      <button id="historyBtn" class="btn"><span data-i18n="history">History</span></button>
       <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
     </div>
+    <div id="dealerLine" style="margin-top:6px; font-weight:800; color:var(--sub); font-size:12px"></div>
   </section>
 
   <section class="players">
     <header><div data-i18n="players">Players</div></header>
-    <div id="playersList" aria-live="polite"></div>
+    <div id="playersList" role="list" aria-live="polite"></div>
     <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
   </section>
 </div>
@@ -235,21 +245,29 @@
 <dialog id="settingsDialog" aria-labelledby="settingsTitle">
   <div class="modal-head">
     <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
-    <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
+    <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
   </div>
   <div class="modal-body">
     <div>
       <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
     </div>
-    <label class="switch" style="display:flex; align-items:center; gap:10px">
+
+    <!-- New accessible switches (track + thumb adjacent to input) -->
+    <label class="switch">
       <input id="autoAdvance" type="checkbox" checked />
-      <span data-i18n="autoAdvance">Auto-advance dealer after round</span>
+      <span class="track" aria-hidden="true"></span>
+      <span class="thumb" aria-hidden="true"></span>
+      <span class="switch-label" data-i18n="autoAdvance">Auto-advance dealer after round</span>
     </label>
-    <label class="switch" style="display:flex; align-items:center; gap:10px">
+
+    <label class="switch">
       <input id="lockOrderSwitch" type="checkbox" />
-      <span data-i18n="lockOrder">Lock player reordering</span>
+      <span class="track" aria-hidden="true"></span>
+      <span class="thumb" aria-hidden="true"></span>
+      <span class="switch-label" data-i18n="lockOrder">Lock player reordering</span>
     </label>
+
     <div style="display:flex; gap:8px; flex-wrap:wrap">
       <button class="btn" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
       <button class="btn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
@@ -266,7 +284,7 @@
     <div style="flex:1; overflow:hidden;">
       <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
     </div>
-    <button class="btn" style="flex-shrink:0; padding:6px 10px" onclick="roundDialog.close()">Close</button>
+    <button class="btn" style="flex-shrink:0; padding:6px 10px" onclick="roundDialog.close()" data-i18n="close">Close</button>
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
@@ -284,7 +302,7 @@
 <dialog id="editDialog" aria-labelledby="editTitle">
   <div class="modal-head">
     <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
-    <button class="btn" onclick="editDialog.close()" style="padding:6px 10px">Close</button>
+    <button class="btn" onclick="editDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
   </div>
   <form id="editForm" method="dialog">
     <div class="modal-body">
@@ -309,13 +327,15 @@
           <div>
             <label data-i18n="photo">Photo</label>
             <div style="display:flex; gap:8px; flex-wrap:wrap">
-              <button type="button" class="btn" id="changePhotoBtn"></button>
+              <button type="button" class="btn" id="changePhotoBtn" data-i18n="addPhoto">Add photo</button>
               <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
             </div>
           </div>
-          <label class="switch" style="display:flex; align-items:center; gap:10px">
+          <label class="switch">
             <input id="setDealerSwitch" type="checkbox">
-            <span data-i18n="setDealer">Set as next dealer</span>
+            <span class="track" aria-hidden="true"></span>
+            <span class="thumb" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="setDealer">Set as next dealer</span>
           </label>
           <div>
             <button type="button" class="btn" id="deletePlayerBtn" data-i18n="deletePlayer">Delete player</button>
@@ -334,7 +354,7 @@
 <dialog id="cropDialog" aria-labelledby="cropTitle">
   <div class="modal-head">
     <div id="cropTitle" style="font-weight:800">Crop Photo</div>
-    <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px">Close</button>
+    <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
   </div>
   <div class="modal-body">
     <div id="cropContainer">
@@ -389,38 +409,57 @@
       <span class="stars" aria-label="Reenganches"></span>
       <span class="score" aria-label="Score"><span class="scoreVal">0</span></span>
     </div>
+    <button class="editBtn" type="button" aria-label="Edit" title="Edit">✎</button>
   </div>
 </template>
 
 <script>
 (() => {
   "use strict";
+
+  /* =======================
+     Versioning (single source of truth)
+     ======================= */
+  const APP = {
+    NAME: "Conga by Alanis",
+    CHANNEL: "STAGE",
+    VERSION: "3.5.9",             // <-- bump here only
+    BUILD: "2025-08-18",          // informational
+    STORAGE_KEY: "conga_state_v2",// stable key (decoupled from version)
+    SCHEMA: 2                     // bump if storage shape changes
+  };
+
+  // Reflect version everywhere (title + header line)
+  document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
+  const verLineEl = document.getElementById("verLine");
+  if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
+
   /* ===== utils ===== */
   const $ = s => document.querySelector(s);
-  const bind = (sel, prop, fn) => { const el = $(sel); if (el) el[prop] = fn; };
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
   const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
   const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
   const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const csv=s=>(/[",\n]/.test(s)?'"'+String(s).replace(/"/g,'""')+'"':String(s));
   const todayStr=()=> new Date().toISOString().slice(0,10);
-
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
     t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
   let saveTimer;
-  const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 500); };
+  const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
 
   // Modal scroll lock helper
   const showModalWithLock = (dlg) => {
     if (dlg) {
       document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none'; // Extra for iOS
       dlg.showModal();
-      dlg.addEventListener('close', () => { document.body.style.overflow = ''; document.body.style.touchAction = ''; }, {once: true});
+      dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true});
     }
   };
+
+  // Pointer helper used by crop + DnD
+  function touchMove(e){ return e && e.touches ? e.touches[0] : e; }
 
   /* ===== i18n ===== */
   const STR = {
@@ -450,52 +489,113 @@
     document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
     $("#pillEn")?.classList.toggle("active", LANG==="en");
     $("#pillEs")?.classList.toggle("active", LANG==="es");
-    const sel=$("#langSelect"); if(sel) sel.value=LANG;
   }
 
   /* ===== state ===== */
-  const storageKey="conga_state_stage_v359"; // bumped for v3.5.9
+  // Stable storage key decoupled from version (migrations handle legacy)
+  const STORAGE_KEY = APP.STORAGE_KEY;
+
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let roundCounter=0; let rounds=[]; let lockOrder=false;
+  let schema = APP.SCHEMA;
 
   const defaultsPlayers = () => ([
     {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
     {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
   ]);
 
-  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder})); };
-  const load=()=>{ 
-    try{
-      const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
-      players = (Array.isArray(s.players) && s.players.length>0) ? s.players : defaultsPlayers();
-      limit = Number.isFinite(s.limit)? s.limit : 100;
-      autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
-      nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
-      gameOver = !!s.gameOver;
-      roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
-      rounds = Array.isArray(s.rounds)? s.rounds : [];
-      lockOrder = !!s.lockOrder;
-    }catch(e){
-      players = defaultsPlayers();
-      nextDealerId = players[0]?.id || null;
-    }
+  const save=()=>{ 
+    const payload = {schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder, app:{version:APP.VERSION, channel:APP.CHANNEL} };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   };
 
+  // Find most recent legacy state (conga_state_stage_vXYZ)
+  function loadLegacyMostRecent(){
+    let bestKey=null, bestNum=-1;
+    for (let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      const m = /^conga_state_stage_v(\d+)/.exec(k||"");
+      if(m){ const n=parseInt(m[1],10); if(n>bestNum){ bestNum=n; bestKey=k; } }
+    }
+    if(bestKey){
+      try { return JSON.parse(localStorage.getItem(bestKey)||"{}"); } catch(e){ return null; }
+    }
+    return null;
+  }
+
+  function migrateIfNeeded(raw){
+    // From older ad-hoc shapes → schema v2
+    const out = { schema: 2,
+      players: Array.isArray(raw?.players) && raw.players.length ? raw.players : defaultsPlayers(),
+      limit: Number.isFinite(raw?.limit) ? raw.limit : 100,
+      autoAdvanceDealer: typeof raw?.autoAdvanceDealer==="boolean" ? raw.autoAdvanceDealer : true,
+      nextDealerId: typeof raw?.nextDealerId==="string" ? raw.nextDealerId : (raw?.players?.[0]?.id || null),
+      gameOver: !!raw?.gameOver,
+      roundCounter: Number.isFinite(raw?.roundCounter) ? raw.roundCounter : 0,
+      rounds: Array.isArray(raw?.rounds) ? raw.rounds : [],
+      lockOrder: !!raw?.lockOrder,
+    };
+    return out;
+  }
+
+  function load(){
+    try{
+      const s = JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
+      if (s && typeof s === 'object' && Number.isFinite(s.schema)) {
+        ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = s);
+        if (!Array.isArray(players) || players.length===0) { players=defaultsPlayers(); }
+      } else {
+        // Try to import legacy once
+        const legacy = loadLegacyMostRecent();
+        const m = migrateIfNeeded(legacy || {});
+        ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = m);
+        save(); // persist to new key
+      }
+    }catch(e){
+      const m = migrateIfNeeded({});
+      ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = m);
+      save();
+    }
+  }
+
   /* ===== render ===== */
-  const list=$("#playersList"), rowTpl=$("#playerRowTpl");
+  const list=$("#playersList"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
   function render(){
     $("#limitInput").value=limit;
     $("#autoAdvance").checked=autoAdvanceDealer;
     $("#lockOrderSwitch").checked=lockOrder;
     $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
     $("#lockToggle").title = t("reorder");
+
+    if (dealerLine) {
+      const dealer = players.find(p=>p.id===nextDealerId);
+      dealerLine.textContent = dealer ? `${LANG==='es'?'Próximo mano:':'Next dealer:'} ${dealer.name}` : '';
+    }
+
     if(list) {
       const frag = document.createDocumentFragment();
       players.forEach((p, i) => {
         const n=rowTpl.content.firstElementChild.cloneNode(true);
         n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-        if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
+        n.setAttribute('role','listitem');
+
+        // Mouse DnD
+        if(!lockOrder){
+          n.addEventListener("dragstart",dragStart);
+          n.addEventListener("dragover",dragOver);
+          n.addEventListener("drop",drop);
+          n.addEventListener("dragend",dragEnd);
+        }
         attachLongPress(n, ()=>openEdit(p.id));
+
+        // Touch/Pointer reorder (progressive)
+        if(!lockOrder && 'PointerEvent' in window){
+          let startIdx=null, overIdx=null;
+          n.addEventListener('pointerdown', (pe)=>{ n.setPointerCapture(pe.pointerId); startIdx=+n.dataset.index; n.style.opacity='.6'; });
+          n.addEventListener('pointermove', (pe)=>{ if(startIdx==null) return; const el=document.elementFromPoint(pe.clientX, pe.clientY); const row=el && el.closest('.row'); if(row && row!==n) overIdx=+row.dataset.index; });
+          n.addEventListener('pointerup', ()=>{ n.style.opacity=''; if(startIdx!=null && overIdx!=null && startIdx!==overIdx){ const keep=nextDealerId; const arr=players.slice(); const m=arr.splice(startIdx,1)[0]; arr.splice(overIdx,0,m); players=arr; nextDealerId=keep; render(); } startIdx=overIdx=null; });
+        }
+
         if(p.id===nextDealerId) n.classList.add("dealer");
         const avatarBox=n.querySelector(".avatar");
         if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
@@ -504,6 +604,9 @@
         const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
         const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
         const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
+        // ✎ button
+        n.querySelector('.editBtn')?.addEventListener('click', ()=>openEdit(p.id));
+
         frag.appendChild(n);
       });
       list.innerHTML = "";
@@ -516,19 +619,36 @@
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = (e)=>{ e.preventDefault(); // Prevent iOS context menu
-      moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const start = (e)=>{ e.preventDefault(); moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
     const end = ()=>{ clearTimeout(tmr); };
-    el.addEventListener('touchstart', start, {passive:false}); // Non-passive to allow preventDefault
+    el.addEventListener('touchstart', start, {passive:false});
     el.addEventListener('mousedown', start);
     el.addEventListener('touchmove', ()=>{ moved=true; }, {passive:true});
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
   }
 
-  /* drag */
-  let dragIdx=null; const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
+  /* keyboard reorder for accessibility */
+  if (list) {
+    list.addEventListener('keydown', (e)=>{
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      const row = e.target.closest('.row');
+      if (!row || lockOrder) return;
+      const idx = +row.dataset.index;
+      if (e.key === 'ArrowUp' && idx > 0) {
+        const keep = nextDealerId, arr = players.slice(), m = arr.splice(idx,1)[0];
+        arr.splice(idx-1,0,m); players=arr; nextDealerId=keep; render(); list.children[idx-1]?.focus(); e.preventDefault();
+      } else if (e.key === 'ArrowDown' && idx < players.length-1) {
+        const keep = nextDealerId, arr = players.slice(), m = arr.splice(idx,1)[0];
+        arr.splice(idx+1,0,m); players=arr; nextDealerId=keep; render(); list.children[idx+1]?.focus(); e.preventDefault();
+      }
+    });
+  }
+
+  /* drag (mouse HTML5 DnD) */
+  let dragIdx=null;
+  const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
   const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
-  const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; arr.splice(to,0,m); const keep=nextDealerId; players=arr; nextDealerId=keep; render(); }};
+  const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; const keep=nextDealerId; arr.splice(to,0,m); players=arr; nextDealerId=keep; render(); }};
   const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
 
   /* edit */
@@ -536,11 +656,9 @@
   function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
-    bind("#changePhotoBtn","onclick", ()=>{ openCrop(p.id, p.avatar); });
-    $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); 
-    applyI18n();
-    bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
-    bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
+    const cp=$("#changePhotoBtn"); if (cp){ cp.setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); cp.textContent = t(p.avatar ? "editPhoto" : "addPhoto"); cp.onclick=()=>openCrop(p.id, p.avatar); }
+    $("#removePhotoBtn")?.addEventListener("click", ()=>{ p.avatar=null; render(); }, {once:true});
+    $("#deletePlayerBtn")?.addEventListener("click", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }}, {once:true});
     showModalWithLock(editDlg);
   }
   if(editForm) editForm.addEventListener("submit", (e)=>{
@@ -549,12 +667,13 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* Interactive crop (fixed drag, circular) */
+  /* Interactive crop */
   const cropDlg = $("#cropDialog"), cropCanvas = $("#cropCanvas"), cropBox = $("#cropBox"), applyCropBtn = $("#applyCropBtn");
   let cropImage, cropPlayerId, cropCtx = cropCanvas?.getContext('2d');
-  let cropX = 0, cropY = 0, cropR = 0; // Radius for circle
+  let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
   let isDragging = false, isResizing = false, resizeHandle = '';
-  let startX, startY, startR;
+  let startX, startY, startW, startH;
+  let cropListenersAttached = false;
 
   function openCrop(id, existingAvatar = null) {
     cropPlayerId = id;
@@ -562,26 +681,22 @@
       const img = new Image();
       img.onload = () => loadCropImage(img);
       img.src = existingAvatar;
+      showModalWithLock(cropDlg);
     } else {
       const photoInput = $("#photoInput");
+      photoInput.onchange = async() => {
+        const file = photoInput.files[0];
+        if (!file) return;
+        try {
+          const dataUrl = await new Promise((res,rej)=> { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+          const img = new Image();
+          img.onload = () => loadCropImage(img);
+          img.src = dataUrl;
+          showModalWithLock(cropDlg);
+        } catch(e) { toast("Photo load error"); }
+      };
       photoInput.click();
     }
-    showModalWithLock(cropDlg);
-  }
-
-  if ($("#photoInput")) {
-    $("#photoInput").addEventListener("change", async() => {
-      const file = $("#photoInput").files[0];
-      if (!file) return;
-      try {
-        const dataUrl = await new Promise((res,rej)=> { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-        const img = new Image();
-        img.onload = () => loadCropImage(img);
-        img.src = dataUrl;
-      } catch(e) {
-        toast("Photo load error");
-      }
-    });
   }
 
   function loadCropImage(img) {
@@ -598,37 +713,41 @@
     cropCtx.clearRect(0, 0, contW, contH);
     cropCtx.drawImage(img, (contW - drawW) / 2, (contH - drawH) / 2, drawW, drawH);
 
-    // Initial crop circle (center, 80% min side)
-    const minSide = Math.min(drawW, drawH) * 0.8 / 2; // Radius
-    cropX = contW / 2;
-    cropY = contH / 2;
-    cropR = minSide;
+    const boxSize = Math.min(drawW, drawH) * 0.8;
+    cropX = (contW - boxSize) / 2;
+    cropY = (contH - boxSize) / 2;
+    cropW = boxSize;
+    cropH = boxSize;
     updateCropBox();
 
-    // Event listeners
-    const touchMove = e => e.touches ? e.touches[0] : e;
-    cropBox.addEventListener('touchstart', startDrag, {passive: false});
+    // Attach global listeners once
+    if (!cropListenersAttached) {
+      document.addEventListener('touchmove', dragMove, {passive: false});
+      document.addEventListener('mousemove', dragMove);
+      document.addEventListener('touchend', endDrag);
+      document.addEventListener('mouseup', endDrag);
+      cropListenersAttached = true;
+    }
+
+    cropBox.addEventListener('touchstart', startDrag, {passive:false});
     cropBox.addEventListener('mousedown', startDrag);
-    document.addEventListener('touchmove', dragMove, {passive: false});
-    document.addEventListener('mousemove', dragMove);
-    document.addEventListener('touchend', endDrag);
-    document.addEventListener('mouseup', endDrag);
   }
 
   function updateCropBox() {
-    cropBox.style.left = `${cropX - cropR}px`;
-    cropBox.style.top = `${cropY - cropR}px`;
-    cropBox.style.width = `${cropR * 2}px`;
-    cropBox.style.height = `${cropR * 2}px`;
+    cropBox.style.left = `${cropX}px`;
+    cropBox.style.top = `${cropY}px`;
+    cropBox.style.width = `${cropW}px`;
+    cropBox.style.height = `${cropH}px`;
   }
 
   function startDrag(e) {
     e.preventDefault();
     const pos = touchMove(e);
     const rect = cropBox.getBoundingClientRect();
-    startX = pos.pageX - rect.left; // Use pageX for absolute positioning
-    startY = pos.pageY - rect.top;
-    startR = cropR;
+    startX = pos.clientX - rect.left;
+    startY = pos.clientY - rect.top;
+    startW = cropW;
+    startH = cropH;
     if (e.target.classList.contains('resize-handle')) {
       isResizing = true;
       resizeHandle = e.target.classList[1];
@@ -642,41 +761,37 @@
     e.preventDefault();
     const pos = touchMove(e);
     if (isDragging) {
-      cropX = pos.pageX - startX + cropR; // Adjust for center
-      cropY = pos.pageY - startY + cropR;
-      // Clamp to canvas
-      cropX = Math.max(cropR, Math.min(cropCanvas.width - cropR, cropX));
-      cropY = Math.max(cropR, Math.min(cropCanvas.height - cropR, cropY));
+      cropX = pos.clientX - startX - cropCanvas.getBoundingClientRect().left;
+      cropY = pos.clientY - startY - cropCanvas.getBoundingClientRect().top;
+      cropX = Math.max(0, Math.min(cropCanvas.width - cropW, cropX));
+      cropY = Math.max(0, Math.min(cropCanvas.height - cropH, cropY));
       updateCropBox();
     } else if (isResizing) {
-      let delta = 0;
-      if (resizeHandle === 'bottom-right' || resizeHandle === 'top-left') {
-        delta = (pos.pageX - (cropX + startX - cropR)) + (pos.pageY - (cropY + startY - cropR)); // Average deltas for symmetry
-        delta /= 2;
-      } else if (resizeHandle === 'bottom-left' || resizeHandle === 'top-right') {
-        delta = -(pos.pageX - (cropX + startX - cropR)) + (pos.pageY - (cropY + startY - cropR));
-        delta /= 2;
-      }
-      let newR = startR + delta;
-      newR = Math.max(25, Math.min(Math.min(cropCanvas.width, cropCanvas.height) / 2, newR)); // Min 50 diameter
-      cropR = newR;
+      let newW = startW, newH = startH, newX = cropX, newY = cropY;
+      const docRect = cropCanvas.getBoundingClientRect();
+      const curX = pos.clientX - docRect.left;
+      const curY = pos.clientY - docRect.top;
+      const deltaX = curX - (cropX + startX);
+      const deltaY = curY - (cropY + startY);
+      const delta = Math.max(deltaX, deltaY);
+      if (resizeHandle === 'bottom-right') { newW = startW + delta; newH = startH + delta; }
+      else if (resizeHandle === 'bottom-left') { newW = startW - delta; newH = startH + delta; newX = cropX + delta; }
+      else if (resizeHandle === 'top-right') { newW = startW + delta; newH = startH - delta; newY = cropY + delta; }
+      else if (resizeHandle === 'top-left') { newW = startW - delta; newH = startH - delta; newX = cropX + delta; newY = cropY + delta; }
+      newW = Math.max(50, Math.min(cropCanvas.width - newX, newW));
+      newH = newW; // keep square
+      cropW = newW; cropH = newH; cropX = newX; cropY = newY;
       updateCropBox();
     }
   }
 
-  function endDrag() {
-    isDragging = false;
-    isResizing = false;
-  }
+  function endDrag() { isDragging = false; isResizing = false; }
 
-  applyCropBtn.addEventListener('click', () => {
+  $("#applyCropBtn")?.addEventListener('click', () => {
     const out = document.createElement('canvas');
     out.width = 256; out.height = 256;
     const outCtx = out.getContext('2d');
-    outCtx.beginPath();
-    outCtx.arc(128, 128, 128, 0, 2 * Math.PI);
-    outCtx.clip();
-    outCtx.drawImage(cropCanvas, cropX - cropR, cropY - cropR, cropR * 2, cropR * 2, 0, 0, 256, 256);
+    outCtx.drawImage(cropCanvas, cropX, cropY, cropW, cropH, 0, 0, 256, 256);
     const dataOut = out.toDataURL('image/png',0.85);
     const p = players.find(x => x.id === cropPlayerId);
     if (p) { p.avatar = dataOut; render(); }
@@ -719,7 +834,7 @@
       });
     } else if (under.length === 0) {
       players.forEach(p => { proj[p.id] = Math.min(proj[p.id], limit); });
-      toast(LANG==="es"?"Todos excedieron - capped":"All over limit - capped");
+      toast(LANG==="es"?"Todos excedieron - limitado":"All over limit - capped");
     }
 
     players.forEach(p=>{ p.score=proj[p.id]; });
@@ -741,12 +856,12 @@
     render();
   }
 
-  if($("#roundForm")) $("#roundForm").addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
+  $("#roundForm")?.addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
 
   /* history modal */
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
-    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
+    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px" data-i18n="close">${t("close")}</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
     const twrap=dlg.querySelector('.table-wrap');
     const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
     trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name} (Δ / Total)</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
@@ -757,23 +872,50 @@
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); twrap.appendChild(table);
+
+    // Export CSV
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn';
+    exportBtn.textContent = LANG==='es' ? 'Exportar CSV' : 'Export CSV';
+    exportBtn.style.margin = '8px 0 0 auto';
+    exportBtn.onclick = () => {
+      const headers = ['Round', ...players.map(p => `${p.name} (Δ,Total)`)];
+      const rowsCsv = rounds.map(r => {
+        const cols = [r.round];
+        players.forEach(p => {
+          const delta = (r.inputs && r.inputs[p.id] != null) ? r.inputs[p.id] : 0;
+          const tot   = (r.totals && r.totals[p.id] != null) ? r.totals[p.id] : 0;
+          cols.push(`${delta},${tot}`);
+        });
+        return cols.map(csv).join(',');
+      });
+      const out = [headers.map(csv).join(','), ...rowsCsv].join('\n');
+      const blob = new Blob([out], {type:'text/csv;charset=utf-8;'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `conga_rounds_${todayStr()}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    dlg.querySelector(".modal-body").appendChild(exportBtn);
     dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); 
     showModalWithLock(dlg);
   }
 
   /* wire-up */
-  bind("#openSettings","onclick", ()=>{ showModalWithLock($("#settingsDialog")); });
-  bind("#historyBtn","onclick", openRoundsTable);
-  bind("#newRoundBtn","onclick", openRound);
-  bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
-  bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ 
+  on("#openSettings","click", ()=> { showModalWithLock($("#settingsDialog")); });
+  on("#historyBtn","click", openRoundsTable);
+  on("#newRoundBtn","click", openRound);
+  on("#addPlayerBtn","click", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
+  on("#resetScoresBtn","click", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
+  on("#clearAllBtn","click", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ 
       players = defaultsPlayers();
       limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false;
-      rounds=[]; roundCounter=0;
+      rounds=[]; roundCounter=0; lockOrder=false;
       render();
     }});
-  bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
+  on("#lockToggle","click", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
   on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
@@ -811,7 +953,6 @@
   /* language controls */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
   $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
-  $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
 
   // init
   load();
