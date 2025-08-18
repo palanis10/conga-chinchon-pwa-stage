@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.0</title>
+<title>Conga by Alanis — STAGE v3.7.1</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -78,12 +78,13 @@
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px;
     user-select: none;
+    position: relative;
   }
-  .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
+  .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset, 0 0 0 2px rgba(78,225,160,.15); }
+  .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub); touch-action:none; }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
-  .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset; }
   .avatar{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:14px;}
-  .row.dealer .avatar{ box-shadow:0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25); }
+  .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25), 0 0 12px rgba(78,225,160,.35); }
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:20px; font-weight:900; }
   .scorewrap{ display:flex; align-items:center; gap:8px; min-width:86px; justify-content:flex-end; }
@@ -97,7 +98,7 @@
     border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55);
-    overflow: hidden;                /* prevents iOS weird jumps */
+    overflow: hidden;
   }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
@@ -107,11 +108,9 @@
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
-
-  /* Inside dialogs use solid borders for buttons */
   dialog .btn { border-style: solid; }
 
-  /* Accessible toggle switch */
+  /* Switch */
   .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
   .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
   .switch .track { width: 40px; height: 20px; background: var(--muted); border-radius: 999px; transition: .15s; }
@@ -120,12 +119,11 @@
   .switch input:checked + .track + .thumb { transform: translateX(20px); }
   .switch .switch-label { font-size: 14px; color: var(--text); }
 
-  /* Settings layout */
   #settingsDialog .modal-body { display: flex; flex-direction: column; gap: 12px; }
   #settingsDialog .btn { width: 100%; }
 
-  /* Round dialog */
-  .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; }
+  /* Round dialog (cutter + inputs) */
+  .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; margin-bottom:8px; }
   .cut-field legend{ font-size:12px; color:var(--sub); padding:0 6px; }
   .cut-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
   .cut-opt{ display:flex; gap:8px; align-items:center; background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
@@ -151,20 +149,17 @@
   .win-name{ font-size:20px; font-weight:900}
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
-  /* ===== Modern Crop dialog ===== */
+  /* ===== Crop dialog ===== */
   #cropDialog { width: min(460px, 92vw); }
   #cropStage { position: relative; width: 100%; height: 360px; border-radius: 16px; background:#0b0f20; border:1px solid rgba(255,255,255,.1); overflow:hidden; touch-action:none; }
   #cropCanvas { position:absolute; inset:0; width:100%; height:100%; }
-  .crop-ring { position:absolute; inset:0; pointer-events:none; }
   .crop-controls { display:grid; gap:10px; padding-top:10px; }
   .zoom-row{ display:grid; grid-template-columns: 1fr 60px; align-items:center; gap:10px; }
   .zoom-row input[type="range"]{ width:100% }
 
-  /* Edit dialog extras */
   .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
   .avatar-lg img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-  /* Responsive */
   @media (max-width: 410px){ .lang-pill{ display:none; } }
   @media (max-width: 400px){
     .modal-head { padding:8px 10px; gap:6px; }
@@ -185,7 +180,7 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.7.0</div>
+        <div class="ver" id="verLine">STAGE v3.7.1</div>
       </div>
     </div>
 
@@ -328,7 +323,7 @@
   </form>
 </dialog>
 
-<!-- Modern circle crop dialog -->
+<!-- Crop dialog -->
 <dialog id="cropDialog" aria-labelledby="cropTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div id="cropTitle" style="font-weight:800">Crop Photo</div>
@@ -337,8 +332,6 @@
   <div class="modal-body">
     <div id="cropStage">
       <canvas id="cropCanvas"></canvas>
-      <!-- overlay ring is drawn in canvas too; this div is kept if we want extra CSS -->
-      <div class="crop-ring" aria-hidden="true"></div>
     </div>
     <div class="crop-controls">
       <div class="zoom-row">
@@ -378,9 +371,8 @@
 
 <input id="photoInput" type="file" accept="image/*" hidden>
 
-<!-- Player row template (no pencil) -->
 <template id="playerRowTpl">
-  <div class="row" draggable="true" aria-grabbed="false" title="Long-press to Edit">
+  <div class="row" aria-grabbed="false" title="Long-press to Edit (when locked)">
     <div class="drag" aria-hidden="true">≡</div>
     <div class="avatar" aria-hidden="true"><span class="initials">P</span></div>
     <strong class="playerName">Player</strong>
@@ -395,18 +387,9 @@
 (() => {
   "use strict";
 
-  /* ========= Versioning ========= */
-  const APP = {
-    NAME: "Conga by Alanis",
-    CHANNEL: "STAGE",
-    VERSION: "3.7.0",
-    BUILD: "2025-08-18",
-    STORAGE_KEY: "conga_state_v2",
-    SCHEMA: 2
-  };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.1", BUILD:"2025-08-18", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
-  const verLineEl = document.getElementById("verLine");
-  if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
+  const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
   /* ===== utils ===== */
   const $ = s => document.querySelector(s);
@@ -419,64 +402,44 @@
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
     t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
-  function point(e){ return e && e.touches ? e.touches[0] : e; }
 
-  let saveTimer;
-  const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
-
-  const showModalWithLock = (dlg) => {
-    if (dlg) {
-      document.body.style.overflow = 'hidden';
-      dlg.showModal();
-      dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true});
-    }
-  };
+  let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
+  const showModalWithLock = (dlg) => { if (dlg) { document.body.style.overflow = 'hidden'; dlg.showModal(); dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true}); } };
 
   /* ===== i18n ===== */
   const STR = {
-    en:{
-      reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
+    en:{ reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
       settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
       lockOrder:"Lock player reordering", resetScores:"Reset scores", clearAll:"Clear all",
       done:"Done", roundHint:"Enter points (negatives OK). \"-10\" changes the input.",
       cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
       photo:"Photo", changePhoto:"Change photo", addPhoto:"Add photo", editPhoto:"Edit photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
-      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
-    },
-    es:{
-      reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
+      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game" },
+    es:{ reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
       settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
       lockOrder:"Bloquear reordenamiento", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
       done:"Listo", roundHint:"Ingresa puntos (negativos ok). \"-10\" cambia el campo.",
       cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
       photo:"Foto", changePhoto:"Cambiar foto", addPhoto:"Agregar foto", editPhoto:"Editar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
-      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
-    }
+      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego" }
   };
   const storageLangKey = "conga_lang";
   let LANG = localStorage.getItem(storageLangKey) || "en";
   function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.en[k] || k; }
-  function applyI18n(){
-    document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
-    $("#pillEn")?.classList.toggle("active", LANG==="en");
-    $("#pillEs")?.classList.toggle("active", LANG==="es");
-  }
+  function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
+    $("#pillEn")?.classList.toggle("active", LANG==="en"); $("#pillEs")?.classList.toggle("active", LANG==="es"); }
 
   /* ===== state ===== */
   const STORAGE_KEY = APP.STORAGE_KEY;
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let roundCounter=0; let rounds=[]; let lockOrder=false;
-  let schema = APP.SCHEMA;
+  let roundCounter=0; let rounds=[]; let lockOrder=false; let schema = APP.SCHEMA;
 
   const defaultsPlayers = () => ([
     {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
     {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
   ]);
 
-  const save=()=>{ 
-    const payload = {schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder, app:{version:APP.VERSION, channel:APP.CHANNEL} };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  };
+  const save=()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder, app:{version:APP.VERSION, channel:APP.CHANNEL}})); };
 
   function loadLegacyMostRecent(){
     let bestKey=null, bestNum=-1;
@@ -485,43 +448,26 @@
       const m = /^conga_state_stage_v(\d+)/.exec(k||"");
       if(m){ const n=parseInt(m[1],10); if(n>bestNum){ bestNum=n; bestKey=k; } }
     }
-    if(bestKey){
-      try { return JSON.parse(localStorage.getItem(bestKey)||"{}"); } catch(e){ return null; }
-    }
+    if(bestKey){ try { return JSON.parse(localStorage.getItem(bestKey)||"{}"); } catch(e){ return null; } }
     return null;
   }
-
   function migrateIfNeeded(raw){
     const out = { schema: 2,
       players: Array.isArray(raw?.players) && raw.players.length ? raw.players : defaultsPlayers(),
       limit: Number.isFinite(raw?.limit) ? raw.limit : 100,
       autoAdvanceDealer: typeof raw?.autoAdvanceDealer==="boolean" ? raw.autoAdvanceDealer : true,
       nextDealerId: typeof raw?.nextDealerId==="string" ? raw.nextDealerId : (raw?.players?.[0]?.id || null),
-      gameOver: !!raw?.gameOver,
-      roundCounter: Number.isFinite(raw?.roundCounter) ? raw.roundCounter : 0,
-      rounds: Array.isArray(raw?.rounds) ? raw.rounds : [],
-      lockOrder: !!raw?.lockOrder,
-    };
-    return out;
+      gameOver: !!raw?.gameOver, roundCounter: Number.isFinite(raw?.roundCounter) ? raw.roundCounter : 0,
+      rounds: Array.isArray(raw?.rounds) ? raw.rounds : [], lockOrder: !!raw?.lockOrder,
+    }; return out;
   }
-
   function load(){
     try{
       const s = JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
-      if (s && typeof s === 'object' && Number.isFinite(s.schema)) {
-        ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = s);
-        if (!Array.isArray(players) || players.length===0) { players=defaultsPlayers(); }
-      } else {
-        const legacy = loadLegacyMostRecent();
-        const m = migrateIfNeeded(legacy || {});
-        ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = m);
-        save();
-      }
-    }catch(e){
-      const m = migrateIfNeeded({});
-      ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = m);
-      save();
-    }
+      if (s && typeof s === 'object' && Number.isFinite(s.schema)) ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = s);
+      else ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = migrateIfNeeded(loadLegacyMostRecent()||{})), save();
+      if (!Array.isArray(players) || players.length===0) players = defaultsPlayers();
+    }catch{ ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = migrateIfNeeded({})); save(); }
   }
 
   /* ===== render ===== */
@@ -542,16 +488,20 @@
       const frag = document.createDocumentFragment();
       players.forEach((p, i) => {
         const n=rowTpl.content.firstElementChild.cloneNode(true);
-        n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-        n.setAttribute('role','listitem');
+        n.dataset.index=i; n.dataset.id=p.id;
 
-        if(!lockOrder){
-          n.addEventListener("dragstart",dragStart);
-          n.addEventListener("dragover",dragOver);
-          n.addEventListener("drop",drop);
-          n.addEventListener("dragend",dragEnd);
+        // Only attach long-press to edit when LOCKED
+        if (lockOrder) attachLongPress(n, ()=>openEdit(p.id));
+
+        // Touch reorder (on handle) only when UNLOCKED
+        const handle = n.querySelector('.drag');
+        if (!lockOrder){
+          handle.classList.remove('locked');
+          enableTouchReorder(handle, p.id);
+        }else{
+          handle.classList.add('locked');
+          handle.onpointerdown = null;
         }
-        attachLongPress(n, ()=>openEdit(p.id));
 
         if(p.id===nextDealerId) n.classList.add("dealer");
         const avatarBox=n.querySelector(".avatar");
@@ -560,7 +510,6 @@
         const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
         const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
         const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-        const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
 
         frag.appendChild(n);
       });
@@ -582,42 +531,52 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
   }
 
-  /* keyboard reorder for accessibility */
-  if (list) {
-    list.addEventListener('keydown', (e)=>{
-      if (e.altKey || e.ctrlKey || e.metaKey) return;
-      const row = e.target.closest('.row');
-      if (!row || lockOrder) return;
-      const idx = +row.dataset.index;
-      if (e.key === 'ArrowUp' && idx > 0) {
-        const keep = nextDealerId, arr = players.slice(), m = arr.splice(idx,1)[0];
-        arr.splice(idx-1,0,m); players=arr; nextDealerId=keep; render(); list.children[idx-1]?.focus(); e.preventDefault();
-      } else if (e.key === 'ArrowDown' && idx < players.length-1) {
-        const keep = nextDealerId, arr = players.slice(), m = arr.splice(idx,1)[0];
-        arr.splice(idx+1,0,m); players=arr; nextDealerId=keep; render(); list.children[idx+1]?.focus(); e.preventDefault();
-      }
-    });
+  /* ===== Touch/pointer reorder (mobile friendly) ===== */
+  let dragActive=false, dragPlayerId=null;
+  function enableTouchReorder(handleEl, playerId){
+    handleEl.onpointerdown = (e)=>{
+      if (lockOrder) return;
+      dragActive=true; dragPlayerId=playerId;
+      handleEl.setPointerCapture(e.pointerId);
+      document.addEventListener('pointermove', onDragMove, {passive:false});
+      document.addEventListener('pointerup', onDragEnd, {passive:false});
+      e.preventDefault();
+    };
   }
-
-  /* drag (mouse HTML5 DnD) */
-  let dragIdx=null;
-  const dragStart=e=>{dragIdx=+e.currentTarget.dataset.index; e.dataTransfer.effectAllowed="move"; e.dataTransfer.setData("text/plain", String(dragIdx)); e.currentTarget.setAttribute("aria-grabbed","true");};
-  const dragOver=e=>{e.preventDefault(); e.dataTransfer.dropEffect="move";};
-  const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; const keep=nextDealerId; arr.splice(to,0,m); players=arr; nextDealerId=keep; render(); }};
-  const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
+  function onDragMove(e){
+    if (!dragActive) return;
+    e.preventDefault();
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const row = el && el.closest ? el.closest('.row') : null;
+    if (!row) return;
+    const fromIdx = players.findIndex(p=>p.id===dragPlayerId);
+    const toIdx = +row.dataset.index;
+    if (fromIdx<0 || toIdx<0 || fromIdx===toIdx) return;
+    const keep = nextDealerId, arr = players.slice();
+    const m = arr.splice(fromIdx,1)[0]; arr.splice(toIdx,0,m);
+    players = arr; nextDealerId = keep; render();
+  }
+  function onDragEnd(){
+    dragActive=false; dragPlayerId=null;
+    document.removeEventListener('pointermove', onDragMove);
+    document.removeEventListener('pointerup', onDragEnd);
+  }
 
   /* ===== Edit dialog ===== */
   const editDlg=$("#editDialog"), editForm=$("#editForm");
+  function refreshEditPreview(id){
+    const p=players.find(x=>x.id===id);
+    const prev=$("#editAvatarPreview");
+    const btn=$("#changePhotoBtn");
+    if (prev){ prev.src = p?.avatar || ""; prev.style.opacity = p?.avatar ? "1" : ".35"; }
+    if (btn){ btn.setAttribute("data-i18n", p?.avatar ? "editPhoto" : "addPhoto"); btn.textContent = t(p?.avatar ? "editPhoto" : "addPhoto"); }
+  }
   function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
-    const cp=$("#changePhotoBtn"); if (cp){
-      cp.setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto");
-      cp.textContent = t(p.avatar ? "editPhoto" : "addPhoto");
-      cp.onclick=()=>openCrop(p.id, p.avatar);
-    }
-    const prev=$("#editAvatarPreview"); if(prev){ prev.src = p.avatar || ""; prev.style.opacity = p.avatar ? "1" : ".35"; }
-    $("#removePhotoBtn").onclick = ()=>{ p.avatar=null; render(); const prev=$("#editAvatarPreview"); if(prev){ prev.src=""; prev.style.opacity=".35"; } };
+    refreshEditPreview(p.id);
+    $("#changePhotoBtn").onclick=()=>openCrop(p.id, p.avatar);
+    $("#removePhotoBtn").onclick = ()=>{ p.avatar=null; refreshEditPreview(p.id); render(); };
     $("#deletePlayerBtn").onclick = ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }};
     showModalWithLock(editDlg);
   }
@@ -627,269 +586,99 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* ===== Modern Circle Crop (pan + slider zoom) ===== */
+  /* ===== Modern circle crop ===== */
   const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"), pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
   const ctx = cropCanvas.getContext('2d');
-
-  // crop state
-  let cropPlayerId=null;
-  let img = new Image();
-  let imgLoaded=false;
-  let scale=1, minScale=1, maxScale=4; // image scale
-  let offsetX=0, offsetY=0;           // image top-left in canvas coords
-  let startPanX=0, startPanY=0, panning=false;
-  let pinchDist0=null, scale0=null;
+  let cropPlayerId=null, img=new Image(), imgLoaded=false, scale=1, minScale=1, maxScale=4, offsetX=0, offsetY=0;
+  let pinchDist0=null, scale0=null; const activeTouches=new Map(); let panning=false, startPanX=0, startPanY=0;
 
   function dprSize(el){ const DPR = window.devicePixelRatio || 1; return [el.clientWidth*DPR, el.clientHeight*DPR, DPR]; }
-
-  function circleSpecs(){
-    // big responsive circle with 12px padding
-    const w = cropCanvas.width, h = cropCanvas.height;
-    const DPR = window.devicePixelRatio || 1;
-    const pad = 12*DPR;
-    const r = Math.min(w, h)/2 - pad;
-    const cx = w/2, cy = h/2;
-    return {cx, cy, r, DPR};
-  }
-
-  function coverMinScale(){
-    // ensure image fully covers the circle
-    const {r} = circleSpecs();
-    const needW = 2*r, needH = 2*r;
-    const s = Math.max(needW / img.width, needH / img.height);
-    return s * 1.001;  // tiny safety
-  }
-
-  function clampPan(){
-    const {cx, cy, r} = circleSpecs();
-    const displayW = img.width * scale;
-    const displayH = img.height * scale;
-
-    // image must cover circle: left<=cx-r, top<=cy-r, right>=cx+r, bottom>=cy+r
-    const minX = cx - r - displayW;
-    const maxX = cx + r - 0;
-    const minY = cy - r - displayH;
-    const maxY = cy + r - 0;
-
-    offsetX = Math.min(Math.max(offsetX, minX), maxX - displayW + displayW); // simplified clamp using inequalities above
-    offsetY = Math.min(Math.max(offsetY, minY), maxY - displayH + displayH);
-
-    // Better, compute exact clamping:
+  function circleSpecs(){ const w=cropCanvas.width, h=cropCanvas.height, DPR=window.devicePixelRatio||1, pad=12*DPR; const r=Math.min(w,h)/2 - pad; return {cx:w/2, cy:h/2, r, DPR}; }
+  function coverMinScale(){ const {r}=circleSpecs(); return Math.max((2*r)/img.width, (2*r)/img.height)*1.001; }
+  function clampPan(){ const {cx,cy,r}=circleSpecs(); const w=img.width*scale, h=img.height*scale;
     if (offsetX > cx - r) offsetX = cx - r;
     if (offsetY > cy - r) offsetY = cy - r;
-    if (offsetX + displayW < cx + r) offsetX = (cx + r) - displayW;
-    if (offsetY + displayH < cy + r) offsetY = (cy + r) - displayH;
+    if (offsetX + w < cx + r) offsetX = (cx + r) - w;
+    if (offsetY + h < cy + r) offsetY = (cy + r) - h;
   }
-
   function drawCrop(){
-    // size canvas correctly
-    const [cw, ch, DPR] = dprSize(cropStage);
-    if (cropCanvas.width !== cw || cropCanvas.height !== ch){
-      cropCanvas.width = cw; cropCanvas.height = ch;
-    }
+    const [cw,ch] = dprSize(cropStage);
+    if (cropCanvas.width !== cw || cropCanvas.height !== ch){ cropCanvas.width=cw; cropCanvas.height=ch; }
     ctx.clearRect(0,0,cw,ch);
-
-    const {cx, cy, r} = circleSpecs();
-
-    if (imgLoaded){
-      const w = img.width * scale;
-      const h = img.height * scale;
-      ctx.drawImage(img, offsetX, offsetY, w, h);
-    }
-
-    // dark overlay with circular cutout + green ring
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,.55)';
-    ctx.beginPath(); ctx.rect(0,0,cw,ch);
-    ctx.moveTo(cx+r, cy);
-    ctx.arc(cx, cy, r, 0, Math.PI*2, true);
-    ctx.fill('evenodd');
-    ctx.restore();
-
+    const {cx,cy,r} = circleSpecs();
+    if (imgLoaded){ const w=img.width*scale, h=img.height*scale; ctx.drawImage(img, offsetX, offsetY, w, h); }
+    // overlay
+    ctx.save(); ctx.fillStyle='rgba(0,0,0,.55)'; ctx.beginPath(); ctx.rect(0,0,cw,ch); ctx.moveTo(cx+r, cy); ctx.arc(cx,cy,r,0,Math.PI*2,true); ctx.fill('evenodd'); ctx.restore();
     // ring
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI*2);
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-2') || '#4ee1a0';
-    ctx.lineWidth = Math.max(2, r*0.04);
-    ctx.stroke();
-    ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#4ee1a0'; ctx.lineWidth=Math.max(2, r*0.04); ctx.stroke(); ctx.restore();
   }
-
-  function setZoomBySlider(val){
-    // val 0..100
-    const t = val/100;
-    scale = minScale + (maxScale - minScale)*t;
-    zoomOut.textContent = Math.round(scale/minScale*100) + '%';
-    clampPan();
-    drawCrop();
-  }
+  function setZoomBySlider(val){ const t=val/100; scale=minScale+(maxScale-minScale)*t; zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); }
 
   function openCrop(playerId, existingAvatar=null){
     cropPlayerId = playerId;
+    const useImage = (src)=>{ imgLoaded=false; img=new Image(); img.onload=()=>{
+        imgLoaded = true; minScale = coverMinScale(); maxScale = Math.max(minScale*4, minScale+0.01); scale = minScale * 1.05;
+        const {cx,cy}=circleSpecs(); const w=img.width*scale, h=img.height*scale; offsetX=cx-w/2; offsetY=cy-h/2; clampPan();
+        const t = (scale - minScale)/(maxScale - minScale); zoomRange.value = Math.round(t*100); zoomOut.textContent = Math.round(scale/minScale*100)+'%';
+        drawCrop(); cropDialog.scrollTop=0;
+      }; img.src = src; };
 
-    const useImage = (src) => {
-      imgLoaded=false;
-      img = new Image();
-      img.onload = ()=>{
-        imgLoaded = true;
-        // init sizing and center
-        minScale = coverMinScale();
-        maxScale = Math.max(minScale*4, minScale+0.01);
-        scale = minScale * 1.05;
-        const {cx, cy} = circleSpecs();
-        const w = img.width * scale, h = img.height * scale;
-        offsetX = cx - w/2; offsetY = cy - h/2;
-        clampPan();
-        // sync slider
-        const t = (scale - minScale)/(maxScale - minScale);
-        zoomRange.value = Math.round(t*100);
-        zoomOut.textContent = Math.round(scale/minScale*100)+'%';
-        drawCrop();
-        // ensure we see the top of dialog / no jump
-        cropDialog.scrollTop = 0;
-      };
-      img.src = src;
-    };
+    const ensureSizedAndShow = (cb)=>{ showModalWithLock(cropDlg); requestAnimationFrame(()=>{ drawCrop(); requestAnimationFrame(cb); }); };
 
-    if (existingAvatar){
-      // open immediately with current avatar; provide "Choose photo" to replace
-      showModalWithLock(cropDlg);
-      // wait a frame to size canvas before load (avoids 0x0 sizing on iOS)
-      requestAnimationFrame(()=>{ drawCrop(); useImage(existingAvatar); });
-    } else {
-      // choose a new photo then open
-      photoInput.onchange = async () => {
-        const file = photoInput.files[0];
-        if (!file) return;
-        const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-        showModalWithLock(cropDlg);
-        requestAnimationFrame(()=>{ drawCrop(); useImage(dataUrl); });
+    if (existingAvatar){ ensureSizedAndShow(()=> useImage(existingAvatar)); }
+    else {
+      photoInput.onchange = async () => { const f = photoInput.files[0]; if(!f) return;
+        const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
+        ensureSizedAndShow(()=> useImage(dataUrl));
       };
       photoInput.click();
     }
   }
 
-  // pointer handlers (pan + pinch)
-  const activeTouches = new Map();
-  cropStage.addEventListener('pointerdown', (e)=>{
-    cropStage.setPointerCapture(e.pointerId);
-    activeTouches.set(e.pointerId, {x:e.clientX, y:e.clientY});
-    if (activeTouches.size===2){
-      // pinch start
-      const pts = [...activeTouches.values()];
-      pinchDist0 = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-      scale0 = scale;
-    } else if (activeTouches.size===1){
-      panning = true;
-      startPanX = e.clientX - offsetX;
-      startPanY = e.clientY - offsetY;
-    }
-  });
-  cropStage.addEventListener('pointermove', (e)=>{
-    if (!imgLoaded) return;
-    if (!activeTouches.has(e.pointerId)) return;
-    activeTouches.set(e.pointerId, {x:e.clientX, y:e.clientY});
-
-    if (activeTouches.size===2){
-      const pts = [...activeTouches.values()];
-      const dist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-      if (pinchDist0 && scale0){
-        const ratio = dist / pinchDist0;
-        scale = Math.min(maxScale, Math.max(minScale, scale0 * ratio));
-        const t = (scale - minScale)/(maxScale - minScale);
-        zoomRange.value = Math.round(t*100);
-        zoomOut.textContent = Math.round(scale/minScale*100)+'%';
-        clampPan(); drawCrop();
-      }
-    } else if (panning){
-      offsetX = e.clientX - startPanX;
-      offsetY = e.clientY - startPanY;
-      clampPan(); drawCrop();
-    }
-  });
-  function endPointer(e){ activeTouches.delete(e.pointerId); if (activeTouches.size<2){ pinchDist0=null; scale0=null; } if (activeTouches.size===0){ panning=false; } }
-  cropStage.addEventListener('pointerup', endPointer);
-  cropStage.addEventListener('pointercancel', endPointer);
-  cropStage.addEventListener('pointerleave', endPointer);
-
-  // slider zoom
+  // pointer handlers for pan / pinch
+  cropStage.addEventListener('pointerdown', (e)=>{ cropStage.setPointerCapture(e.pointerId); activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if (activeTouches.size===2){ const pts=[...activeTouches.values()]; pinchDist0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); scale0=scale; }
+    else if (activeTouches.size===1){ panning=true; startPanX=e.clientX - offsetX; startPanY=e.clientY - offsetY; } });
+  cropStage.addEventListener('pointermove', (e)=>{ if(!imgLoaded) return; if(!activeTouches.has(e.pointerId)) return; activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if (activeTouches.size===2){ const pts=[...activeTouches.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if (pinchDist0 && scale0){ const ratio=dist/pinchDist0; scale=Math.min(maxScale, Math.max(minScale, scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
+    else if (panning){ offsetX=e.clientX-startPanX; offsetY=e.clientY-startPanY; clampPan(); drawCrop(); } }, {passive:false});
+  function endPointer(e){ activeTouches.delete(e.pointerId); if(activeTouches.size<2){ pinchDist0=null; scale0=null; } if(activeTouches.size===0){ panning=false; } }
+  cropStage.addEventListener('pointerup', endPointer); cropStage.addEventListener('pointercancel', endPointer); cropStage.addEventListener('pointerleave', endPointer);
   zoomRange.addEventListener('input', (e)=> setZoomBySlider(+e.target.value));
+  $("#pickAnotherBtn").addEventListener('click', ()=>{ photoInput.onchange = async () => { const f=photoInput.files[0]; if(!f) return; try{
+      const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
+      imgLoaded=false; requestAnimationFrame(()=>{ drawCrop(); openCrop(cropPlayerId, dataUrl); });
+    }catch{ toast('Photo load error'); } }; photoInput.click(); });
 
-  // pick another
-  pickAnotherBtn.addEventListener('click', ()=>{
-    photoInput.onchange = async () => {
-      const file = photoInput.files[0];
-      if (!file) return;
-      try{
-        const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-        imgLoaded=false;
-        requestAnimationFrame(()=>{ drawCrop(); openCrop(cropPlayerId, dataUrl); });
-      }catch{ toast('Photo load error'); }
-    };
-    photoInput.click();
-  });
-
-  // export (hi-res circle)
-  applyCropBtn.addEventListener('click', ()=>{
+  $("#applyCropBtn").addEventListener('click', ()=>{
     if (!imgLoaded) { cropDlg.close(); return; }
     const {cx, cy, r} = circleSpecs();
-    // map circle center to original image coordinates
-    const ox = (cx - offsetX) / scale;
-    const oy = (cy - offsetY) / scale;
-    const or = r / scale;
-
-    const size = 512; // output
-    const out = document.createElement('canvas');
-    out.width = size; out.height = size;
-    const octx = out.getContext('2d');
-    octx.clearRect(0,0,size,size);
-    octx.save();
-    // clip circle
-    octx.beginPath(); octx.arc(size/2, size/2, size/2, 0, Math.PI*2); octx.clip();
-    // scale so that radius or maps to size/2
-    const S = (size/2) / or;
-    octx.setTransform(S,0,0,S, size/2 - ox*S, size/2 - oy*S);
-    octx.imageSmoothingQuality = 'high';
-    octx.drawImage(img, 0,0);
-    octx.restore();
+    const ox = (cx - offsetX) / scale, oy = (cy - offsetY) / scale, or = r / scale;
+    const size = 512; const out = document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
+    octx.clearRect(0,0,size,size); octx.save(); octx.beginPath(); octx.arc(size/2,size/2,size/2,0,Math.PI*2); octx.clip();
+    const S = (size/2) / or; octx.setTransform(S,0,0,S, size/2 - ox*S, size/2 - oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut = out.toDataURL('image/png', 0.95);
-
     const p = players.find(x=>x.id===cropPlayerId);
-    if (p){ p.avatar = dataOut; render(); }
+    if (p){ p.avatar = dataOut; refreshEditPreview(p.id); render(); }
     cropDlg.close();
   });
 
-  /* ===== Round dialog (cutter + threshold 101+) ===== */
+  /* ===== Round dialog (cutter + reenganche @ limit+1) ===== */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn"), cutGrid=$("#cutGrid");
   let selectedCutterId = "";
 
   function buildCutterGrid(){
     cutGrid.innerHTML = "";
-    const makeOpt = (id,label,checked=false)=>{
-      const wrap=document.createElement("label");
-      wrap.className="cut-opt";
-      const input=document.createElement("input");
-      input.type="radio"; input.name="cutter"; input.value=id; input.checked=checked;
-      const span=document.createElement("span"); span.textContent=label;
-      wrap.append(input,span);
-      input.addEventListener('change', validateRound);
-      return wrap;
-    };
-    cutGrid.appendChild(makeOpt("", LANG==='es'?'Nadie':'None', true));
-    players.forEach(p=> cutGrid.appendChild(makeOpt(p.id, p.name, false)));
+    const mk = (id,label,checked=false)=>{ const w=document.createElement("label"); w.className="cut-opt"; const i=document.createElement("input"); i.type="radio"; i.name="cutter"; i.value=id; i.checked=checked; const s=document.createElement("span"); s.textContent=label; w.append(i,s); i.addEventListener('change', validateRound); return w; };
+    cutGrid.appendChild(mk("", LANG==='es'?'Nadie':'None', true));
+    players.forEach(p=> cutGrid.appendChild(mk(p.id, p.name)));
   }
 
-  const openRound=()=>{ 
-    if(!roundDlg||!rows) return; 
-    if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; } 
-    rows.innerHTML="";
-    buildCutterGrid();
-    selectedCutterId = "";
-
+  const openRound=()=>{ if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
+    rows.innerHTML=""; buildCutterGrid(); selectedCutterId="";
     const frag = document.createDocumentFragment();
-    players.forEach(p=>{ 
-      const r=document.createElement("div"); r.className="round-row";
+    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
       inp.addEventListener('input', validateRound);
@@ -898,34 +687,19 @@
     });
     rows.appendChild(frag);
     rErr.style.display="none"; applyBtn.disabled=false;
-
-    // Open first, then focus without scrolling + force dialog to top (prevents iOS jump)
     showModalWithLock(roundDlg);
-    requestAnimationFrame(()=>{
-      roundDlg.scrollTop = 0;
-      rows.scrollTop = 0;
-      rows.querySelector('input')?.focus({preventScroll:true});
-    });
+    requestAnimationFrame(()=>{ roundDlg.scrollTop=0; rows.scrollTop=0; rows.querySelector('input')?.focus({preventScroll:true}); });
   };
 
-  function roundInputs(){
-    const m={}; 
-    for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} 
-    return m; 
-  }
+  function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
 
   function validateRound(){
-    const inputs = roundInputs();
-    const radios = document.querySelectorAll('input[name="cutter"]');
-    radios.forEach(r=>{ if(r.checked) selectedCutterId = r.value; });
-    if (!selectedCutterId) { rErr.style.display="none"; applyBtn.disabled=false; return; }
-    const cutter = players.find(p=>p.id===selectedCutterId);
-    if (!cutter){ rErr.style.display="none"; applyBtn.disabled=false; return; }
+    const inputs = roundInputs(); const radios=document.querySelectorAll('input[name="cutter"]'); radios.forEach(r=>{ if(r.checked) selectedCutterId=r.value; });
+    if (!selectedCutterId){ rErr.style.display="none"; applyBtn.disabled=false; return; }
+    const cutter = players.find(p=>p.id===selectedCutterId); if(!cutter){ rErr.style.display="none"; applyBtn.disabled=false; return; }
     const projected = clampInt(cutter.score||0) + clampInt(inputs[cutter.id]||0);
-    if (projected > limit){
-      rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`;
-      rErr.style.display="block"; applyBtn.disabled=true; 
-    } else { rErr.style.display="none"; applyBtn.disabled=false; }
+    if (projected > limit){ rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`; rErr.style.display="block"; applyBtn.disabled=true; }
+    else { rErr.style.display="none"; applyBtn.disabled=false; }
   }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
@@ -951,7 +725,6 @@
       }
     }
 
-    // Reenganche only at limit+1 or higher
     roundCounter += 1;
     const REENG_THRESHOLD = limit + 1;
     const under = players.filter(p => proj[p.id] <= limit);
@@ -959,10 +732,7 @@
 
     if (under.length >= 2 && over.length > 0) {
       const maxUnderVal = Math.max(...under.map(p => proj[p.id]));
-      over.forEach(p => {
-        proj[p.id] = maxUnderVal;
-        p.reenganches = (p.reenganches || 0) + 1;
-      });
+      over.forEach(p => { proj[p.id] = maxUnderVal; p.reenganches = (p.reenganches || 0) + 1; });
     } else if (under.length === 0) {
       players.forEach(p => { proj[p.id] = Math.min(proj[p.id], limit); });
       toast(LANG==="es"?"Todos excedieron - limitado":"All over limit - capped");
@@ -979,13 +749,9 @@
     gameOver=false;
 
     const alive = players.filter(p=>p.score<=limit);
-    if(alive.length===1){
-      gameOver=true;
-      showWinOverlay(alive[0]);
-    }
+    if(alive.length===1){ gameOver=true; showWinOverlay(alive[0]); }
     render();
   }
-
   $("#roundForm")?.addEventListener("submit", (e)=>{ e.preventDefault(); const inputs = roundInputs(); applyRound(inputs); roundDlg && roundDlg.close(); });
 
   /* ===== History modal ===== */
@@ -1002,48 +768,17 @@
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); twrap.appendChild(table);
-
-    const exportBtn = document.createElement('button');
-    exportBtn.className = 'btn';
-    exportBtn.textContent = LANG==='es' ? 'Exportar CSV' : 'Export CSV';
-    exportBtn.style.margin = '8px 0 0 auto';
-    exportBtn.onclick = () => {
-      const headers = ['Round', ...players.map(p => `${p.name} (Δ,Total)`)];
-      const rowsCsv = rounds.map(r => {
-        const cols = [r.round + (r.instantWin?'*':'')];
-        players.forEach(p => {
-          const delta = (r.inputs && r.inputs[p.id] != null) ? r.inputs[p.id] : 0;
-          const tot   = (r.totals && r.totals[p.id] != null) ? r.totals[p.id] : 0;
-          cols.push(`${delta},${tot}`);
-        });
-        return cols.map(csv).join(',');
-      });
-      const out = [headers.map(csv).join(','), ...rowsCsv].join('\n');
-      const blob = new Blob([out], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `conga_rounds_${todayStr()}.csv`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    };
-
-    dlg.querySelector(".modal-body").appendChild(exportBtn);
     dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); 
     showModalWithLock(dlg);
   }
 
   /* ===== Wire-up ===== */
-  on("#openSettings","click", ()=> { showModalWithLock($("#settingsDialog")); });
+  on("#openSettings","click", ()=> showModalWithLock($("#settingsDialog")));
   on("#historyBtn","click", openRoundsTable);
   on("#newRoundBtn","click", openRound);
   on("#addPlayerBtn","click", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
   on("#resetScoresBtn","click", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  on("#clearAllBtn","click", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ 
-      players = defaultsPlayers();
-      limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false;
-      rounds=[]; roundCounter=0; lockOrder=false;
-      render();
-    }});
+  on("#clearAllBtn","click", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players = defaultsPlayers(); limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false; rounds=[]; roundCounter=0; lockOrder=false; render(); }});
   on("#lockToggle","click", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
   on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
   on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
@@ -1078,14 +813,12 @@
     setTimeout(stopConfetti, 5000);
   }
 
-  /* ===== Lang toggles ===== */
+  /* ===== Language toggles ===== */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
   $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
 
   // init
-  load();
-  applyI18n();
-  render();
+  load(); applyI18n(); render();
 })();
 </script>
 </body>
