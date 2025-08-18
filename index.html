@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.6</title>
+<title>Conga by Alanis — STAGE v3.5.7</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -139,15 +139,18 @@
   .switch input:checked + ::before { background: var(--accent); }
   .switch input:checked + ::after { transform: translateX(20px); }
 
-  /* Round dialog (scrollable on small screens) */
-  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
-  .grid-rows{ display:grid; gap:6px }
-  .round-row{ display:grid; grid-template-columns: 1fr 120px 64px; gap:8px; align-items:center;
-    padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
+  /* Round dialog (scrollable on small screens, compact for mobile) */
+  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:6px; max-height:70vh; overflow:auto }
+  .grid-rows{ display:grid; gap:4px }
+  .round-row{ display:grid; grid-template-columns: auto 100px 50px; gap:6px; align-items:center;
+    padding:4px; border:1px dashed rgba(255,255,255,.15); border-radius:10px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
-  .round-row input[type="number"]{ height:34px; padding:6px 8px; }
-  .round-row .minus10{ width:100%; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 4px; }
+  .round-row > div:first-child { display: flex; flex-direction: column; font-size: 14px; }
+  .round-row strong { font-size: 16px; }
+  .round-row .hint { font-size: 11px; color: var(--sub); }
+  .round-row input[type="number"]{ height:30px; padding:4px 8px; font-size:14px; }
+  .round-row .minus10{ width:100%; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
   /* Win overlay (compact) */
@@ -158,11 +161,21 @@
   .win-photo{ width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)}
   .win-photo img{ width:100%; height:100%; object-fit:cover}
   .win-name{ font-size:20px; font-weight:900}
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none}
+  #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
-  /* Responsive: hide pill if it would crowd the header; tools must remain 1 row */
+  /* Responsive: hide pill if it would crowd the header; tools must remain 1 row; compact modals */
   @media (max-width: 410px){
     .lang-pill{ display:none; }
+  }
+  @media (max-width: 400px){
+    .modal-head { padding:8px 10px; gap:6px; }
+    .modal-body { padding:8px 10px; }
+    .modal-foot { padding:8px 10px; gap:6px; }
+    .round-row { grid-template-columns: auto 80px 40px; gap:4px; font-size:12px; }
+    .round-row strong { font-size:14px; }
+    .round-row .hint { font-size:10px; }
+    .round-row input[type="number"] { height:28px; padding:2px 6px; font-size:12px; }
+    .round-row .minus10 { height:28px; font-size:12px; padding:0; }
   }
 </style>
 </head>
@@ -172,7 +185,7 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.5.6</div>
+        <div class="ver" id="verLine">STAGE v3.5.7</div>
       </div>
     </div>
 
@@ -234,11 +247,10 @@
 <!-- Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle">
   <div class="modal-head">
-    <div>
+    <div style="flex:1; overflow:hidden;">
       <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
-      <div class="hint" data-i18n="roundHint">Enter points (negatives OK). "-10" changes the input.</div>
     </div>
-    <button class="btn" onclick="roundDialog.close()" style="padding:6px 10px">Close</button>
+    <button class="btn" style="flex-shrink:0; padding:6px 10px" onclick="roundDialog.close()">Close</button>
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
@@ -361,6 +373,15 @@
   let saveTimer;
   const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 500); };
 
+  // Modal scroll lock helper
+  const showModalWithLock = (dlg) => {
+    if (dlg) {
+      document.body.style.overflow = 'hidden';
+      dlg.showModal();
+      dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true});
+    }
+  };
+
   /* ===== i18n ===== */
   const STR = {
     en:{
@@ -369,7 +390,7 @@
       lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
       done:"Done", roundHint:"Enter points (negatives OK). \"-10\" changes the input.",
       cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
-      photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
+      photo:"Photo", changePhoto:"Change photo", addPhoto:"Add photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
       deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
     },
     es:{
@@ -378,7 +399,7 @@
       lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
       done:"Listo", roundHint:"Ingresa puntos (negativos ok). \"-10\" cambia el campo.",
       cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
-      photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
+      photo:"Foto", changePhoto:"Cambiar foto", addPhoto:"Agregar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
       deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
     }
   };
@@ -393,7 +414,7 @@
   }
 
   /* ===== state ===== */
-  const storageKey="conga_state_stage_v356"; // bumped storage key for this version
+  const storageKey="conga_state_stage_v357"; // bumped for v3.5.7
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let roundCounter=0; let rounds=[]; let lockOrder=false;
 
@@ -475,9 +496,10 @@
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
+    $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "changePhoto" : "addPhoto"); applyI18n(); // Dynamic text
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
     bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
-    editDlg && editDlg.showModal();
+    showModalWithLock(editDlg);
   }
   if(editForm) editForm.addEventListener("submit", (e)=>{
     e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
@@ -485,22 +507,26 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* photo -> simple square cropper, downscaled for efficiency */
+  /* photo -> simple square cropper, downscaled for efficiency, with error handling */
   if(photoInput){
     photoInput.removeAttribute('capture');
     photoInput.addEventListener("change", async()=>{
       if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
       const file=photoInput.files[0];
-      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
-      const img=new Image(); img.onload=()=>{
-        const side=Math.min(img.width,img.height);
-        const sx=(img.width-side)/2, sy=(img.height-side)/2;
-        const out=document.createElement('canvas'); out.width=256; out.height=256; // Downscale for storage/perf
-        const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,256,256);
-        const dataOut=out.toDataURL('image/png',0.85); // Lower quality for size
-        const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); }
-        window._photoTarget=null;
-      }; img.src=dataUrl;
+      try {
+        const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+        const img=new Image(); img.onload=()=>{
+          const side=Math.min(img.width,img.height);
+          const sx=(img.width-side)/2, sy=(img.height-side)/2;
+          const out=document.createElement('canvas'); out.width=256; out.height=256;
+          const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,256,256);
+          const dataOut=out.toDataURL('image/png',0.85);
+          const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); }
+          window._photoTarget=null;
+        }; img.onerror=() => toast("Image load failed"); img.src=dataUrl;
+      } catch(e) {
+        toast("Photo upload error"); console.error(e);
+      }
     });
   }
 
@@ -515,7 +541,8 @@
       r.append(name,inp,minus); frag.appendChild(r);
     });
     rows.appendChild(frag);
-    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal();
+    if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; 
+    showModalWithLock(roundDlg);
     rows.querySelector('input')?.focus(); // Auto-focus first input
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
@@ -539,7 +566,7 @@
         p.reenganches = (p.reenganches || 0) + 1;
       });
     } else if (under.length === 0) {
-      // All over: Force reenganche to limit, or end game? Here, cap at limit + warn
+      // All over: Force cap at limit + warn
       players.forEach(p => { proj[p.id] = Math.min(proj[p.id], limit); });
       toast(LANG==="es"?"Todos excedieron - capped":"All over limit - capped");
     }
@@ -581,11 +608,12 @@
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); twrap.appendChild(table);
-    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); dlg.showModal();
+    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); 
+    showModalWithLock(dlg);
   }
 
   /* wire-up */
-  bind("#openSettings","onclick", ()=> { $("#settingsDialog")?.showModal(); });
+  bind("#openSettings","onclick", ()=> { showModalWithLock($("#settingsDialog")); });
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
@@ -611,12 +639,13 @@
     const ov=$("#winOverlay"); if(!ov) return;
     $("#winName").textContent = winner?.name || 'Winner';
     $("#winPhoto").src = winner?.avatar || '';
+    document.body.style.overflow = 'hidden';
     ov.style.display='flex';
     try{ $("#winSound").play().catch(()=>{});}catch{}
     startConfetti();
   }
-  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; stopConfetti(); });
-  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; stopConfetti(); document.body.style.overflow = ''; });
+  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); document.body.style.overflow = ''; render(); window.scrollTo({top:0,behavior:"smooth"}); });
 
   function stopConfetti() { if (confettiRaf) cancelAnimationFrame(confettiRaf); }
 
@@ -631,7 +660,7 @@
     setTimeout(stopConfetti, 5000); // Auto-stop after 5s for perf
   }
 
-  /* CSV (now hoisted as a function to avoid TDZ errors) */
+  /* CSV */
   function exportCSV(){
     const header=["name","score","reenganches","isDealer"];
     const rows=players.map(p=>[
