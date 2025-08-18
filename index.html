@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.7</title>
+<title>Conga by Alanis — STAGE v3.5.8</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -105,6 +105,7 @@
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px;
+    user-select: none; /* Prevent text selection/context menu */
   }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
@@ -131,7 +132,7 @@
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
-  /* Checkbox switch styling (was missing) */
+  /* Checkbox switch styling */
   .switch input[type="checkbox"] { opacity: 0; width: 0; height: 0; }
   .switch { position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0; }
   .switch::before { content: ""; position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--muted); transition: .15s; border-radius: 20px; }
@@ -139,7 +140,12 @@
   .switch input:checked + ::before { background: var(--accent); }
   .switch input:checked + ::after { transform: translateX(20px); }
 
-  /* Round dialog (scrollable on small screens, compact for mobile) */
+  /* Improved Settings layout: Flex column, no wraps, larger elements */
+  #settingsDialog .modal-body { display: flex; flex-direction: column; gap: 12px; }
+  #settingsDialog label.switch { display: flex; align-items: center; gap: 10px; font-size: 14px; white-space: nowrap; }
+  #settingsDialog .btn { width: 100%; } /* Full-width buttons on mobile */
+
+  /* Round dialog (compact) */
   #roundDialog .modal-body{ display:flex; flex-direction:column; gap:6px; max-height:70vh; overflow:auto }
   .grid-rows{ display:grid; gap:4px }
   .round-row{ display:grid; grid-template-columns: auto 100px 50px; gap:6px; align-items:center;
@@ -153,7 +159,7 @@
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* Win overlay (compact) */
+  /* Win overlay */
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
   .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
@@ -163,7 +169,7 @@
   .win-name{ font-size:20px; font-weight:900}
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
-  /* Responsive: hide pill if it would crowd the header; tools must remain 1 row; compact modals */
+  /* Responsive */
   @media (max-width: 410px){
     .lang-pill{ display:none; }
   }
@@ -185,7 +191,7 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.5.7</div>
+        <div class="ver" id="verLine">STAGE v3.5.8</div>
       </div>
     </div>
 
@@ -219,14 +225,13 @@
     <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
     <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px">Close</button>
   </div>
-  <div class="modal-body" style="display:grid; gap:14px">
-    <!-- Language row removed on purpose; header pill remains -->
+  <div class="modal-body">
     <div>
       <label for="limitInput" data-i18n="limitLabel">Limit (default 100)</label>
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
     </div>
     <label class="switch" style="display:flex; align-items:center; gap:10px">
-      <input id="autoAdvance" type="checkbox" />
+      <input id="autoAdvance" type="checkbox" checked />
       <span data-i18n="autoAdvance">Auto-advance dealer after round</span>
     </label>
     <label class="switch" style="display:flex; align-items:center; gap:10px">
@@ -234,7 +239,6 @@
       <span data-i18n="lockOrder">Lock player reordering</span>
     </label>
     <div style="display:flex; gap:8px; flex-wrap:wrap">
-      <button class="btn" id="exportBtn" data-i18n="exportCsv">Export CSV</button>
       <button class="btn" id="resetScoresBtn" data-i18n="resetScores">Reset scores</button>
       <button class="btn" id="clearAllBtn" data-i18n="clearAll">Clear all</button>
     </div>
@@ -293,7 +297,7 @@
           <div>
             <label data-i18n="photo">Photo</label>
             <div style="display:flex; gap:8px; flex-wrap:wrap">
-              <button type="button" class="btn" id="changePhotoBtn" data-i18n="changePhoto">Change photo</button>
+              <button type="button" class="btn" id="changePhotoBtn"></button>
               <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
             </div>
           </div>
@@ -387,19 +391,19 @@
     en:{
       reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
       settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
-      lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
+      lockOrder:"Lock player reordering", resetScores:"Reset scores", clearAll:"Clear all",
       done:"Done", roundHint:"Enter points (negatives OK). \"-10\" changes the input.",
       cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
-      photo:"Photo", changePhoto:"Change photo", addPhoto:"Add photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
+      photo:"Photo", changePhoto:"Change photo", addPhoto:"Add photo", editPhoto:"Edit photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
       deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
     },
     es:{
       reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
       settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
-      lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
+      lockOrder:"Bloquear reordenamiento", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
       done:"Listo", roundHint:"Ingresa puntos (negativos ok). \"-10\" cambia el campo.",
       cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
-      photo:"Foto", changePhoto:"Cambiar foto", addPhoto:"Agregar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
+      photo:"Foto", changePhoto:"Cambiar foto", addPhoto:"Agregar foto", editPhoto:"Editar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
       deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
     }
   };
@@ -410,11 +414,11 @@
     document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
     $("#pillEn")?.classList.toggle("active", LANG==="en");
     $("#pillEs")?.classList.toggle("active", LANG==="es");
-    const sel=$("#langSelect"); if(sel) sel.value=LANG; // safe even if row removed
+    const sel=$("#langSelect"); if(sel) sel.value=LANG;
   }
 
   /* ===== state ===== */
-  const storageKey="conga_state_stage_v357"; // bumped for v3.5.7
+  const storageKey="conga_state_stage_v358"; // bumped for v3.5.8
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let roundCounter=0; let rounds=[]; let lockOrder=false;
 
@@ -476,9 +480,10 @@
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = ()=>{ moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const start = (e)=>{ e.preventDefault(); // Prevent iOS context menu
+      moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
     const end = ()=>{ clearTimeout(tmr); };
-    el.addEventListener('touchstart', start, {passive:true});
+    el.addEventListener('touchstart', start, {passive:false}); // Non-passive to allow preventDefault
     el.addEventListener('mousedown', start);
     el.addEventListener('touchmove', ()=>{ moved=true; }, {passive:true});
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
@@ -496,7 +501,8 @@
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     bind("#changePhotoBtn","onclick", ()=>{ if(photoInput){ window._photoTarget=p.id; photoInput.value=""; photoInput.click(); }});
-    $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "changePhoto" : "addPhoto"); applyI18n(); // Dynamic text
+    $("#changePhotoBtn").setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); // Updated to "Edit photo"
+    applyI18n();
     bind("#removePhotoBtn","onclick", ()=>{ p.avatar=null; render(); });
     bind("#deletePlayerBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }});
     showModalWithLock(editDlg);
@@ -507,25 +513,27 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* photo -> simple square cropper, downscaled for efficiency, with error handling */
+  /* photo -> simple square cropper, with enhanced error handling */
   if(photoInput){
     photoInput.removeAttribute('capture');
     photoInput.addEventListener("change", async()=>{
       if(!window._photoTarget || !photoInput.files || !photoInput.files[0]) return;
       const file=photoInput.files[0];
       try {
+        if (file.size > 5 * 1024 * 1024) throw new Error("File too large");
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
         const img=new Image(); img.onload=()=>{
           const side=Math.min(img.width,img.height);
           const sx=(img.width-side)/2, sy=(img.height-side)/2;
           const out=document.createElement('canvas'); out.width=256; out.height=256;
-          const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,256,256);
+          const ctx=out.getContext('2d'); if (!ctx) throw new Error("Canvas context failed");
+          ctx.drawImage(img, sx, sy, side, side, 0,0,256,256);
           const dataOut=out.toDataURL('image/png',0.85);
           const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); }
           window._photoTarget=null;
-        }; img.onerror=() => toast("Image load failed"); img.src=dataUrl;
+        }; img.onerror=() => { throw new Error("Image load failed"); }; img.src=dataUrl;
       } catch(e) {
-        toast("Photo upload error"); console.error(e);
+        toast("Photo error: " + e.message); console.error(e);
       }
     });
   }
@@ -543,7 +551,7 @@
     rows.appendChild(frag);
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; 
     showModalWithLock(roundDlg);
-    rows.querySelector('input')?.focus(); // Auto-focus first input
+    rows.querySelector('input')?.focus();
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
 
@@ -558,7 +566,6 @@
     const under = players.filter(p => (proj[p.id] <= limit));
     const over  = players.filter(p => (proj[p.id] >= (limit + 1)));
 
-    // Reenganche if >=2 under and some over: set over to max under
     if (under.length >= 2 && over.length > 0) {
       const maxUnderVal = Math.max(...under.map(p => proj[p.id]));
       over.forEach(p => {
@@ -566,14 +573,12 @@
         p.reenganches = (p.reenganches || 0) + 1;
       });
     } else if (under.length === 0) {
-      // All over: Force cap at limit + warn
       players.forEach(p => { proj[p.id] = Math.min(proj[p.id], limit); });
       toast(LANG==="es"?"Todos excedieron - capped":"All over limit - capped");
     }
 
     players.forEach(p=>{ p.score=proj[p.id]; });
 
-    // Dealer auto-advance (kept by id if reordered)
     if(autoAdvanceDealer && players.length > 0 && nextDealerId){ 
       const i=players.findIndex(p=>p.id===nextDealerId); 
       nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; 
@@ -582,7 +587,6 @@
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
     gameOver=false;
 
-    // Winner check
     const alive = players.filter(p=>p.score<=limit);
     if(alive.length===1){
       gameOver=true;
@@ -617,7 +621,6 @@
   bind("#historyBtn","onclick", openRoundsTable);
   bind("#newRoundBtn","onclick", openRound);
   bind("#addPlayerBtn","onclick", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
-  bind("#exportBtn","onclick", exportCSV);
   bind("#resetScoresBtn","onclick", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
   bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ 
       players = defaultsPlayers();
@@ -651,35 +654,18 @@
 
   function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
     const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
-    const N=80; // Reduced particles for perf
+    const N=80;
     const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2, color: `hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
     const tick=()=>{ ctx.clearRect(0,0,W,H);
       pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
       confettiRaf=requestAnimationFrame(tick);
     }; stopConfetti(); tick();
-    setTimeout(stopConfetti, 5000); // Auto-stop after 5s for perf
+    setTimeout(stopConfetti, 5000);
   }
 
-  /* CSV */
-  function exportCSV(){
-    const header=["name","score","reenganches","isDealer"];
-    const rows=players.map(p=>[
-      csv(p.name||""),
-      String(clampInt(p.score||0)),
-      String(clampInt(p.reenganches||0)),
-      String(p.id===nextDealerId)
-    ]);
-    const all=[header].concat(rows).map(r=>r.join(",")).join("\n");
-    const blob=new Blob(["\ufeff",all],{type:"text/csv;charset=utf-8"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download="conga_scores.csv";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0);
-  }
+  /* CSV removed */
 
-  /* language controls (header pill) */
+  /* language controls */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
   $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
   $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
