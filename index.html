@@ -131,6 +131,14 @@
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
+  /* Checkbox switch styling (was missing) */
+  .switch input[type="checkbox"] { opacity: 0; width: 0; height: 0; }
+  .switch { position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0; }
+  .switch::before { content: ""; position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--muted); transition: .15s; border-radius: 20px; }
+  .switch::after { content: ""; position: absolute; width: 18px; height: 18px; left: 1px; bottom: 1px; background: var(--text); transition: .15s; border-radius: 50%; }
+  .switch input:checked + ::before { background: var(--accent); }
+  .switch input:checked + ::after { transform: translateX(20px); }
+
   /* Round dialog (scrollable on small screens) */
   #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
   .grid-rows{ display:grid; gap:6px }
@@ -228,7 +236,7 @@
   <div class="modal-head">
     <div>
       <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
-      <div class="hint" data-i18n="roundHint">Enter points (negatives OK). “−10” changes the input.</div>
+      <div class="hint" data-i18n="roundHint">Enter points (negatives OK). "-10" changes the input.</div>
     </div>
     <button class="btn" onclick="roundDialog.close()" style="padding:6px 10px">Close</button>
   </div>
@@ -350,13 +358,16 @@
     t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
+  let saveTimer;
+  const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 500); };
+
   /* ===== i18n ===== */
   const STR = {
     en:{
       reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
       settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
       lockOrder:"Lock player reordering", exportCsv:"Export CSV", resetScores:"Reset scores", clearAll:"Clear all",
-      done:"Done", roundHint:"Enter points (negatives OK). “−10” changes the input.",
+      done:"Done", roundHint:"Enter points (negatives OK). \"-10\" changes the input.",
       cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
       photo:"Photo", changePhoto:"Change photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
       deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game"
@@ -365,7 +376,7 @@
       reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
       settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
       lockOrder:"Bloquear reordenamiento", exportCsv:"Exportar CSV", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
-      done:"Listo", roundHint:"Ingresa puntos (negativos ok). “−10” cambia el campo.",
+      done:"Listo", roundHint:"Ingresa puntos (negativos ok). \"-10\" cambia el campo.",
       cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
       photo:"Foto", changePhoto:"Cambiar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
       deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego"
@@ -384,15 +395,14 @@
   /* ===== state ===== */
   const storageKey="conga_state_stage_v356"; // bumped storage key for this version
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let cutsHistory=[]; let roundCounter=0; let rounds=[]; let winsLog=[]; let lockOrder=false;
+  let roundCounter=0; let rounds=[]; let lockOrder=false;
 
   const defaultsPlayers = () => ([
     {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
     {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
   ]);
 
-  const pruneWins=()=>{ const cutoff=Date.now()-7*24*3600*1000; winsLog = (winsLog||[]).filter(w=>w.timestamp>=cutoff); };
-  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,cutsHistory,roundCounter,rounds,winsLog,lockOrder})); };
+  const save=()=>{ localStorage.setItem(storageKey, JSON.stringify({players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder})); };
   const load=()=>{ 
     try{
       const s=JSON.parse(localStorage.getItem(storageKey)||"{}");
@@ -401,11 +411,9 @@
       autoAdvanceDealer = typeof s.autoAdvanceDealer==="boolean" ? s.autoAdvanceDealer : true;
       nextDealerId = typeof s.nextDealerId==="string" ? s.nextDealerId : (players[0]? players[0].id : null);
       gameOver = !!s.gameOver;
-      cutsHistory = Array.isArray(s.cutsHistory)? s.cutsHistory : [];
       roundCounter = Number.isFinite(s.roundCounter)? s.roundCounter : 0;
       rounds = Array.isArray(s.rounds)? s.rounds : [];
-      winsLog = Array.isArray(s.winsLog)? s.winsLog : [];
-      lockOrder = !!s.lockOrder; pruneWins();
+      lockOrder = !!s.lockOrder;
     }catch(e){
       players = defaultsPlayers();
       nextDealerId = players[0]?.id || null;
@@ -420,25 +428,29 @@
     $("#lockOrderSwitch").checked=lockOrder;
     $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
     $("#lockToggle").title = t("reorder");
-    if(list) list.innerHTML="";
-    for(let i=0;i<players.length;i++){
-      const p=players[i]; const n=rowTpl.content.firstElementChild.cloneNode(true);
-      n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
-      if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
-      attachLongPress(n, ()=>openEdit(p.id));
-      if(p.id===nextDealerId) n.classList.add("dealer");
-      const avatarBox=n.querySelector(".avatar");
-      if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
-      n.querySelector(".playerName").textContent=p.name||"—";
-      const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
-      const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
-      const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-      const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
-      list && list.appendChild(n);
+    if(list) {
+      const frag = document.createDocumentFragment();
+      players.forEach((p, i) => {
+        const n=rowTpl.content.firstElementChild.cloneNode(true);
+        n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
+        if(!lockOrder){ n.addEventListener("dragstart",dragStart); n.addEventListener("dragover",dragOver); n.addEventListener("drop",drop); n.addEventListener("dragend",dragEnd); }
+        attachLongPress(n, ()=>openEdit(p.id));
+        if(p.id===nextDealerId) n.classList.add("dealer");
+        const avatarBox=n.querySelector(".avatar");
+        if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
+        n.querySelector(".playerName").textContent=p.name||"—";
+        const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
+        const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
+        const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
+        const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
+        frag.appendChild(n);
+      });
+      list.innerHTML = "";
+      list.appendChild(frag);
     }
     $("#newRoundBtn").disabled=gameOver || players.length===0;
     applyI18n();
-    save();
+    debounceSave();
   }
 
   function attachLongPress(el, cb){
@@ -473,7 +485,7 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* photo -> simple square cropper */
+  /* photo -> simple square cropper, downscaled for efficiency */
   if(photoInput){
     photoInput.removeAttribute('capture');
     photoInput.addEventListener("change", async()=>{
@@ -483,10 +495,10 @@
       const img=new Image(); img.onload=()=>{
         const side=Math.min(img.width,img.height);
         const sx=(img.width-side)/2, sy=(img.height-side)/2;
-        const out=document.createElement('canvas'); out.width=512; out.height=512;
-        const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,512,512);
-        const dataOut=out.toDataURL('image/png',0.92);
-        const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); save(); }
+        const out=document.createElement('canvas'); out.width=256; out.height=256; // Downscale for storage/perf
+        const ctx=out.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0,0,256,256);
+        const dataOut=out.toDataURL('image/png',0.85); // Lower quality for size
+        const p=players.find(x=>x.id===window._photoTarget); if(p){ p.avatar=dataOut; render(); }
         window._photoTarget=null;
       }; img.src=dataUrl;
     });
@@ -494,44 +506,51 @@
 
   /* round dialog */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
-  const openRound=()=>{ if(!roundDlg||!rows) return; rows.innerHTML="";
+  const openRound=()=>{ if(!roundDlg||!rows) return; if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; } rows.innerHTML="";
+    const frag = document.createDocumentFragment();
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="−10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
-      r.append(name,inp,minus); rows.appendChild(r);
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
+      r.append(name,inp,minus); frag.appendChild(r);
     });
+    rows.appendChild(frag);
     if(rErr) rErr.style.display="none"; if(applyBtn) applyBtn.disabled=false; roundDlg.showModal();
+    rows.querySelector('input')?.focus(); // Auto-focus first input
   };
   const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
   function applyRound(inputs){
-    const snapshotInputs = JSON.parse(JSON.stringify(inputs));
+    const snapshotInputs = {...inputs};
     const roundNo = roundCounter + 1;
-    const proj=new Map(); players.forEach(p=>proj.set(p.id, clampInt(p.score||0)+clampInt(inputs[p.id]||0)));
+    const proj = {}; players.forEach(p => proj[p.id] = clampInt(p.score||0) + clampInt(inputs[p.id]||0));
     roundCounter += 1;
 
-    const under = players.filter(p => (proj.get(p.id) <= limit));
-    const over  = players.filter(p => (proj.get(p.id) >= (limit+1)));
+    const under = players.filter(p => (proj[p.id] <= limit));
+    const over  = players.filter(p => (proj[p.id] >= (limit + 1)));
 
-    // Reenganche ONLY at == limit+1 => set to max≤limit
-    if (under.length >= 2 && over.length){
-      const maxUnderVal = Math.max.apply(null, under.map(p => proj.get(p.id)));
-      players.forEach(p=>{
-        let val = proj.get(p.id);
-        if (val >= (limit+1)){
-          proj.set(p.id, maxUnderVal);
-          p.reenganches = (p.reenganches||0) + 1;
-        }
+    // Reenganche if >=2 under and some over: set over to max under
+    if (under.length >= 2 && over.length > 0) {
+      const maxUnderVal = Math.max(...under.map(p => proj[p.id]));
+      over.forEach(p => {
+        proj[p.id] = maxUnderVal;
+        p.reenganches = (p.reenganches || 0) + 1;
       });
+    } else if (under.length === 0) {
+      // All over: Force reenganche to limit, or end game? Here, cap at limit + warn
+      players.forEach(p => { proj[p.id] = Math.min(proj[p.id], limit); });
+      toast(LANG==="es"?"Todos excedieron - capped":"All over limit - capped");
     }
 
-    players.forEach(p=>{ p.score=proj.get(p.id); });
+    players.forEach(p=>{ p.score=proj[p.id]; });
 
     // Dealer auto-advance (kept by id if reordered)
-    if(autoAdvanceDealer){ if(players.length && nextDealerId){ const i=players.findIndex(p=>p.id===nextDealerId); nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; } }
+    if(autoAdvanceDealer && players.length > 0 && nextDealerId){ 
+      const i=players.findIndex(p=>p.id===nextDealerId); 
+      nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; 
+    }
 
     rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
     gameOver=false;
@@ -541,7 +560,6 @@
     if(alive.length===1){
       gameOver=true;
       const winner=alive[0];
-      winsLog.push({ playerId:winner.id, name:winner.name, date:todayStr(), timestamp:Date.now() }); pruneWins();
       showWinOverlay(winner);
     }
     render();
@@ -555,11 +573,11 @@
     dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
     const twrap=dlg.querySelector('.table-wrap');
     const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
-    trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name}</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
+    trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name} (Δ / Total)</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
     const tbody=document.createElement('tbody');
     rounds.forEach(r=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:""}</td>`).join("");
+      tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join("");
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); twrap.appendChild(table);
@@ -576,7 +594,7 @@
   bind("#clearAllBtn","onclick", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ 
       players = defaultsPlayers();
       limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false;
-      cutsHistory=[]; rounds=[]; roundCounter=0; winsLog=[];
+      rounds=[]; roundCounter=0;
       render();
     }});
   bind("#lockToggle","onclick", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
@@ -588,6 +606,7 @@
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
   /* win overlay */
+  let confettiRaf;
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
     $("#winName").textContent = winner?.name || 'Winner';
@@ -596,16 +615,20 @@
     try{ $("#winSound").play().catch(()=>{});}catch{}
     startConfetti();
   }
-  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; });
-  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; stopConfetti(); });
+  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
+
+  function stopConfetti() { if (confettiRaf) cancelAnimationFrame(confettiRaf); }
 
   function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
     const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
-    const N=120; const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2}));
-    let raf; const tick=()=>{ ctx.clearRect(0,0,W,H);
-      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=`hsl(${Math.floor(Math.random()*360)},90%,60%)`; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
-      raf=requestAnimationFrame(tick);
-    }; cancelAnimationFrame(raf); tick();
+    const N=80; // Reduced particles for perf
+    const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2, color: `hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
+    const tick=()=>{ ctx.clearRect(0,0,W,H);
+      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
+      confettiRaf=requestAnimationFrame(tick);
+    }; stopConfetti(); tick();
+    setTimeout(stopConfetti, 5000); // Auto-stop after 5s for perf
   }
 
   /* CSV (now hoisted as a function to avoid TDZ errors) */
@@ -628,9 +651,9 @@
   }
 
   /* language controls (header pill) */
-  $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
-  $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
-  $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); });
+  $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
+  $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
+  $("#langSelect")?.addEventListener("change", (e)=>{ LANG=e.target.value; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
 
   // init
   load();
