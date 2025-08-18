@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.5.9</title>
+<title>Conga by Alanis — STAGE v3.6.0</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,7 +27,7 @@
   }
   .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
 
-  /* ===== Header (compact, stacked) ===== */
+  /* ===== Header ===== */
   header{
     display:grid;
     grid-template-columns: 1fr auto auto;
@@ -37,23 +37,9 @@
     margin-bottom:8px;
   }
   .brand-wrap{min-width:0}
-  .brand{
-    display:flex;
-    flex-direction:column;       /* stack title over version */
-    align-items:flex-start;
-    gap:2px;
-    min-width:0;
-  }
-  .title{
-    font-weight:900; letter-spacing:.2px;
-    font-size: clamp(18px, 5vw, 26px);
-    color:var(--text);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .ver{
-    display:block;
-    font-weight:800; font-size:12px; color:var(--sub); opacity:.9; line-height:1.1;
-  }
+  .brand{display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0}
+  .title{font-weight:900; letter-spacing:.2px; font-size: clamp(18px, 5vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .ver{font-weight:800; font-size:12px; color:var(--sub); opacity:.9; line-height:1.1;}
   .lang-pill{
     display:inline-flex; gap:8px; align-items:center;
     border:1px dashed rgba(255,255,255,.18);
@@ -61,34 +47,21 @@
     color:var(--text); font-weight:800; letter-spacing:.2px;
     user-select:none;
   }
-  .lang-pill button{
-    appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer;
-    opacity:.85;
-  }
+  .lang-pill button{appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer; opacity:.85;}
   .lang-pill .active{ opacity:1; text-decoration:underline; }
-
-  .iconbtn{
-    width:40px; height:40px; display:grid; place-items:center; border-radius:12px;
-    border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;
-  }
+  .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
 
   /* ===== Card + tools row ===== */
-  .card{
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding:10px;
-  }
-  .tools{
-    display:flex; gap:8px; align-items:center; white-space:nowrap;
-  }
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:10px; }
+  .tools{ display:flex; gap:8px; align-items:center; white-space:nowrap; }
   .btn{
     appearance:none; border:0; cursor:pointer; user-select:none;
     padding:10px 12px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34);
     border:1px dashed rgba(255,255,255,.22);
     color:var(--text); font-weight:900; letter-spacing:.2px;
-    transition:.15s;
-    flex:1 1 0; min-width:0; white-space:nowrap;
+    transition:.15s; flex:1 1 0; min-width:0; white-space:nowrap;
     font-size: clamp(12px, 3.4vw, 16px);
   }
   .btn:hover{ filter:brightness(1.07)}
@@ -104,13 +77,12 @@
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px;
-    user-select: none; /* Prevent text selection/context menu */
+    user-select: none;
   }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub) }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset; }
-  .avatar{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center;
-    background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:14px;}
+  .avatar{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:14px;}
   .row.dealer .avatar{ box-shadow:0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25); }
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:20px; font-weight:900; }
@@ -127,16 +99,18 @@
     box-shadow: 0 24px 64px rgba(0,0,0,.55); }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px } .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
+  .modal-body{ padding:12px 14px } 
+  .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
 
+  /* Inside dialogs we use solid borders for buttons (cleaner look) */
+  dialog .btn { border-style: solid; }
+
   /* Accessible toggle switch */
-  .switch {
-    position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px;
-  }
+  .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
   .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
   .switch .track { width: 40px; height: 20px; background: var(--muted); border-radius: 999px; transition: .15s; }
   .switch .thumb { position: absolute; width: 18px; height: 18px; left: 1px; top: 1px; border-radius: 50%; background: var(--text); transition: .15s; }
@@ -148,8 +122,12 @@
   #settingsDialog .modal-body { display: flex; flex-direction: column; gap: 12px; }
   #settingsDialog .btn { width: 100%; }
 
-  /* Round dialog (compact) */
-  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:6px; max-height:70vh; overflow:auto }
+  /* Round dialog */
+  #roundDialog .modal-body{ display:flex; flex-direction:column; gap:10px; max-height:70vh; overflow:auto }
+  .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; }
+  .cut-field legend{ font-size:12px; color:var(--sub); padding:0 6px; }
+  .cut-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
+  .cut-opt{ display:flex; gap:8px; align-items:center; background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
   .grid-rows{ display:grid; gap:4px }
   .round-row{ display:grid; grid-template-columns: auto 100px 50px; gap:6px; align-items:center;
     padding:4px; border:1px dashed rgba(255,255,255,.15); border-radius:10px;
@@ -173,31 +151,27 @@
   #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
   /* Crop dialog */
-  #cropDialog { width: min(400px, 90vw); height: auto; }
-  #cropContainer { position: relative; margin: 10px auto; width: 100%; height: 300px; overflow: hidden; }
-  #cropCanvas { width: 100%; height: 100%; }
+  #cropDialog { width: min(420px, 92vw); height: auto; }
+  #cropContainer { position: relative; margin: 10px auto; width: 100%; height: 320px; overflow: hidden; }
+  #cropCanvas { width: 100%; height: 100%; background:#0b0f20; border:1px solid rgba(255,255,255,.1); border-radius:12px; }
   #cropBox { position: absolute; border: 2px dashed var(--accent); box-sizing: border-box; cursor: move; }
-  #cropBox .resize-handle { position: absolute; width: 10px; height: 10px; background: var(--accent); border: 1px solid var(--text); }
-  #cropBox .resize-handle.top-left { top: -5px; left: -5px; cursor: nwse-resize; }
-  #cropBox .resize-handle.top-right { top: -5px; right: -5px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-left { bottom: -5px; left: -5px; cursor: nesw-resize; }
-  #cropBox .resize-handle.bottom-right { bottom: -5px; right: -5px; cursor: nwse-resize; }
+  #cropBox .resize-handle { position: absolute; width: 12px; height: 12px; background: var(--accent); border: 1px solid var(--text); border-radius:2px; }
+  #cropBox .resize-handle.top-left { top: -6px; left: -6px; cursor: nwse-resize; }
+  #cropBox .resize-handle.top-right { top: -6px; right: -6px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-left { bottom: -6px; left: -6px; cursor: nesw-resize; }
+  #cropBox .resize-handle.bottom-right { bottom: -6px; right: -6px; cursor: nwse-resize; }
 
-  /* Table polish for history */
-  dialog table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  dialog th, dialog td { border: 1px solid rgba(255,255,255,.12); padding: 6px 8px; text-align: right; }
-  dialog th:first-child, dialog td:first-child { text-align: left; }
-  dialog thead th { position: sticky; top: 0; background: #12172e; z-index: 1; }
-  dialog tbody tr:nth-child(even) { background: rgba(255,255,255,.02); }
+  /* Edit dialog extras */
+  .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
+  .avatar-lg img{ width:100%; height:100%; object-fit:cover; display:block; }
 
   /* Responsive */
-  @media (max-width: 410px){
-    .lang-pill{ display:none; }
-  }
+  @media (max-width: 410px){ .lang-pill{ display:none; } }
   @media (max-width: 400px){
     .modal-head { padding:8px 10px; gap:6px; }
     .modal-body { padding:8px 10px; }
     .modal-foot { padding:8px 10px; gap:6px; }
+    .cut-grid{ grid-template-columns: 1fr; }
     .round-row { grid-template-columns: auto 80px 40px; gap:4px; font-size:12px; }
     .round-row strong { font-size:14px; }
     .round-row .hint { font-size:10px; }
@@ -212,13 +186,12 @@
     <div class="brand-wrap">
       <div class="brand">
         <div class="title" id="appTitle">Conga by Alanis</div>
-        <div class="ver" id="verLine">STAGE v3.5.9</div>
+        <div class="ver" id="verLine">STAGE v3.6.0</div>
       </div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
-      <button data-lang="en" id="pillEn" class="active">EN</button>
-      <span>/</span>
+      <button data-lang="en" id="pillEn" class="active">EN</button><span>/</span>
       <button data-lang="es" id="pillEs">ES</button>
     </div>
 
@@ -242,7 +215,7 @@
 </div>
 
 <!-- SETTINGS -->
-<dialog id="settingsDialog" aria-labelledby="settingsTitle">
+<dialog id="settingsDialog" aria-labelledby="settingsTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div id="settingsTitle" style="font-weight:800" data-i18n="settings">Settings</div>
     <button class="btn" onclick="settingsDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
@@ -253,7 +226,6 @@
       <input id="limitInput" type="number" inputmode="numeric" min="1" step="1" />
     </div>
 
-    <!-- New accessible switches (track + thumb adjacent to input) -->
     <label class="switch">
       <input id="autoAdvance" type="checkbox" checked />
       <span class="track" aria-hidden="true"></span>
@@ -279,7 +251,7 @@
 </dialog>
 
 <!-- Round dialog -->
-<dialog id="roundDialog" aria-labelledby="roundTitle">
+<dialog id="roundDialog" aria-labelledby="roundTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div style="flex:1; overflow:hidden;">
       <div id="roundTitle" style="font-weight:800" data-i18n="newRound">New Round</div>
@@ -288,6 +260,12 @@
   </div>
   <form id="roundForm" method="dialog">
     <div class="modal-body">
+      <!-- Cutter selector -->
+      <fieldset class="cut-field">
+        <legend>Who cut? (optional)</legend>
+        <div class="cut-grid" id="cutGrid"></div>
+      </fieldset>
+
       <div class="grid-rows" id="roundRows"></div>
     </div>
     <div class="modal-foot">
@@ -299,7 +277,7 @@
 </dialog>
 
 <!-- Edit player dialog -->
-<dialog id="editDialog" aria-labelledby="editTitle">
+<dialog id="editDialog" aria-labelledby="editTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
     <button class="btn" onclick="editDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
@@ -326,9 +304,12 @@
         <div style="display:grid; gap:10px; margin-top:6px">
           <div>
             <label data-i18n="photo">Photo</label>
-            <div style="display:flex; gap:8px; flex-wrap:wrap">
-              <button type="button" class="btn" id="changePhotoBtn" data-i18n="addPhoto">Add photo</button>
-              <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+              <div class="avatar-lg"><img id="editAvatarPreview" alt=""></div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap">
+                <button type="button" class="btn" id="changePhotoBtn" data-i18n="addPhoto">Add photo</button>
+                <button type="button" class="btn" id="removePhotoBtn" data-i18n="removePhoto">Remove photo</button>
+              </div>
             </div>
           </div>
           <label class="switch">
@@ -351,7 +332,7 @@
 </dialog>
 
 <!-- Crop dialog -->
-<dialog id="cropDialog" aria-labelledby="cropTitle">
+<dialog id="cropDialog" aria-labelledby="cropTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div id="cropTitle" style="font-weight:800">Crop Photo</div>
     <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
@@ -396,10 +377,8 @@
     src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAQAAABgAABcAAABWAAACAAACAQAAAC4AAABfAAAAdwAAAIQAAACkAAAAvwAAAN4AAAD///8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAAAgP8AAP//AP//AP8AAP//AAAAAP8AAP//AP//AP//AP//AP//AP//AAAAAAA="/>
 </audio>
 
-<!-- Hidden inputs -->
 <input id="photoInput" type="file" accept="image/*" hidden>
 
-<!-- Player row template -->
 <template id="playerRowTpl">
   <div class="row" draggable="true" aria-grabbed="false" title="Long-press to Edit">
     <div class="drag" aria-hidden="true">≡</div>
@@ -417,19 +396,15 @@
 (() => {
   "use strict";
 
-  /* =======================
-     Versioning (single source of truth)
-     ======================= */
+  /* ========= Versioning ========= */
   const APP = {
     NAME: "Conga by Alanis",
     CHANNEL: "STAGE",
-    VERSION: "3.5.9",             // <-- bump here only
-    BUILD: "2025-08-18",          // informational
-    STORAGE_KEY: "conga_state_v2",// stable key (decoupled from version)
-    SCHEMA: 2                     // bump if storage shape changes
+    VERSION: "3.6.0",
+    BUILD: "2025-08-18",
+    STORAGE_KEY: "conga_state_v2",
+    SCHEMA: 2
   };
-
-  // Reflect version everywhere (title + header line)
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine");
   if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
@@ -445,11 +420,11 @@
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
     t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
+  function touchPoint(e){ return e && e.touches ? e.touches[0] : e; }
 
   let saveTimer;
   const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
 
-  // Modal scroll lock helper
   const showModalWithLock = (dlg) => {
     if (dlg) {
       document.body.style.overflow = 'hidden';
@@ -457,9 +432,6 @@
       dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true});
     }
   };
-
-  // Pointer helper used by crop + DnD
-  function touchMove(e){ return e && e.touches ? e.touches[0] : e; }
 
   /* ===== i18n ===== */
   const STR = {
@@ -492,9 +464,7 @@
   }
 
   /* ===== state ===== */
-  // Stable storage key decoupled from version (migrations handle legacy)
   const STORAGE_KEY = APP.STORAGE_KEY;
-
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let roundCounter=0; let rounds=[]; let lockOrder=false;
   let schema = APP.SCHEMA;
@@ -509,7 +479,6 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   };
 
-  // Find most recent legacy state (conga_state_stage_vXYZ)
   function loadLegacyMostRecent(){
     let bestKey=null, bestNum=-1;
     for (let i=0;i<localStorage.length;i++){
@@ -524,7 +493,6 @@
   }
 
   function migrateIfNeeded(raw){
-    // From older ad-hoc shapes → schema v2
     const out = { schema: 2,
       players: Array.isArray(raw?.players) && raw.players.length ? raw.players : defaultsPlayers(),
       limit: Number.isFinite(raw?.limit) ? raw.limit : 100,
@@ -545,11 +513,10 @@
         ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = s);
         if (!Array.isArray(players) || players.length===0) { players=defaultsPlayers(); }
       } else {
-        // Try to import legacy once
         const legacy = loadLegacyMostRecent();
         const m = migrateIfNeeded(legacy || {});
         ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = m);
-        save(); // persist to new key
+        save();
       }
     }catch(e){
       const m = migrateIfNeeded({});
@@ -579,7 +546,6 @@
         n.dataset.index=i; n.dataset.id=p.id; n.draggable=!lockOrder;
         n.setAttribute('role','listitem');
 
-        // Mouse DnD
         if(!lockOrder){
           n.addEventListener("dragstart",dragStart);
           n.addEventListener("dragover",dragOver);
@@ -588,7 +554,6 @@
         }
         attachLongPress(n, ()=>openEdit(p.id));
 
-        // Touch/Pointer reorder (progressive)
         if(!lockOrder && 'PointerEvent' in window){
           let startIdx=null, overIdx=null;
           n.addEventListener('pointerdown', (pe)=>{ n.setPointerCapture(pe.pointerId); startIdx=+n.dataset.index; n.style.opacity='.6'; });
@@ -604,7 +569,6 @@
         const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
         const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
         const handle=n.querySelector(".drag"); if(lockOrder){ handle.classList.add("locked"); handle.onclick=()=>toast(t("lockOrder")); } else { handle.classList.remove("locked"); handle.onclick=null; }
-        // ✎ button
         n.querySelector('.editBtn')?.addEventListener('click', ()=>openEdit(p.id));
 
         frag.appendChild(n);
@@ -651,14 +615,15 @@
   const drop=e=>{e.preventDefault(); const from=dragIdx!=null?dragIdx:+e.dataTransfer.getData("text/plain"); const to=+e.currentTarget.dataset.index; if(Number.isInteger(from)&&Number.isInteger(to)&&from!==to){ const arr=players.slice(); const m=arr.splice(from,1)[0]; const keep=nextDealerId; arr.splice(to,0,m); players=arr; nextDealerId=keep; render(); }};
   const dragEnd=e=>{e.currentTarget.setAttribute("aria-grabbed","false"); dragIdx=null;};
 
-  /* edit */
+  /* ===== Edit dialog ===== */
   const editDlg=$("#editDialog"), editForm=$("#editForm");
   function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
     const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
     const cp=$("#changePhotoBtn"); if (cp){ cp.setAttribute("data-i18n", p.avatar ? "editPhoto" : "addPhoto"); cp.textContent = t(p.avatar ? "editPhoto" : "addPhoto"); cp.onclick=()=>openCrop(p.id, p.avatar); }
-    $("#removePhotoBtn")?.addEventListener("click", ()=>{ p.avatar=null; render(); }, {once:true});
-    $("#deletePlayerBtn")?.addEventListener("click", ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }}, {once:true});
+    const prev=$("#editAvatarPreview"); if(prev){ prev.src = p.avatar || ""; prev.style.opacity = p.avatar ? "1" : ".35"; }
+    $("#removePhotoBtn").onclick = ()=>{ p.avatar=null; render(); const prev=$("#editAvatarPreview"); if(prev){ prev.src=""; prev.style.opacity=".35"; } };
+    $("#deletePlayerBtn").onclick = ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }};
     showModalWithLock(editDlg);
   }
   if(editForm) editForm.addEventListener("submit", (e)=>{
@@ -667,21 +632,22 @@
     const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
   });
 
-  /* Interactive crop */
+  /* ===== Crop tool (fixed quality & listeners) ===== */
   const cropDlg = $("#cropDialog"), cropCanvas = $("#cropCanvas"), cropBox = $("#cropBox"), applyCropBtn = $("#applyCropBtn");
   let cropImage, cropPlayerId, cropCtx = cropCanvas?.getContext('2d');
   let cropX = 0, cropY = 0, cropW = 0, cropH = 0;
   let isDragging = false, isResizing = false, resizeHandle = '';
   let startX, startY, startW, startH;
   let cropListenersAttached = false;
+  // Mapping from canvas space to original image
+  let imgScale=1, imgDX=0, imgDY=0;
 
   function openCrop(id, existingAvatar = null) {
     cropPlayerId = id;
     if (existingAvatar) {
       const img = new Image();
-      img.onload = () => loadCropImage(img);
+      img.onload = () => { loadCropImage(img); showModalWithLock(cropDlg); };
       img.src = existingAvatar;
-      showModalWithLock(cropDlg);
     } else {
       const photoInput = $("#photoInput");
       photoInput.onchange = async() => {
@@ -690,9 +656,8 @@
         try {
           const dataUrl = await new Promise((res,rej)=> { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
           const img = new Image();
-          img.onload = () => loadCropImage(img);
+          img.onload = () => { loadCropImage(img); showModalWithLock(cropDlg); };
           img.src = dataUrl;
-          showModalWithLock(cropDlg);
         } catch(e) { toast("Photo load error"); }
       };
       photoInput.click();
@@ -707,20 +672,22 @@
     cropCanvas.width = contW;
     cropCanvas.height = contH;
 
-    const scale = Math.min(contW / img.width, contH / img.height);
-    const drawW = img.width * scale;
-    const drawH = img.height * scale;
+    imgScale = Math.min(contW / img.width, contH / img.height);
+    const drawW = img.width * imgScale;
+    const drawH = img.height * imgScale;
+    imgDX = (contW - drawW) / 2;
+    imgDY = (contH - drawH) / 2;
+
     cropCtx.clearRect(0, 0, contW, contH);
-    cropCtx.drawImage(img, (contW - drawW) / 2, (contH - drawH) / 2, drawW, drawH);
+    cropCtx.drawImage(img, imgDX, imgDY, drawW, drawH);
 
     const boxSize = Math.min(drawW, drawH) * 0.8;
-    cropX = (contW - boxSize) / 2;
-    cropY = (contH - boxSize) / 2;
+    cropX = imgDX + (drawW - boxSize) / 2;
+    cropY = imgDY + (drawH - boxSize) / 2;
     cropW = boxSize;
     cropH = boxSize;
     updateCropBox();
 
-    // Attach global listeners once
     if (!cropListenersAttached) {
       document.addEventListener('touchmove', dragMove, {passive: false});
       document.addEventListener('mousemove', dragMove);
@@ -728,7 +695,6 @@
       document.addEventListener('mouseup', endDrag);
       cropListenersAttached = true;
     }
-
     cropBox.addEventListener('touchstart', startDrag, {passive:false});
     cropBox.addEventListener('mousedown', startDrag);
   }
@@ -742,7 +708,7 @@
 
   function startDrag(e) {
     e.preventDefault();
-    const pos = touchMove(e);
+    const pos = touchPoint(e);
     const rect = cropBox.getBoundingClientRect();
     startX = pos.clientX - rect.left;
     startY = pos.clientY - rect.top;
@@ -755,22 +721,21 @@
       isDragging = true;
     }
   }
-
   function dragMove(e) {
     if (!isDragging && !isResizing) return;
     e.preventDefault();
-    const pos = touchMove(e);
+    const pos = touchPoint(e);
+    const canRect = cropCanvas.getBoundingClientRect();
     if (isDragging) {
-      cropX = pos.clientX - startX - cropCanvas.getBoundingClientRect().left;
-      cropY = pos.clientY - startY - cropCanvas.getBoundingClientRect().top;
+      cropX = pos.clientX - startX - canRect.left;
+      cropY = pos.clientY - startY - canRect.top;
       cropX = Math.max(0, Math.min(cropCanvas.width - cropW, cropX));
       cropY = Math.max(0, Math.min(cropCanvas.height - cropH, cropY));
       updateCropBox();
     } else if (isResizing) {
       let newW = startW, newH = startH, newX = cropX, newY = cropY;
-      const docRect = cropCanvas.getBoundingClientRect();
-      const curX = pos.clientX - docRect.left;
-      const curY = pos.clientY - docRect.top;
+      const curX = pos.clientX - canRect.left;
+      const curY = pos.clientY - canRect.top;
       const deltaX = curX - (cropX + startX);
       const deltaY = curY - (cropY + startY);
       const delta = Math.max(deltaX, deltaY);
@@ -779,33 +744,71 @@
       else if (resizeHandle === 'top-right') { newW = startW + delta; newH = startH - delta; newY = cropY + delta; }
       else if (resizeHandle === 'top-left') { newW = startW - delta; newH = startH - delta; newX = cropX + delta; newY = cropY + delta; }
       newW = Math.max(50, Math.min(cropCanvas.width - newX, newW));
-      newH = newW; // keep square
+      newH = newW;
       cropW = newW; cropH = newH; cropX = newX; cropY = newY;
       updateCropBox();
     }
   }
-
   function endDrag() { isDragging = false; isResizing = false; }
 
   $("#applyCropBtn")?.addEventListener('click', () => {
+    // Map cropBox (canvas coords) -> original image coords and crop from ORIGINAL for crispness
+    let sx = (cropX - imgDX) / imgScale;
+    let sy = (cropY - imgDY) / imgScale;
+    let sw = cropW / imgScale;
+    let sh = cropH / imgScale;
+    // clamp to image bounds
+    sx = Math.max(0, Math.min(cropImage.width - 1, sx));
+    sy = Math.max(0, Math.min(cropImage.height - 1, sy));
+    sw = Math.max(1, Math.min(cropImage.width - sx, sw));
+    sh = Math.max(1, Math.min(cropImage.height - sy, sh));
+
     const out = document.createElement('canvas');
     out.width = 256; out.height = 256;
     const outCtx = out.getContext('2d');
-    outCtx.drawImage(cropCanvas, cropX, cropY, cropW, cropH, 0, 0, 256, 256);
-    const dataOut = out.toDataURL('image/png',0.85);
+    outCtx.imageSmoothingQuality = 'high';
+    outCtx.drawImage(cropImage, sx, sy, sw, sh, 0, 0, 256, 256);
+    const dataOut = out.toDataURL('image/png',0.92);
     const p = players.find(x => x.id === cropPlayerId);
     if (p) { p.avatar = dataOut; render(); }
     cropDlg.close();
   });
 
-  /* round dialog */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn");
-  const openRound=()=>{ if(!roundDlg||!rows) return; if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; } rows.innerHTML="";
+  /* ===== Round dialog (with cutter selector) ===== */
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn"), cutGrid=$("#cutGrid");
+  let selectedCutterId = ""; // "" = none
+
+  function buildCutterGrid(){
+    cutGrid.innerHTML = "";
+    const noneId = "cut_none";
+    const makeOpt = (id,label,checked=false)=>{
+      const wrap=document.createElement("label");
+      wrap.className="cut-opt";
+      const input=document.createElement("input");
+      input.type="radio"; input.name="cutter"; input.value=id; input.checked=checked;
+      const span=document.createElement("span"); span.textContent=label;
+      wrap.append(input,span);
+      input.addEventListener('change', validateRound);
+      return wrap;
+    };
+    cutGrid.appendChild(makeOpt("", LANG==='es'?'Nadie':'None', true));
+    players.forEach(p=> cutGrid.appendChild(makeOpt(p.id, p.name, false)));
+  }
+
+  const openRound=()=>{ 
+    if(!roundDlg||!rows) return; 
+    if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; } 
+    rows.innerHTML="";
+    buildCutterGrid();
+    selectedCutterId = "";
+
     const frag = document.createDocumentFragment();
-    players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
+    players.forEach(p=>{ 
+      const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
+      inp.addEventListener('input', validateRound);
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
       r.append(name,inp,minus); frag.appendChild(r);
     });
     rows.appendChild(frag);
@@ -813,14 +816,61 @@
     showModalWithLock(roundDlg);
     rows.querySelector('input')?.focus();
   };
-  const roundInputs=()=>{ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; };
+
+  function roundInputs(){
+    const m={}; 
+    for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} 
+    return m; 
+  }
+
+  function validateRound(){
+    const inputs = roundInputs();
+    const radios = document.querySelectorAll('input[name="cutter"]');
+    radios.forEach(r=>{ if(r.checked) selectedCutterId = r.value; });
+    if (!selectedCutterId) { rErr.style.display="none"; applyBtn.disabled=false; return; }
+
+    const cutter = players.find(p=>p.id===selectedCutterId);
+    if (!cutter){ rErr.style.display="none"; applyBtn.disabled=false; return; }
+    const projected = clampInt(cutter.score||0) + clampInt(inputs[cutter.id]||0);
+    if (projected > limit){
+      rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`;
+      rErr.style.display="block"; applyBtn.disabled=true; 
+    } else {
+      rErr.style.display="none"; applyBtn.disabled=false;
+    }
+  }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
   function applyRound(inputs){
-    const snapshotInputs = {...inputs};
     const roundNo = roundCounter + 1;
     const proj = {}; players.forEach(p => proj[p.id] = clampInt(p.score||0) + clampInt(inputs[p.id]||0));
+
+    // Cutter validation (guard double-check)
+    if (selectedCutterId){
+      const cutterProj = proj[selectedCutterId] || 0;
+      if (cutterProj > limit){ validateRound(); return; }
+    }
+
+    // ===== Instant win check (before any reenganches/dealer advance) =====
+    if (selectedCutterId){
+      const cutterProj = proj[selectedCutterId];
+      const others = players.filter(p=>p.id!==selectedCutterId);
+      const allOthersOver = others.every(p => proj[p.id] > limit);
+      const cutterEligible = cutterProj <= limit;
+      if (cutterEligible && allOthersOver){
+        // Apply scores, record round, but DO NOT auto-advance dealer and NO reenganche.
+        players.forEach(p=>{ p.score = proj[p.id]; });
+        roundCounter += 1;
+        rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId, instantWin:true});
+        gameOver=true;
+        showWinOverlay(players.find(p=>p.id===selectedCutterId));
+        render();
+        return;
+      }
+    }
+
+    // ===== Normal reenganche path (same as previous build) =====
     roundCounter += 1;
 
     const under = players.filter(p => (proj[p.id] <= limit));
@@ -844,21 +894,20 @@
       nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; 
     }
 
-    rounds.push({round:roundNo, inputs:snapshotInputs, totals:snapshotTotalsById(), timestamp:Date.now()});
+    rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId||""});
     gameOver=false;
 
     const alive = players.filter(p=>p.score<=limit);
     if(alive.length===1){
       gameOver=true;
-      const winner=alive[0];
-      showWinOverlay(winner);
+      showWinOverlay(alive[0]);
     }
     render();
   }
 
-  $("#roundForm")?.addEventListener("submit", (e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg && roundDlg.close(); });
+  $("#roundForm")?.addEventListener("submit", (e)=>{ e.preventDefault(); const inputs = roundInputs(); applyRound(inputs); roundDlg && roundDlg.close(); });
 
-  /* history modal */
+  /* ===== History modal ===== */
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
     dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px" data-i18n="close">${t("close")}</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
@@ -868,12 +917,11 @@
     const tbody=document.createElement('tbody');
     rounds.forEach(r=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join("");
+      tr.innerHTML=`<th>${r.round}${r.instantWin?' ⭐':''}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join("");
       tbody.appendChild(tr);
     });
     table.appendChild(tbody); twrap.appendChild(table);
 
-    // Export CSV
     const exportBtn = document.createElement('button');
     exportBtn.className = 'btn';
     exportBtn.textContent = LANG==='es' ? 'Exportar CSV' : 'Export CSV';
@@ -881,7 +929,7 @@
     exportBtn.onclick = () => {
       const headers = ['Round', ...players.map(p => `${p.name} (Δ,Total)`)];
       const rowsCsv = rounds.map(r => {
-        const cols = [r.round];
+        const cols = [r.round + (r.instantWin?'*':'')];
         players.forEach(p => {
           const delta = (r.inputs && r.inputs[p.id] != null) ? r.inputs[p.id] : 0;
           const tot   = (r.totals && r.totals[p.id] != null) ? r.totals[p.id] : 0;
@@ -903,7 +951,7 @@
     showModalWithLock(dlg);
   }
 
-  /* wire-up */
+  /* ===== Wire-up ===== */
   on("#openSettings","click", ()=> { showModalWithLock($("#settingsDialog")); });
   on("#historyBtn","click", openRoundsTable);
   on("#newRoundBtn","click", openRound);
@@ -923,7 +971,7 @@
   const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* win overlay */
+  /* ===== Win overlay ===== */
   let confettiRaf;
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
@@ -938,7 +986,6 @@
   $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); document.body.style.overflow = ''; render(); window.scrollTo({top:0,behavior:"smooth"}); });
 
   function stopConfetti() { if (confettiRaf) cancelAnimationFrame(confettiRaf); }
-
   function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
     const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
     const N=80;
@@ -950,7 +997,7 @@
     setTimeout(stopConfetti, 5000);
   }
 
-  /* language controls */
+  /* ===== Lang toggles ===== */
   $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
   $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
 
