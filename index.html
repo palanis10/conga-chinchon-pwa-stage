@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.2</title>
+<title>Conga by Alanis — STAGE v3.7.3</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,6 +24,7 @@
     color:var(--text);
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
+    -webkit-tap-highlight-color: transparent;
   }
   .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
 
@@ -57,12 +58,13 @@
 
   /* ===== Players ===== */
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
+  .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
   .row{
     display:grid; grid-template-columns: 28px 44px 1fr auto;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-    margin-bottom:8px; user-select:none; position:relative
+    margin-bottom:8px; position:relative
   }
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset, 0 0 0 2px rgba(78,225,160,.15); }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub); touch-action:none; }
@@ -151,7 +153,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.7.2</div>
+      <div class="ver" id="verLine">STAGE v3.7.3</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -222,14 +224,14 @@
     </div>
     <button class="btn" style="flex-shrink:0; padding:6px 10px" onclick="roundDialog.close()" data-i18n="close">Close</button>
   </div>
-  <form id="roundForm" method="dialog">
+  <form id="roundForm">
     <div class="modal-body">
       <div class="grid-rows" id="roundRows"></div>
     </div>
     <div class="modal-foot">
       <div id="roundError" class="error" style="display:none"></div>
       <button type="button" class="btn" onclick="roundDialog.close()" data-i18n="cancel">Cancel</button>
-      <button id="applyRoundBtn" type="submit" class="btn success" data-i18n="apply">Apply</button>
+      <button id="applyRoundBtn" type="button" class="btn success" data-i18n="apply">Apply</button>
     </div>
   </form>
 </dialog>
@@ -240,7 +242,7 @@
     <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
     <button class="btn" onclick="editDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
   </div>
-  <form id="editForm" method="dialog">
+  <form id="editForm">
     <div class="modal-body">
       <input type="hidden" id="editId" />
       <div style="display:grid; gap:10px">
@@ -351,7 +353,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.2", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.3", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -368,7 +370,7 @@
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
   const showModalWithLock = (dlg) => { if (dlg) { document.body.style.overflow = 'hidden'; dlg.showModal(); dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true}); } };
 
-  /* i18n (kept minimal for this drop) */
+  /* i18n (minimal) */
   const STR = { en:{reorder:"Reorder",history:"History",newRound:"New round",players:"Players",addPlayer:"Add player",
       settings:"Settings",limitLabel:"Limit (default 100)",autoAdvance:"Auto-advance dealer after round",lockOrder:"Lock player reordering",
       resetScores:"Reset scores",clearAll:"Clear all",done:"Done",cancel:"Cancel",apply:"Apply",editPlayer:"Edit player",
@@ -417,8 +419,8 @@
 
         /* touch reorder on handle when unlocked */
         const handle=n.querySelector('.drag');
-        if(!lockOrder){ handle.classList.remove('locked'); enableTouchReorder(handle, i); }
-        else { handle.classList.add('locked'); handle.onpointerdown=null; }
+        if(!lockOrder){ handle.classList.remove('locked'); enableTouchReorder(handle); }
+        else { handle.classList.add('locked'); handle.onpointerdown=null; handle.ontouchstart=null; handle.onmousedown=null; }
 
         if(p.id===nextDealerId) n.classList.add("dealer");
         const avatarBox=n.querySelector(".avatar");
@@ -443,31 +445,65 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,end));
   }
 
-  /* pointer reorder (apply on drop) */
+  /* pointer/touch reorder — apply on drop */
   let dragStartIdx=null, dragPoint={x:0,y:0};
-  function enableTouchReorder(handleEl, idx){
-    handleEl.onpointerdown=(e)=>{
+  function enableTouchReorder(handleEl){
+    const start=(e)=>{
       if(lockOrder) return;
-      dragStartIdx=idx; dragPoint.x=e.clientX; dragPoint.y=e.clientY;
-      handleEl.setPointerCapture(e.pointerId);
-      document.addEventListener('pointermove', onDragMove, {passive:false});
-      document.addEventListener('pointerup', onDragEnd, {passive:false});
+      const row = handleEl.closest('.row');
+      dragStartIdx = +row.dataset.index;
+      dragPoint.x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      dragPoint.y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      // capture + listeners
+      if(e.pointerId!=null && handleEl.setPointerCapture){ handleEl.setPointerCapture(e.pointerId); }
+      window.addEventListener('pointermove', onDragMove, {passive:false});
+      window.addEventListener('pointerup', onDragEnd, {passive:false});
+      window.addEventListener('touchmove', onTouchMove, {passive:false});
+      window.addEventListener('touchend', onTouchEnd, {passive:false});
+      window.addEventListener('mousemove', onMouseMove, {passive:false});
+      window.addEventListener('mouseup', onMouseEnd, {passive:false});
       e.preventDefault();
     };
+    handleEl.onpointerdown = start;
+    handleEl.ontouchstart = start;
+    handleEl.onmousedown = start;
   }
   function onDragMove(e){ dragPoint.x=e.clientX; dragPoint.y=e.clientY; e.preventDefault(); }
-  function onDragEnd(e){
-    document.removeEventListener('pointermove', onDragMove);
-    document.removeEventListener('pointerup', onDragEnd);
-    const rowEl = document.elementFromPoint(dragPoint.x, dragPoint.y)?.closest?.('.row');
-    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
+  function onTouchMove(e){ const t=e.touches[0]; if(!t) return; dragPoint.x=t.clientX; dragPoint.y=t.clientY; e.preventDefault(); }
+  function onMouseMove(e){ dragPoint.x=e.clientX; dragPoint.y=e.clientY; e.preventDefault(); }
+  function finishDrag(toIdx){
     if(Number.isInteger(dragStartIdx) && Number.isInteger(toIdx) && dragStartIdx!==toIdx){
       const arr=players.slice(); const keepDealer=nextDealerId;
       const m=arr.splice(dragStartIdx,1)[0]; arr.splice(toIdx,0,m);
       players=arr; nextDealerId=keepDealer; render();
     }
     dragStartIdx=null;
-    e.preventDefault();
+  }
+  function onDragEnd(e){
+    window.removeEventListener('pointermove', onDragMove);
+    window.removeEventListener('pointerup', onDragEnd);
+    const rowEl = document.elementFromPoint(dragPoint.x, dragPoint.y)?.closest?.('.row');
+    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
+    finishDrag(toIdx);
+    if(e) e.preventDefault();
+  }
+  function onTouchEnd(e){
+    window.removeEventListener('touchmove', onTouchMove);
+    window.removeEventListener('touchend', onTouchEnd);
+    const t=e.changedTouches && e.changedTouches[0];
+    const x=t?t.clientX:dragPoint.x, y=t?t.clientY:dragPoint.y;
+    const rowEl = document.elementFromPoint(x,y)?.closest?.('.row');
+    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
+    finishDrag(toIdx);
+    if(e) e.preventDefault();
+  }
+  function onMouseEnd(e){
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseEnd);
+    const rowEl = document.elementFromPoint(dragPoint.x, dragPoint.y)?.closest?.('.row');
+    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
+    finishDrag(toIdx);
+    if(e) e.preventDefault();
   }
 
   /* Edit dialog */
@@ -556,8 +592,8 @@
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* Round logic (no cutter) */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows");
+  /* Round (no cutter) */
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn");
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
     rows.innerHTML="";
@@ -573,6 +609,7 @@
     requestAnimationFrame(()=>{ roundDlg.scrollTop=0; rows.querySelector('input')?.focus({preventScroll:true}); });
   }
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
+  applyRoundBtn.addEventListener('click', ()=>{ applyRound(roundInputs()); roundDlg.close(); });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
@@ -607,7 +644,6 @@
     if(alive.length===1){ gameOver=true; showWinOverlay(alive[0]); }
     render();
   }
-  $("#roundForm")?.addEventListener("submit",(e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg.close(); });
 
   /* History */
   function openRoundsTable(){
