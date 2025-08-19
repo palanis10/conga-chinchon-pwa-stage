@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.5</title>
+<title>Conga by Alanis — STAGE v3.7.6</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,20 +26,20 @@
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
 
-    /* NEW: lock page scroll — only inner panel scrolls */
+    /* Keep the page itself non-scrollable. Only the Players pane scrolls. */
     min-height: 100svh;
     overflow: hidden;
   }
 
-  /* App fills the viewport; top stays, center scrolls */
+  /* Shell fills the viewport; header + tools stay, players scroll */
   .app{
     max-width:980px; margin:0 auto;
     height:100%; min-height:100svh;
-    padding:6px 12px; /* bottom padding now handled by players pane */
+    padding:6px 12px;
     display:flex; flex-direction:column;
   }
 
-  /* ===== Header (non-scrolling) ===== */
+  /* ===== Header (fixed in layout) ===== */
   header{
     display:grid;
     grid-template-columns: 1fr auto auto;
@@ -55,9 +55,12 @@
   .lang-pill .active{opacity:1; text-decoration:underline}
   .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px}
 
-  /* ===== Tools card (non-scrolling) ===== */
-  .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:10px; margin:8px 0}
+  /* ===== Tools card (fixed in layout) ===== */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding:10px; margin:8px 0;
+  }
   .tools{display:flex; gap:8px; align-items:center; white-space:nowrap}
   .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 12px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px dashed rgba(255,255,255,.22);
@@ -73,12 +76,12 @@
     overflow:auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* breathing room above iOS bar */
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
 
-  /* Players list / rows */
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
   .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+
   .row{
     display:grid; grid-template-columns: 28px 44px 1fr auto;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
@@ -111,7 +114,7 @@
     opacity:.98;
   }
 
-  /* ===== Dialogs / inputs / cropper (unchanged from 3.7.4) ===== */
+  /* Dialogs / inputs */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); overflow:hidden }
@@ -145,7 +148,7 @@
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* Crop dialog */
+  /* Circular cropper */
   #cropDialog { width: min(460px, 92vw); }
   #cropStage { position: relative; width: 100%; height: 360px; border-radius: 16px; background:#0b0f20; border:1px solid rgba(255,255,255,.1); overflow:hidden; touch-action:none; }
   #cropCanvas { position:absolute; inset:0; width:100%; height:100%; }
@@ -176,7 +179,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.7.5</div>
+      <div class="ver" id="verLine">STAGE v3.7.6</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -339,13 +342,13 @@
 </dialog>
 
 <!-- Win overlay -->
-<div class="win-overlay" id="winOverlay" aria-live="polite">
-  <div class="win-card">
+<div class="win-overlay" id="winOverlay" aria-live="polite" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px">
+  <div class="win-card" style="width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden">
     <canvas id="confettiCanvas"></canvas>
-    <div class="win-head">
-      <div class="win-photo"><img id="winPhoto" alt=""></div>
+    <div class="win-head" style="display:flex; align-items:center; gap:12px">
+      <div class="win-photo" style="width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)"><img id="winPhoto" alt=""></div>
       <div>
-        <div class="win-name" id="winName">Winner</div>
+        <div class="win-name" id="winName" style="font-size:20px; font-weight:900">Winner</div>
         <div class="win-sub" id="winSubtitle" data-i18n="winner">WINNER</div>
       </div>
     </div>
@@ -379,7 +382,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.5", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.6", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -394,9 +397,11 @@
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
-  const showModalWithLock = (dlg) => { if (dlg) { document.body.style.overflow = 'hidden'; dlg.showModal(); dlg.addEventListener('close', () => { document.body.style.overflow = ''; }, {once: true}); } };
 
-  /* i18n (minimal) */
+  // IMPORTANT: do not flip body overflow anymore; dialogs already block page.
+  const showModalWithLock = (dlg) => { if (dlg) { dlg.showModal(); dlg.scrollTop = 0; } };
+
+  /* i18n */
   const STR = { en:{reorder:"Reorder",history:"History",newRound:"New round",players:"Players",addPlayer:"Add player",
       settings:"Settings",limitLabel:"Limit (default 100)",autoAdvance:"Auto-advance dealer after round",lockOrder:"Lock player reordering",
       resetScores:"Reset scores",clearAll:"Clear all",done:"Done",cancel:"Cancel",apply:"Apply",editPlayer:"Edit player",
@@ -464,7 +469,7 @@
     }
     applyI18n(); debounceSave();
 
-    // restore scroll
+    // restore scroll (keeps header/tools always visible)
     if(playersPane) playersPane.scrollTop = preserveScroll;
   }
 
@@ -685,7 +690,7 @@
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
 
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1; // trigger at exactly 101 and higher if limit=100
+    const REENG_THRESHOLD=limit+1; // at exactly 101+ when limit=100
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -712,7 +717,7 @@
     render();
   }
 
-  /* History (same) */
+  /* History */
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
     dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">History</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
@@ -748,12 +753,12 @@
     const ov=$("#winOverlay"); if(!ov) return;
     $("#winName").textContent=winner?.name||'Winner';
     $("#winPhoto").src=winner?.avatar||'';
-    document.body.style.overflow='hidden'; ov.style.display='flex';
+    ov.style.display='flex';
     try{ $("#winSound").play().catch(()=>{});}catch{}
     startConfetti();
   }
-  $("#winCloseBtn")?.addEventListener('click',()=>{ $("#winOverlay").style.display='none'; stopConfetti(); document.body.style.overflow=''; });
-  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); document.body.style.overflow=''; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  $("#winCloseBtn")?.addEventListener('click',()=>{ $("#winOverlay").style.display='none'; stopConfetti(); });
+  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
   function stopConfetti(){ if(confettiRaf) cancelAnimationFrame(confettiRaf); }
   function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
     const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
