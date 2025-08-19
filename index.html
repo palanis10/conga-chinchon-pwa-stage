@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.7</title>
+<title>Conga by Alanis — STAGE v3.7.8</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,7 +26,7 @@
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
 
-    /* Page doesn’t scroll; only the players pane does */
+    /* Page itself doesn’t scroll; only the players pane does */
     min-height: 100svh;
     overflow: hidden;
   }
@@ -149,12 +149,6 @@
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* Cutter / instant-win block */
-  .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; margin-bottom:8px; }
-  .cut-field legend{ font-size:12px; color:var(--sub); padding:0 6px; }
-  .cut-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
-  .cut-opt{ display:flex; gap:8px; align-items:center; background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
-
   /* Circular cropper */
   #cropDialog { width: min(460px, 92vw); }
   #cropStage { position: relative; width: 100%; height: 360px; border-radius: 16px; background:#0b0f20; border:1px solid rgba(255,255,255,.1); overflow:hidden; touch-action:none; }
@@ -176,7 +170,6 @@
     .round-row .hint { font-size:10px; }
     .round-row input[type="number"] { height:28px; padding:2px 6px; font-size:12px; }
     .round-row .minus10 { height:28px; font-size:12px; padding:0; }
-    .cut-grid{ grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -187,7 +180,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.7.7</div>
+      <div class="ver" id="verLine">STAGE v3.7.8</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -263,12 +256,6 @@
   </div>
   <form id="roundForm">
     <div class="modal-body">
-      <!-- Cutter block (reintroduced) -->
-      <fieldset class="cut-field">
-        <legend>Who cut? (optional)</legend>
-        <div class="cut-grid" id="cutGrid"></div>
-      </fieldset>
-
       <div class="grid-rows" id="roundRows"></div>
     </div>
     <div class="modal-foot">
@@ -396,7 +383,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.7", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.8", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -411,8 +398,6 @@
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
-
-  // Dialogs already block; don’t toggle body scrolling.
   const showModalWithLock = (dlg) => { if (dlg) { dlg.showModal(); dlg.scrollTop = 0; } };
 
   /* i18n */
@@ -676,51 +661,25 @@
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* ===== Round (with cutter / instant-win + reenganche >= limit+1) ===== */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn"), cutGrid=$("#cutGrid"), rErr=$("#roundError");
-  let selectedCutterId="";
-
-  function buildCutterGrid(){
-    cutGrid.innerHTML="";
-    const mk=(id,label,checked=false)=>{ const w=document.createElement("label"); w.className="cut-opt";
-      const i=document.createElement("input"); i.type="radio"; i.name="cutter"; i.value=id; i.checked=checked;
-      const s=document.createElement("span"); s.textContent=label; w.append(i,s); i.addEventListener('change', validateRound); return w; };
-    mk("", "None", true); // helper for default
-    cutGrid.appendChild(mk("", LANG==='es'?'Nadie':'None', true));
-    players.forEach(p=> cutGrid.appendChild(mk(p.id, p.name)));
-  }
-
+  /* ===== Round (no cutter) ===== */
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows");
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
-    rows.innerHTML=""; buildCutterGrid(); selectedCutterId="";
+    rows.innerHTML="";
     const frag=document.createDocumentFragment();
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
-      inp.addEventListener('input', validateRound);
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); validateRound(); };
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
       r.append(name,inp,minus); frag.appendChild(r);
     });
     rows.appendChild(frag);
-    rErr.style.display="none";
     showModalWithLock(roundDlg);
     requestAnimationFrame(()=>{ roundDlg.scrollTop=0; /* no autofocus to avoid iOS jump */ });
   }
-
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
 
-  function validateRound(){
-    const inputs = roundInputs();
-    const radios = document.querySelectorAll('input[name="cutter"]');
-    radios.forEach(r=>{ if(r.checked) selectedCutterId=r.value; });
-    if (!selectedCutterId){ rErr.style.display="none"; applyRoundBtn.disabled=false; return; }
-    const cutter = players.find(p=>p.id===selectedCutterId); if(!cutter){ rErr.style.display="none"; applyRoundBtn.disabled=false; return; }
-    const projected = clampInt(cutter.score||0) + clampInt(inputs[cutter.id]||0);
-    if (projected > limit){
-      rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`;
-      rErr.style.display="block"; applyRoundBtn.disabled=true;
-    } else { rErr.style.display="none"; applyRoundBtn.disabled=false; }
-  }
+  on("#roundForm","submit",(e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg.close(); });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
@@ -728,22 +687,8 @@
     const roundNo=roundCounter+1;
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
 
-    // Instant-win logic if a cutter was chosen
-    if (selectedCutterId){
-      const cutterProj = proj[selectedCutterId] || 0;
-      if (cutterProj > limit){ validateRound(); return; } // guard
-      const others = players.filter(p=>p.id!==selectedCutterId);
-      const allOthersOver = others.every(p => proj[p.id] > limit);
-      if (cutterProj <= limit && allOthersOver){
-        players.forEach(p=>{ p.score = proj[p.id]; });
-        roundCounter += 1;
-        rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId, instantWin:true});
-        gameOver=true; showWinOverlay(players.find(p=>p.id===selectedCutterId)); render(); return;
-      }
-    }
-
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1; // reenganche only at exactly 101+ when limit=100
+    const REENG_THRESHOLD=limit+1; // reenganche only at 101+ when limit=100
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -762,15 +707,13 @@
       nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id;
     }
 
-    rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId||""});
+    rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now()});
     gameOver=false;
 
     const alive=players.filter(p=>p.score<=limit);
     if(alive.length===1){ gameOver=true; showWinOverlay(alive[0]); }
     render();
   }
-
-  on("#roundForm","submit",(e)=>{ e.preventDefault(); const inputs = roundInputs(); applyRound(inputs); roundDlg.close(); });
 
   /* History */
   function openRoundsTable(){
@@ -780,7 +723,7 @@
     const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
     trh.innerHTML="<th>#</th>"+players.map(p=>`<th>${p.name} (Δ / Total)</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
     const tbody=document.createElement('tbody');
-    rounds.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<th>${r.round}${r.instantWin?' ⭐':''}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join(""); tbody.appendChild(tr); });
+    rounds.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join(""); tbody.appendChild(tr); });
     table.appendChild(tbody); twrap.appendChild(table);
     dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); showModalWithLock(dlg);
   }
