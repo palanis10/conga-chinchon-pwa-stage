@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.3</title>
+<title>Conga by Alanis — STAGE v3.7.4</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -77,6 +77,19 @@
   .stars{ color:var(--danger); font-weight:900; font-size:16px; white-space:nowrap; margin-right:2px }
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
+
+  /* Live drag visuals */
+  .row.placeholder{
+    background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px);
+    border:2px dashed rgba(78,225,160,.55);
+    box-shadow: inset 0 0 0 2px rgba(78,225,160,.25);
+  }
+  .drag-ghost{
+    position:fixed; left:0; top:0; z-index:9999; pointer-events:none;
+    transform: translate3d(0,0,0);
+    box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    opacity:.98;
+  }
 
   /* ===== Dialogs ===== */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
@@ -153,7 +166,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.7.3</div>
+      <div class="ver" id="verLine">STAGE v3.7.4</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -216,7 +229,7 @@
   </div>
 </dialog>
 
-<!-- Round dialog (NO cutter section) -->
+<!-- Round dialog (no cutter / instant win block) -->
 <dialog id="roundDialog" aria-labelledby="roundTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div style="flex:1; overflow:hidden;">
@@ -353,7 +366,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.3", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.4", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -417,10 +430,10 @@
         /* edit only when locked */
         if(lockOrder) attachLongPress(n, ()=>openEdit(p.id));
 
-        /* touch reorder on handle when unlocked */
+        /* live reorder when unlocked */
         const handle=n.querySelector('.drag');
-        if(!lockOrder){ handle.classList.remove('locked'); enableTouchReorder(handle); }
-        else { handle.classList.add('locked'); handle.onpointerdown=null; handle.ontouchstart=null; handle.onmousedown=null; }
+        if(!lockOrder){ handle.classList.remove('locked'); enableLiveReorder(handle, n); }
+        else { handle.classList.add('locked'); handle.onpointerdown=handle.ontouchstart=handle.onmousedown=null; }
 
         if(p.id===nextDealerId) n.classList.add("dealer");
         const avatarBox=n.querySelector(".avatar");
@@ -445,68 +458,115 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,end));
   }
 
-  /* pointer/touch reorder — apply on drop */
-  let dragStartIdx=null, dragPoint={x:0,y:0};
-  function enableTouchReorder(handleEl){
+  /* ===== Live reorder (ghost + placeholder) ===== */
+  function enableLiveReorder(handle, rowEl){
     const start=(e)=>{
       if(lockOrder) return;
-      const row = handleEl.closest('.row');
-      dragStartIdx = +row.dataset.index;
-      dragPoint.x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-      dragPoint.y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
-      // capture + listeners
-      if(e.pointerId!=null && handleEl.setPointerCapture){ handleEl.setPointerCapture(e.pointerId); }
-      window.addEventListener('pointermove', onDragMove, {passive:false});
-      window.addEventListener('pointerup', onDragEnd, {passive:false});
+      const isTouch = e.touches && e.touches.length;
+      const clientX = isTouch ? e.touches[0].clientX : (e.clientX ?? 0);
+      const clientY = isTouch ? e.touches[0].clientY : (e.clientY ?? 0);
+
+      const rect = rowEl.getBoundingClientRect();
+      const startIdx = +rowEl.dataset.index;
+
+      // placeholder
+      const ph = document.createElement('div');
+      ph.className = 'row placeholder';
+      ph.style.height = rect.height + 'px';
+
+      // ghost
+      const ghost = rowEl.cloneNode(true);
+      ghost.classList.add('drag-ghost');
+      ghost.style.width = rect.width + 'px';
+      ghost.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+
+      // offset
+      const offsetX = clientX - rect.left;
+      const offsetY = clientY - rect.top;
+
+      // mount
+      const parent = list;
+      parent.insertBefore(ph, rowEl);
+      rowEl.remove(); // keep DOM clean while dragging
+      document.body.appendChild(ghost);
+
+      // prevent scroll bounce
+      const scrollLockPrev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+
+      // drag state
+      let lastY = clientY;
+
+      const move = (cx, cy) => {
+        ghost.style.transform = `translate3d(${cx - offsetX}px, ${cy - offsetY}px, 0)`;
+        lastY = cy;
+
+        // auto-scroll parent if near edges
+        const pr = parent.getBoundingClientRect();
+        const edge = 36;
+        if (cy < pr.top + edge) parent.scrollBy({top:-14, behavior:'auto'});
+        else if (cy > pr.bottom - edge) parent.scrollBy({top:14, behavior:'auto'});
+
+        // re-position placeholder by ghost center
+        const centerY = cy;
+        const rows = Array.from(parent.querySelectorAll('.row')); // includes placeholder
+        const target = rows.find(el => el !== ph && (centerY < el.getBoundingClientRect().top + el.offsetHeight/2));
+        if (target) parent.insertBefore(ph, target); else parent.appendChild(ph);
+      };
+
+      const onPointerMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
+      const onTouchMove = ev => { const t=ev.touches[0]; if(!t) return; ev.preventDefault(); move(t.clientX, t.clientY); };
+      const onMouseMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
+
+      const end = () => {
+        // compute destination index
+        const kids = Array.from(parent.children);
+        const toIdx = kids.indexOf(ph);
+
+        // cleanup UI
+        ghost.remove(); ph.remove();
+        document.body.style.overflow = scrollLockPrev;
+
+        // apply reorder
+        if (Number.isInteger(startIdx) && Number.isInteger(toIdx) && startIdx !== toIdx) {
+          const arr = players.slice(); const keepDealer = nextDealerId;
+          const moving = arr.splice(startIdx,1)[0]; arr.splice(toIdx,0,moving);
+          players = arr; nextDealerId = keepDealer;
+        }
+        render();
+        detach();
+      };
+
+      const detach = () => {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      const onPointerUp = ev => { ev.preventDefault(); end(); };
+      const onTouchEnd = ev => { ev.preventDefault(); end(); };
+      const onMouseUp = ev => { ev.preventDefault(); end(); };
+
+      window.addEventListener('pointermove', onPointerMove, {passive:false});
+      window.addEventListener('pointerup', onPointerUp, {passive:false});
       window.addEventListener('touchmove', onTouchMove, {passive:false});
       window.addEventListener('touchend', onTouchEnd, {passive:false});
       window.addEventListener('mousemove', onMouseMove, {passive:false});
-      window.addEventListener('mouseup', onMouseEnd, {passive:false});
+      window.addEventListener('mouseup', onMouseUp, {passive:false});
+
       e.preventDefault();
+      move(clientX, clientY);
     };
-    handleEl.onpointerdown = start;
-    handleEl.ontouchstart = start;
-    handleEl.onmousedown = start;
-  }
-  function onDragMove(e){ dragPoint.x=e.clientX; dragPoint.y=e.clientY; e.preventDefault(); }
-  function onTouchMove(e){ const t=e.touches[0]; if(!t) return; dragPoint.x=t.clientX; dragPoint.y=t.clientY; e.preventDefault(); }
-  function onMouseMove(e){ dragPoint.x=e.clientX; dragPoint.y=e.clientY; e.preventDefault(); }
-  function finishDrag(toIdx){
-    if(Number.isInteger(dragStartIdx) && Number.isInteger(toIdx) && dragStartIdx!==toIdx){
-      const arr=players.slice(); const keepDealer=nextDealerId;
-      const m=arr.splice(dragStartIdx,1)[0]; arr.splice(toIdx,0,m);
-      players=arr; nextDealerId=keepDealer; render();
-    }
-    dragStartIdx=null;
-  }
-  function onDragEnd(e){
-    window.removeEventListener('pointermove', onDragMove);
-    window.removeEventListener('pointerup', onDragEnd);
-    const rowEl = document.elementFromPoint(dragPoint.x, dragPoint.y)?.closest?.('.row');
-    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
-    finishDrag(toIdx);
-    if(e) e.preventDefault();
-  }
-  function onTouchEnd(e){
-    window.removeEventListener('touchmove', onTouchMove);
-    window.removeEventListener('touchend', onTouchEnd);
-    const t=e.changedTouches && e.changedTouches[0];
-    const x=t?t.clientX:dragPoint.x, y=t?t.clientY:dragPoint.y;
-    const rowEl = document.elementFromPoint(x,y)?.closest?.('.row');
-    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
-    finishDrag(toIdx);
-    if(e) e.preventDefault();
-  }
-  function onMouseEnd(e){
-    window.removeEventListener('mousemove', onMouseMove);
-    window.removeEventListener('mouseup', onMouseEnd);
-    const rowEl = document.elementFromPoint(dragPoint.x, dragPoint.y)?.closest?.('.row');
-    const toIdx = rowEl ? +rowEl.dataset.index : dragStartIdx;
-    finishDrag(toIdx);
-    if(e) e.preventDefault();
+
+    handle.onpointerdown = start;
+    handle.ontouchstart = start;
+    handle.onmousedown = start;
   }
 
-  /* Edit dialog */
+  /* ===== Edit dialog ===== */
   const editDlg=$("#editDialog"), editForm=$("#editForm");
   function refreshEditPreview(id){ const p=players.find(x=>x.id===id); const prev=$("#editAvatarPreview"), btn=$("#changePhotoBtn");
     if(prev){ prev.src=p?.avatar||""; prev.style.opacity=p?.avatar?"1":".35"; }
@@ -532,7 +592,7 @@
     editDlg.close(); render();
   });
 
-  /* Modern circular crop */
+  /* ===== Modern circular crop ===== */
   const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
         pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
   const ctx=cropCanvas.getContext('2d');
@@ -592,7 +652,7 @@
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* Round (no cutter) */
+  /* ===== Round (no cutter) ===== */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn");
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
