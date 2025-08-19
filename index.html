@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.8</title>
+<title>Conga by Alanis — STAGE v3.7.9</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,6 +30,10 @@
     min-height: 100svh;
     overflow: hidden;
   }
+
+  /* When any modal is open, freeze the players pane (prevents background scroll/jump) */
+  body.scroll-locked .players-pane{ overflow: hidden !important; }
+  body.scroll-locked{ touch-action:none; }
 
   /* Shell: header + tools fixed, players pane scrolls */
   .app{
@@ -83,7 +87,9 @@
   .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
 
   .row{
-    display:grid; grid-template-columns: 28px 44px 1fr auto;
+    display:grid;
+    /* avatar column wider (56px avatar) */
+    grid-template-columns: 28px 56px 1fr auto;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
@@ -92,7 +98,9 @@
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset, 0 0 0 2px rgba(78,225,160,.15); }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub); touch-action:none; }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
-  .avatar{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:14px;}
+
+  /* Bigger avatar */
+  .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:16px;}
   .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25), 0 0 12px rgba(78,225,160,.35); }
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:20px; font-weight:900; }
@@ -180,7 +188,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.7.8</div>
+      <div class="ver" id="verLine">STAGE v3.7.9</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -383,7 +391,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.8", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.9", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -398,7 +406,20 @@
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
-  const showModalWithLock = (dlg) => { if (dlg) { dlg.showModal(); dlg.scrollTop = 0; } };
+
+  /* modal helper: lock players pane scroll + restore position on close */
+  const showModalWithLock = (dlg) => {
+    if (!dlg) return;
+    const pane = document.getElementById('playersPane');
+    const prev = pane ? pane.scrollTop : 0;
+    document.body.classList.add('scroll-locked');
+    dlg.addEventListener('close', () => {
+      document.body.classList.remove('scroll-locked');
+      if (pane) pane.scrollTop = prev;
+    }, {once:true});
+    dlg.showModal();
+    dlg.scrollTop = 0;
+  };
 
   /* i18n */
   const STR = { en:{reorder:"Reorder",history:"History",newRound:"New round",players:"Players",addPlayer:"Add player",
@@ -641,20 +662,20 @@
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
         ensureShow(()=>useImage(dataUrl)); }; photoInput.click(); }
   }
-  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(touches.size===2){ const pts=[...touches.values()]; pinchDist0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); scale0=scale; }
-    else if(touches.size===1){ panning=true; startPanX=e.clientX-offsetX; startPanY=e.clientY-offsetY; } });
-  cropStage.addEventListener('pointermove',e=>{ if(!imgLoaded||!touches.has(e.pointerId)) return; touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); const t={x:e.clientX,y:e.clientY}; (window.__t=window.__t||new Map()).set(e.pointerId,t);
+    const touches=window.__t; if(touches.size===2){ const pts=[...touches.values()]; window.__pinch0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); window.__scale0=scale; }
+    else if(touches.size===1){ window.__panning=true; window.__panStartX=e.clientX-offsetX; window.__panStartY=e.clientY-offsetY; } });
+  cropStage.addEventListener('pointermove',e=>{ const touches=window.__t; if(!imgLoaded||!touches||!touches.has(e.pointerId)) return; touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(touches.size===2){ const pts=[...touches.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-      if(pinchDist0&&scale0){ const ratio=dist/pinchDist0; scale=Math.min(maxScale,Math.max(minScale,scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
-    else if(panning){ offsetX=e.clientX-startPanX; offsetY=e.clientY-startPanY; clampPan(); drawCrop(); } }, {passive:false});
-  function endPtr(e){ touches.delete(e.pointerId); if(touches.size<2){ pinchDist0=null; scale0=null; } if(touches.size===0){ panning=false; } }
+      if(window.__pinch0&&window.__scale0){ const ratio=dist/window.__pinch0; scale=Math.min(maxScale,Math.max(minScale,window.__scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); document.getElementById('zoomRange').value=Math.round(t*100); document.getElementById('zoomOut').textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
+    else if(window.__panning){ offsetX=e.clientX-window.__panStartX; offsetY=e.clientY-window.__panStartY; clampPan(); drawCrop(); } }, {passive:false});
+  function endPtr(e){ const touches=window.__t; if(touches){ touches.delete(e.pointerId); if(touches.size<2){ window.__pinch0=null; window.__scale0=null; } if(touches.size===0){ window.__panning=false; } } }
   cropStage.addEventListener('pointerup',endPtr); cropStage.addEventListener('pointercancel',endPtr); cropStage.addEventListener('pointerleave',endPtr);
-  zoomRange.addEventListener('input',e=>setZoomBySlider(+e.target.value));
-  $("#pickAnotherBtn").addEventListener('click',()=>{ photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
+  document.getElementById('zoomRange').addEventListener('input',e=>setZoomBySlider(+e.target.value));
+  document.getElementById('pickAnotherBtn').addEventListener('click',()=>{ photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
       openCrop(cropPlayerId, dataUrl); }; photoInput.click(); });
-  $("#applyCropBtn").addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
+  document.getElementById('applyCropBtn').addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
     const {cx,cy,r}=circleSpecs(); const ox=(cx-offsetX)/scale, oy=(cy-offsetY)/scale, or=r/scale;
     const size=512; const out=document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
     octx.clearRect(0,0,size,size); octx.save(); octx.beginPath(); octx.arc(size/2,size/2,size/2,0,Math.PI*2); octx.clip();
@@ -675,11 +696,12 @@
     });
     rows.appendChild(frag);
     showModalWithLock(roundDlg);
-    requestAnimationFrame(()=>{ roundDlg.scrollTop=0; /* no autofocus to avoid iOS jump */ });
+    requestAnimationFrame(()=>{ roundDlg.scrollTop=0; });
   }
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
-
   on("#roundForm","submit",(e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg.close(); });
+  /* Extra safety for iOS: also bind click on the button */
+  on("#applyRoundBtn","click",(e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg.close(); });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
