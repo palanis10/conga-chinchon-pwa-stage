@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.2</title>
+<title>Conga by Alanis — STAGE v3.7.7</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,73 +24,70 @@
     color:var(--text);
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
-  }
-  .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
+    -webkit-tap-highlight-color: transparent;
 
-  /* ===== Sticky Topbar (Header + Tools) ===== */
-  .topbar{
-    position: sticky;
-    top: env(safe-area-inset-top, 0px);
-    z-index: 60;
-    margin: -6px -12px 8px;
-    padding: calc(env(safe-area-inset-top, 0px) + 6px) 12px 10px;
-    background:
-      linear-gradient(180deg, rgba(15,18,32,0.95), rgba(15,18,32,0.70) 65%, rgba(15,18,32,0.0));
-    backdrop-filter: saturate(120%) blur(6px);
+    /* Page doesn’t scroll; only the players pane does */
+    min-height: 100svh;
+    overflow: hidden;
   }
 
-  /* ===== Header (compact, stacked) ===== */
+  /* Shell: header + tools fixed, players pane scrolls */
+  .app{
+    max-width:980px; margin:0 auto;
+    height:100%; min-height:100svh;
+    padding:6px 12px;
+    display:flex; flex-direction:column;
+  }
+
+  /* ===== Header (fixed in layout) ===== */
   header{
     display:grid;
     grid-template-columns: 1fr auto auto;
     align-items:center;
     gap:10px;
     padding:6px 0 2px 0;
-    margin-bottom:8px;
   }
-  .brand-wrap{min-width:0}
-  .brand{display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0}
+  .brand{display:flex; flex-direction:column; gap:2px}
   .title{font-weight:900; letter-spacing:.2px; font-size: clamp(18px, 5vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .ver{font-weight:800; font-size:12px; color:var(--sub); opacity:.9; line-height:1.1;}
-  .lang-pill{
-    display:inline-flex; gap:8px; align-items:center;
-    border:1px dashed rgba(255,255,255,.18);
-    border-radius:999px; padding:6px 10px; height:36px;
-    color:var(--text); font-weight:800; letter-spacing:.2px;
-    user-select:none;
-  }
-  .lang-pill button{appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer; opacity:.85;}
-  .lang-pill .active{ opacity:1; text-decoration:underline; }
-  .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px;}
+  .ver{font-weight:800; font-size:12px; color:var(--sub); opacity:.9}
+  .lang-pill{display:inline-flex; gap:8px; align-items:center; border:1px dashed rgba(255,255,255,.18); border-radius:999px; padding:6px 10px; height:36px; font-weight:800}
+  .lang-pill button{appearance:none; background:none; border:0; color:inherit; font:inherit; cursor:pointer; opacity:.85}
+  .lang-pill .active{opacity:1; text-decoration:underline}
+  .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px}
 
-  /* ===== Tools card ===== */
-  .card{ background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:10px; }
-  .tools{ display:flex; gap:8px; align-items:center; white-space:nowrap; }
-  .btn{
-    appearance:none; border:0; cursor:pointer; user-select:none;
-    padding:10px 12px; border-radius:12px;
-    background: linear-gradient(135deg, #1a2344, #121a34);
-    border:1px dashed rgba(255,255,255,.22);
-    color:var(--text); font-weight:900; letter-spacing:.2px;
-    transition:.15s; flex:1 1 0; min-width:0; white-space:nowrap;
-    font-size: clamp(12px, 3.4vw, 16px);
+  /* ===== Tools card (fixed in layout) ===== */
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding:10px; margin:8px 0;
   }
-  .btn:hover{ filter:brightness(1.07)}
-  .btn:active{ transform:translateY(1px)}
-  .btn.primary{ background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid; }
-  .btn.success{ background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid; }
+  .tools{display:flex; gap:8px; align-items:center; white-space:nowrap}
+  .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 12px; border-radius:12px;
+    background: linear-gradient(135deg, #1a2344, #121a34); border:1px dashed rgba(255,255,255,.22);
+    color:var(--text); font-weight:900; letter-spacing:.2px; transition:.15s; flex:1 1 0; min-width:0; white-space:nowrap; font-size: clamp(12px, 3.4vw, 16px)}
+  .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
+  .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid}
+  .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
+  #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
 
-  /* ===== Players ===== */
+  /* ===== Players panel (ONLY this scrolls) ===== */
+  .players-pane{
+    flex:1 1 auto;
+    overflow:auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
+  .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+
   .row{
     display:grid; grid-template-columns: 28px 44px 1fr auto;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-    margin-bottom:8px;
-    user-select: none;
-    position: relative;
+    margin-bottom:8px; position:relative
   }
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset, 0 0 0 2px rgba(78,225,160,.15); }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub); touch-action:none; }
@@ -104,17 +101,26 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  /* ===== Dialogs ===== */
-  dialog{
-    width:min(720px, 96vw);
-    border-radius:16px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
-    box-shadow: 0 24px 64px rgba(0,0,0,.55);
-    overflow: hidden;
+  /* Live drag visuals */
+  .row.placeholder{
+    background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px);
+    border:2px dashed rgba(78,225,160,.55);
+    box-shadow: inset 0 0 0 2px rgba(78,225,160,.25);
   }
+  .drag-ghost{
+    position:fixed; left:0; top:0; z-index:9999; pointer-events:none;
+    transform: translate3d(0,0,0);
+    box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    opacity:.98;
+  }
+
+  /* ===== Dialogs / inputs ===== */
+  dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
+    box-shadow: 0 24px 64px rgba(0,0,0,.55); overflow:hidden }
   dialog::backdrop{ background: rgba(2,6,23,.55) }
   .modal-head{ padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px }
-  .modal-body{ padding:12px 14px; max-height:70vh; overflow:auto; overscroll-behavior:contain; }
+  .modal-body{ padding:12px 14px; max-height:70vh; overflow:auto; overscroll-behavior:contain }
   .modal-foot{ padding:12px 14px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap }
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
@@ -122,7 +128,6 @@
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
   dialog .btn { border-style: solid; }
 
-  /* Switch */
   .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
   .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
   .switch .track { width: 40px; height: 20px; background: var(--muted); border-radius: 999px; transition: .15s; }
@@ -131,14 +136,7 @@
   .switch input:checked + .track + .thumb { transform: translateX(20px); }
   .switch .switch-label { font-size: 14px; color: var(--text); }
 
-  #settingsDialog .modal-body { display: flex; flex-direction: column; gap: 12px; }
-  #settingsDialog .btn { width: 100%; }
-
-  /* Round dialog (cutter + inputs) */
-  .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; margin-bottom:8px; }
-  .cut-field legend{ font-size:12px; color:var(--sub); padding:0 6px; }
-  .cut-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
-  .cut-opt{ display:flex; gap:8px; align-items:center; background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
+  /* Round rows */
   .grid-rows{ display:grid; gap:4px }
   .round-row{ display:grid; grid-template-columns: auto 100px 50px; gap:6px; align-items:center;
     padding:4px; border:1px dashed rgba(255,255,255,.15); border-radius:10px;
@@ -151,17 +149,13 @@
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* Win overlay */
-  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:999999; padding:16px}
-  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
-  .win-head{ display:flex; align-items:center; gap:12px}
-  .win-photo{ width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)}
-  .win-photo img{ width:100%; height:100%; object-fit:cover}
-  .win-name{ font-size:20px; font-weight:900}
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
+  /* Cutter / instant-win block */
+  .cut-field{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; margin-bottom:8px; }
+  .cut-field legend{ font-size:12px; color:var(--sub); padding:0 6px; }
+  .cut-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:6px; }
+  .cut-opt{ display:flex; gap:8px; align-items:center; background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
 
-  /* ===== Crop dialog ===== */
+  /* Circular cropper */
   #cropDialog { width: min(460px, 92vw); }
   #cropStage { position: relative; width: 100%; height: 360px; border-radius: 16px; background:#0b0f20; border:1px solid rgba(255,255,255,.1); overflow:hidden; touch-action:none; }
   #cropCanvas { position:absolute; inset:0; width:100%; height:100%; }
@@ -177,51 +171,49 @@
     .modal-head { padding:8px 10px; gap:6px; }
     .modal-body { padding:8px 10px; }
     .modal-foot { padding:8px 10px; gap:6px; }
-    .cut-grid{ grid-template-columns: 1fr; }
     .round-row { grid-template-columns: auto 80px 40px; gap:4px; font-size:12px; }
     .round-row strong { font-size:14px; }
     .round-row .hint { font-size:10px; }
     .round-row input[type="number"] { height:28px; padding:2px 6px; font-size:12px; }
     .round-row .minus10 { height:28px; font-size:12px; padding:0; }
+    .cut-grid{ grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="app" id="app">
 
-  <!-- Sticky region -->
-  <div class="topbar">
-    <header>
-      <div class="brand-wrap">
-        <div class="brand">
-          <div class="title" id="appTitle">Conga by Alanis</div>
-          <div class="ver" id="verLine">STAGE v3.7.2</div>
-        </div>
-      </div>
+  <!-- Non-scrolling top -->
+  <header>
+    <div class="brand">
+      <div class="title" id="appTitle">Conga by Alanis</div>
+      <div class="ver" id="verLine">STAGE v3.7.7</div>
+    </div>
 
-      <div class="lang-pill" id="langPill" aria-label="Language">
-        <button data-lang="en" id="pillEn" class="active">EN</button><span>/</span>
-        <button data-lang="es" id="pillEs">ES</button>
-      </div>
+    <div class="lang-pill" id="langPill" aria-label="Language">
+      <button data-lang="en" id="pillEn" class="active">EN</button><span>/</span>
+      <button data-lang="es" id="pillEs">ES</button>
+    </div>
 
-      <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
-    </header>
+    <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
+  </header>
 
-    <section class="card tools-card" style="padding:10px; margin-bottom:8px">
-      <div class="tools">
-        <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
-        <button id="historyBtn" class="btn"><span data-i18n="history">History</span></button>
-        <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
-      </div>
-      <div id="dealerLine" style="margin-top:6px; font-weight:800; color:var(--sub); font-size:12px"></div>
-    </section>
-  </div>
+  <section class="card">
+    <div class="tools">
+      <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
+      <button id="historyBtn" class="btn"><span data-i18n="history">History</span></button>
+      <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
+    </div>
+    <div id="dealerLine"></div>
+  </section>
 
-  <!-- Content -->
-  <section class="players">
-    <header><div data-i18n="players">Players</div></header>
-    <div id="playersList" role="list" aria-live="polite"></div>
-    <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
+  <!-- Scrollable center -->
+  <section id="playersPane" class="players-pane">
+    <div class="players">
+      <header><div data-i18n="players">Players</div></header>
+      <div id="playersList" role="list" aria-live="polite"></div>
+      <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
+    </div>
   </section>
 </div>
 
@@ -269,12 +261,14 @@
     </div>
     <button class="btn" style="flex-shrink:0; padding:6px 10px" onclick="roundDialog.close()" data-i18n="close">Close</button>
   </div>
-  <form id="roundForm" method="dialog">
+  <form id="roundForm">
     <div class="modal-body">
+      <!-- Cutter block (reintroduced) -->
       <fieldset class="cut-field">
         <legend>Who cut? (optional)</legend>
         <div class="cut-grid" id="cutGrid"></div>
       </fieldset>
+
       <div class="grid-rows" id="roundRows"></div>
     </div>
     <div class="modal-foot">
@@ -291,7 +285,7 @@
     <div id="editTitle" style="font-weight:800" data-i18n="editPlayer">Edit player</div>
     <button class="btn" onclick="editDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
   </div>
-  <form id="editForm" method="dialog">
+  <form id="editForm">
     <div class="modal-body">
       <input type="hidden" id="editId" />
       <div style="display:grid; gap:10px">
@@ -362,13 +356,13 @@
 </dialog>
 
 <!-- Win overlay -->
-<div class="win-overlay" id="winOverlay" aria-live="polite">
-  <div class="win-card" id="winCard">
+<div class="win-overlay" id="winOverlay" aria-live="polite" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px">
+  <div class="win-card" style="width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden">
     <canvas id="confettiCanvas"></canvas>
-    <div class="win-head">
-      <div class="win-photo"><img id="winPhoto" alt=""></div>
+    <div class="win-head" style="display:flex; align-items:center; gap:12px">
+      <div class="win-photo" style="width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)"><img id="winPhoto" alt=""></div>
       <div>
-        <div class="win-name" id="winName">Winner</div>
+        <div class="win-name" id="winName" style="font-size:20px; font-weight:900">Winner</div>
         <div class="win-sub" id="winSubtitle" data-i18n="winner">WINNER</div>
       </div>
     </div>
@@ -387,7 +381,7 @@
 <input id="photoInput" type="file" accept="image/*" hidden>
 
 <template id="playerRowTpl">
-  <div class="row" aria-grabbed="false" title="Long-press to Edit (when locked)">
+  <div class="row" title="Long-press to Edit (when locked)">
     <div class="drag" aria-hidden="true">≡</div>
     <div class="avatar" aria-hidden="true"><span class="initials">P</span></div>
     <strong class="playerName">Player</strong>
@@ -402,233 +396,234 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.2", BUILD:"2025-08-19", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.7", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
-  /* ===== utils ===== */
+  /* utils */
   const $ = s => document.querySelector(s);
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
   const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
   const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
   const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
-    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:1000000;font-weight:800;letter-spacing:.2px";
+    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
-  /* Scroll lock that preserves position (fixes jump on modal open/close) */
-  let scrollYBeforeLock = 0;
-  function lockScroll(){
-    scrollYBeforeLock = window.scrollY || document.documentElement.scrollTop || 0;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollYBeforeLock}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
-  }
-  function unlockScroll(){
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    document.body.style.width = '';
-    document.body.style.overflow = '';
-    window.scrollTo({top: scrollYBeforeLock, behavior: 'instant'});
-  }
-  const showModalWithLock = (dlg) => {
-    if (!dlg) return;
-    lockScroll();
-    dlg.showModal();
-    dlg.addEventListener('close', () => { unlockScroll(); }, {once: true});
-  };
+  let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
 
-  /* ===== i18n ===== */
-  const STR = {
-    en:{ reorder:"Reorder", history:"History", newRound:"New round", players:"Players", addPlayer:"Add player",
-      settings:"Settings", language:"Language", limitLabel:"Limit (default 100)", autoAdvance:"Auto-advance dealer after round",
-      lockOrder:"Lock player reordering", resetScores:"Reset scores", clearAll:"Clear all",
-      done:"Done", roundHint:"Enter points (negatives OK). \"-10\" changes the input.",
-      cancel:"Cancel", apply:"Apply", editPlayer:"Edit player", name:"Name", score:"Score", reenganches:"Reenganches",
-      photo:"Photo", changePhoto:"Change photo", addPhoto:"Add photo", editPhoto:"Edit photo", removePhoto:"Remove photo", setDealer:"Set as next dealer",
-      deletePlayer:"Delete player", save:"Save", winner:"WINNER", close:"Close", newGame:"New game" },
-    es:{ reorder:"Reordenar", history:"Historial", newRound:"Nueva ronda", players:"Jugadores", addPlayer:"Agregar jugador",
-      settings:"Ajustes", language:"Idioma", limitLabel:"Límite (por defecto 100)", autoAdvance:"Avanzar mano automáticamente",
-      lockOrder:"Bloquear reordenamiento", resetScores:"Reiniciar puntajes", clearAll:"Borrar todo",
-      done:"Listo", roundHint:"Ingresa puntos (negativos ok). \"-10\" cambia el campo.",
-      cancel:"Cancelar", apply:"Aplicar", editPlayer:"Editar jugador", name:"Nombre", score:"Puntos", reenganches:"Reenganches",
-      photo:"Foto", changePhoto:"Cambiar foto", addPhoto:"Agregar foto", editPhoto:"Editar foto", removePhoto:"Quitar foto", setDealer:"Fijar como próximo mano",
-      deletePlayer:"Eliminar jugador", save:"Guardar", winner:"GANADOR", close:"Cerrar", newGame:"Nuevo juego" }
-  };
-  const storageLangKey = "conga_lang";
-  let LANG = localStorage.getItem(storageLangKey) || "en";
+  // Dialogs already block; don’t toggle body scrolling.
+  const showModalWithLock = (dlg) => { if (dlg) { dlg.showModal(); dlg.scrollTop = 0; } };
+
+  /* i18n */
+  const STR = { en:{reorder:"Reorder",history:"History",newRound:"New round",players:"Players",addPlayer:"Add player",
+      settings:"Settings",limitLabel:"Limit (default 100)",autoAdvance:"Auto-advance dealer after round",lockOrder:"Lock player reordering",
+      resetScores:"Reset scores",clearAll:"Clear all",done:"Done",cancel:"Cancel",apply:"Apply",editPlayer:"Edit player",
+      name:"Name",score:"Score",reenganches:"Reenganches",photo:"Photo",addPhoto:"Add photo",editPhoto:"Edit photo",removePhoto:"Remove photo",
+      setDealer:"Set as next dealer",deletePlayer:"Delete player",save:"Save",winner:"WINNER",close:"Close",newGame:"New game"},
+    es:{reorder:"Reordenar",history:"Historial",newRound:"Nueva ronda",players:"Jugadores",addPlayer:"Agregar jugador",
+      settings:"Ajustes",limitLabel:"Límite (por defecto 100)",autoAdvance:"Avanzar mano automáticamente",lockOrder:"Bloquear reordenamiento",
+      resetScores:"Reiniciar puntajes",clearAll:"Borrar todo",done:"Listo",cancel:"Cancelar",apply:"Aplicar",editPlayer:"Editar jugador",
+      name:"Nombre",score:"Puntos",reenganches:"Reenganches",photo:"Foto",addPhoto:"Agregar foto",editPhoto:"Editar foto",removePhoto:"Quitar foto",
+      setDealer:"Fijar como próximo mano",deletePlayer:"Eliminar jugador",save:"Guardar",winner:"GANADOR",close:"Cerrar",newGame:"Nuevo juego"} };
+  const storageLangKey="conga_lang"; let LANG=localStorage.getItem(storageLangKey)||"en";
   function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.en[k] || k; }
-  function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(n=>{ const key=n.getAttribute("data-i18n"); n.textContent=t(key); });
-    $("#pillEn")?.classList.toggle("active", LANG==="en"); $("#pillEs")?.classList.toggle("active", LANG==="es"); }
+  function applyI18n(){ document.querySelectorAll("[data-i18n]").forEach(n=>n.textContent=t(n.dataset.i18n)); $("#pillEn")?.classList.toggle("active",LANG==="en"); $("#pillEs")?.classList.toggle("active",LANG==="es"); }
 
-  /* ===== state ===== */
-  const STORAGE_KEY = APP.STORAGE_KEY;
+  /* state */
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
-  let roundCounter=0; let rounds=[]; let lockOrder=false; let schema = APP.SCHEMA;
+  let roundCounter=0; let rounds=[]; let lockOrder=false; let schema=APP.SCHEMA;
 
-  const defaultsPlayers = () => ([
-    {id:uid(), name:"Player 1", score:0, reenganches:0, avatar:null},
-    {id:uid(), name:"Player 2", score:0, reenganches:0, avatar:null}
-  ]);
+  const defaultsPlayers = ()=>[{id:uid(),name:"Player 1",score:0,reenganches:0,avatar:null},{id:uid(),name:"Player 2",score:0,reenganches:0,avatar:null}];
 
-  const save=()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder, app:{version:APP.VERSION, channel:APP.CHANNEL}})); };
+  const save=()=>localStorage.setItem(APP.STORAGE_KEY, JSON.stringify({schema,players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder,app:{version:APP.VERSION}}));
 
-  function loadLegacyMostRecent(){
-    let bestKey=null, bestNum=-1;
-    for (let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      const m = /^conga_state_stage_v(\d+)/.exec(k||"");
-      if(m){ const n=parseInt(m[1],10); if(n>bestNum){ bestNum=n; bestKey=k; } }
-    }
-    if(bestKey){ try { return JSON.parse(localStorage.getItem(bestKey)||"{}"); } catch(e){ return null; } }
-    return null;
-  }
-  function migrateIfNeeded(raw){
-    const out = { schema: 2,
-      players: Array.isArray(raw?.players) && raw.players.length ? raw.players : defaultsPlayers(),
-      limit: Number.isFinite(raw?.limit) ? raw.limit : 100,
-      autoAdvanceDealer: typeof raw?.autoAdvanceDealer==="boolean" ? raw.autoAdvanceDealer : true,
-      nextDealerId: typeof raw?.nextDealerId==="string" ? raw.nextDealerId : (raw?.players?.[0]?.id || null),
-      gameOver: !!raw?.gameOver, roundCounter: Number.isFinite(raw?.roundCounter) ? raw.roundCounter : 0,
-      rounds: Array.isArray(raw?.rounds) ? raw.rounds : [], lockOrder: !!raw?.lockOrder,
-    }; return out;
-  }
   function load(){
     try{
-      const s = JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
-      if (s && typeof s === 'object' && Number.isFinite(s.schema)) ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = s);
-      else ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = migrateIfNeeded(loadLegacyMostRecent()||{})), save();
-      if (!Array.isArray(players) || players.length===0) players = defaultsPlayers();
-    }catch{ ({schema, players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder} = migrateIfNeeded({})); save(); }
+      const s=JSON.parse(localStorage.getItem(APP.STORAGE_KEY)||"null");
+      if(s){ ({schema,players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder}=s); }
+      if(!Array.isArray(players)||players.length===0){ players=defaultsPlayers(); }
+      if(!nextDealerId){ nextDealerId=players[0]?.id||null; }
+    }catch{ players=defaultsPlayers(); nextDealerId=players[0].id; }
   }
 
-  /* ===== render ===== */
-  const list=$("#playersList"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
+  /* render */
+  const list=$("#playersList"), playersPane=$("#playersPane"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
   function render(){
-    $("#limitInput").value=limit;
-    $("#autoAdvance").checked=autoAdvanceDealer;
-    $("#lockOrderSwitch").checked=lockOrder;
-    $("#lockToggle").innerHTML = (lockOrder? "🔒 " : "🔓 ") + t("reorder");
-    $("#lockToggle").title = t("reorder");
+    const preserveScroll = playersPane ? playersPane.scrollTop : 0;
 
-    if (dealerLine) {
-      const dealer = players.find(p=>p.id===nextDealerId);
-      dealerLine.textContent = dealer ? `${LANG==='es'?'Próximo mano:':'Next dealer:'} ${dealer.name}` : '';
-    }
-
-    if(list) {
-      const frag = document.createDocumentFragment();
-      players.forEach((p, i) => {
+    $("#limitInput").value=limit; $("#autoAdvance").checked=autoAdvanceDealer; $("#lockOrderSwitch").checked=lockOrder;
+    $("#lockToggle").innerHTML=(lockOrder?"🔒 ":"🔓 ")+t("reorder");
+    if(dealerLine){ const d=players.find(p=>p.id===nextDealerId); dealerLine.textContent=d?`${LANG==='es'?'Próximo mano:':'Next dealer:'} ${d.name}`:""; }
+    if(list){
+      const frag=document.createDocumentFragment();
+      players.forEach((p,i)=>{
         const n=rowTpl.content.firstElementChild.cloneNode(true);
         n.dataset.index=i; n.dataset.id=p.id;
 
-        // Edit only when LOCKED
-        if (lockOrder) attachLongPress(n, ()=>openEdit(p.id));
+        /* edit only when locked */
+        if(lockOrder) attachLongPress(n, ()=>openEdit(p.id));
 
-        // Pointer reorder on handle when UNLOCKED
-        const handle = n.querySelector('.drag');
-        if (!lockOrder){
-          handle.classList.remove('locked');
-          enableTouchReorder(handle, p.id);
-        }else{
-          handle.classList.add('locked');
-          handle.onpointerdown = null;
-        }
+        /* live reorder when unlocked */
+        const handle=n.querySelector('.drag');
+        if(!lockOrder){ handle.classList.remove('locked'); enableLiveReorder(handle, n); }
+        else { handle.classList.add('locked'); handle.onpointerdown=handle.ontouchstart=handle.onmousedown=null; }
 
         if(p.id===nextDealerId) n.classList.add("dealer");
         const avatarBox=n.querySelector(".avatar");
-        if(avatarBox){ avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`; }
+        avatarBox.innerHTML = p.avatar ? `<img alt="" src="${p.avatar}">` : `<span class="initials">${initials(p.name||"")}</span>`;
         n.querySelector(".playerName").textContent=p.name||"—";
-        const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent = r>0 ? (r===1?"★":"★ "+r) : "";
+        const r=clampInt(p.reenganches||0,0); n.querySelector(".stars").textContent=r>0?(r===1?"★":"★ "+r):"";
         const sv=n.querySelector(".scoreVal"); sv.textContent=clampInt(p.score||0);
         const sc=n.querySelector(".score"); if((p.score||0)>=limit+1) sc.classList.add("over"); else sc.classList.remove("over");
-
         frag.appendChild(n);
       });
-      list.innerHTML = "";
-      list.appendChild(frag);
+      list.innerHTML=""; list.appendChild(frag);
     }
-    $("#newRoundBtn").disabled=gameOver || players.length===0;
-    applyI18n();
-    save();
+    applyI18n(); debounceSave();
+
+    if(playersPane) playersPane.scrollTop = preserveScroll;
   }
 
   function attachLongPress(el, cb){
     let tmr, moved=false;
-    const start = (e)=>{ e.preventDefault(); moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
-    const end = ()=>{ clearTimeout(tmr); };
-    el.addEventListener('touchstart', start, {passive:false});
-    el.addEventListener('mousedown', start);
-    el.addEventListener('touchmove', ()=>{ moved=true; }, {passive:true});
-    ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev, end));
+    const start=e=>{ e.preventDefault(); moved=false; tmr=setTimeout(()=>{ if(!moved) cb(); },600); };
+    const end=()=>clearTimeout(tmr);
+    el.addEventListener('touchstart',start,{passive:false}); el.addEventListener('mousedown',start);
+    el.addEventListener('touchmove',()=>{moved=true;},{passive:true});
+    ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,end));
   }
 
-  /* ===== Touch/pointer reorder ===== */
-  let dragActive=false, dragPlayerId=null;
-  function enableTouchReorder(handleEl, playerId){
-    handleEl.onpointerdown = (e)=>{
-      if (lockOrder) return;
-      dragActive=true; dragPlayerId=playerId;
-      handleEl.setPointerCapture(e.pointerId);
-      document.addEventListener('pointermove', onDragMove, {passive:false});
-      document.addEventListener('pointerup', onDragEnd, {passive:false});
+  /* ===== Live reorder (ghost + placeholder) ===== */
+  function enableLiveReorder(handle, rowEl){
+    const start=(e)=>{
+      if(lockOrder) return;
+      const isTouch = e.touches && e.touches.length;
+      const clientX = isTouch ? e.touches[0].clientX : (e.clientX ?? 0);
+      const clientY = isTouch ? e.touches[0].clientY : (e.clientY ?? 0);
+
+      const rect = rowEl.getBoundingClientRect();
+      const startIdx = +rowEl.dataset.index;
+
+      // placeholder
+      const ph = document.createElement('div');
+      ph.className = 'row placeholder';
+      ph.style.height = rect.height + 'px';
+
+      // ghost
+      const ghost = rowEl.cloneNode(true);
+      ghost.classList.add('drag-ghost');
+      ghost.style.width = rect.width + 'px';
+      ghost.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+
+      // offset
+      const offsetX = clientX - rect.left;
+      const offsetY = clientY - rect.top;
+
+      // mount
+      const parent = list;
+      parent.insertBefore(ph, rowEl);
+      rowEl.remove();
+      document.body.appendChild(ghost);
+
+      // keep scroll inside players pane
+      const pr = playersPane.getBoundingClientRect();
+      const edge = 36;
+
+      const move = (cx, cy) => {
+        ghost.style.transform = `translate3d(${cx - offsetX}px, ${cy - offsetY}px, 0)`;
+
+        // auto-scroll players pane near edges
+        if (cy < pr.top + edge) playersPane.scrollBy({top:-14, behavior:'auto'});
+        else if (cy > pr.bottom - edge) playersPane.scrollBy({top:14, behavior:'auto'});
+
+        // re-position placeholder by ghost center
+        const centerY = cy;
+        const rows = Array.from(parent.querySelectorAll('.row')); // includes placeholder
+        const target = rows.find(el => el !== ph && (centerY < el.getBoundingClientRect().top + el.offsetHeight/2));
+        if (target) parent.insertBefore(ph, target); else parent.appendChild(ph);
+      };
+
+      const detach = () => {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      const end = () => {
+        const kids = Array.from(parent.children);
+        const toIdx = kids.indexOf(ph);
+        ghost.remove(); ph.remove();
+        if (Number.isInteger(startIdx) && Number.isInteger(toIdx) && startIdx !== toIdx) {
+          const arr = players.slice(); const keepDealer = nextDealerId;
+          const moving = arr.splice(startIdx,1)[0]; arr.splice(toIdx,0,moving);
+          players = arr; nextDealerId = keepDealer;
+        }
+        render();
+        detach();
+      };
+
+      const onPointerMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
+      const onTouchMove = ev => { const t=ev.touches[0]; if(!t) return; ev.preventDefault(); move(t.clientX, t.clientY); };
+      const onMouseMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
+
+      const onPointerUp = ev => { ev.preventDefault(); end(); };
+      const onTouchEnd = ev => { ev.preventDefault(); end(); };
+      const onMouseUp = ev => { ev.preventDefault(); end(); };
+
+      window.addEventListener('pointermove', onPointerMove, {passive:false});
+      window.addEventListener('pointerup', onPointerUp, {passive:false});
+      window.addEventListener('touchmove', onTouchMove, {passive:false});
+      window.addEventListener('touchend', onTouchEnd, {passive:false});
+      window.addEventListener('mousemove', onMouseMove, {passive:false});
+      window.addEventListener('mouseup', onMouseUp, {passive:false});
+
       e.preventDefault();
+      move(clientX, clientY);
     };
-  }
-  function onDragMove(e){
-    if (!dragActive) return; e.preventDefault();
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    const row = el && el.closest ? el.closest('.row') : null;
-    if (!row) return;
-    const fromIdx = players.findIndex(p=>p.id===dragPlayerId);
-    const toIdx = +row.dataset.index;
-    if (fromIdx<0 || toIdx<0 || fromIdx===toIdx) return;
-    const keep = nextDealerId, arr = players.slice();
-    const m = arr.splice(fromIdx,1)[0]; arr.splice(toIdx,0,m);
-    players = arr; nextDealerId = keep; render();
-  }
-  function onDragEnd(){
-    dragActive=false; dragPlayerId=null;
-    document.removeEventListener('pointermove', onDragMove);
-    document.removeEventListener('pointerup', onDragEnd);
+
+    handle.onpointerdown = start;
+    handle.ontouchstart = start;
+    handle.onmousedown = start;
   }
 
   /* ===== Edit dialog ===== */
   const editDlg=$("#editDialog"), editForm=$("#editForm");
-  function refreshEditPreview(id){
-    const p=players.find(x=>x.id===id);
-    const prev=$("#editAvatarPreview");
-    const btn=$("#changePhotoBtn");
-    if (prev){ prev.src = p?.avatar || ""; prev.style.opacity = p?.avatar ? "1" : ".35"; }
-    if (btn){ btn.setAttribute("data-i18n", p?.avatar ? "editPhoto" : "addPhoto"); btn.textContent = t(p?.avatar ? "editPhoto" : "addPhoto"); }
+  function refreshEditPreview(id){ const p=players.find(x=>x.id===id); const prev=$("#editAvatarPreview"), btn=$("#changePhotoBtn");
+    if(prev){ prev.src=p?.avatar||""; prev.style.opacity=p?.avatar?"1":".35"; }
+    if(btn){ const key=p?.avatar?"editPhoto":"addPhoto"; btn.setAttribute("data-i18n",key); btn.textContent=t(key); }
   }
-  function openEdit(id){ const p=players.find(x=>x.id===id); if(!p) return;
+  function openEdit(id){
+    const p=players.find(x=>x.id===id); if(!p) return;
     $("#editId").value=p.id; $("#editName").value=p.name||""; $("#editScore").value=clampInt(p.score||0); $("#editReeng").value=clampInt(p.reenganches||0);
-    const sds=$("#setDealerSwitch"); if(sds) sds.checked=(p.id===nextDealerId);
+    $("#setDealerSwitch").checked=(p.id===nextDealerId);
     refreshEditPreview(p.id);
     $("#changePhotoBtn").onclick=()=>openCrop(p.id, p.avatar);
-    $("#removePhotoBtn").onclick = ()=>{ p.avatar=null; refreshEditPreview(p.id); render(); };
-    $("#deletePlayerBtn").onclick = ()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); }};
+    $("#removePhotoBtn").onclick=()=>{ p.avatar=null; refreshEditPreview(p.id); render(); };
+    $("#deletePlayerBtn").onclick=()=>{ if(confirm(LANG==="es"?"¿Eliminar jugador?":"Delete this player?")){ editDlg.close(); removePlayer(p.id); } };
     showModalWithLock(editDlg);
   }
-  if(editForm) editForm.addEventListener("submit", (e)=>{
-    e.preventDefault(); const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p) return editDlg && editDlg.close();
-    p.name=String($("#editName").value||"").trim()||p.name; p.score=clampInt($("#editScore").value, p.score); p.reenganches=Math.max(0, clampInt($("#editReeng").value, p.reenganches));
-    const sds=$("#setDealerSwitch"); if(sds && sds.checked) nextDealerId=p.id; editDlg && editDlg.close(); render();
+  editForm?.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    const id=$("#editId").value; const p=players.find(x=>x.id===id); if(!p){ editDlg.close(); return; }
+    p.name=String($("#editName").value||"").trim()||p.name;
+    p.score=clampInt($("#editScore").value,p.score);
+    p.reenganches=Math.max(0,clampInt($("#editReeng").value,p.reenganches));
+    if($("#setDealerSwitch").checked) nextDealerId=p.id;
+    editDlg.close(); render();
   });
 
-  /* ===== Circle Cropper ===== */
-  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"), pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
-  const ctx = cropCanvas.getContext('2d');
+  /* ===== Circular cropper ===== */
+  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
+        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
+  const ctx=cropCanvas.getContext('2d');
   let cropPlayerId=null, img=new Image(), imgLoaded=false, scale=1, minScale=1, maxScale=4, offsetX=0, offsetY=0;
-  let pinchDist0=null, scale0=null; const activeTouches=new Map(); let panning=false, startPanX=0, startPanY=0;
+  let pinchDist0=null, scale0=null; const touches=new Map(); let panning=false, startPanX=0, startPanY=0;
 
-  function dprSize(el){ const DPR = window.devicePixelRatio || 1; return [el.clientWidth*DPR, el.clientHeight*DPR, DPR]; }
+  function dprSize(el){ const DPR=window.devicePixelRatio||1; return [el.clientWidth*DPR, el.clientHeight*DPR, DPR]; }
   function circleSpecs(){ const w=cropCanvas.width, h=cropCanvas.height, DPR=window.devicePixelRatio||1, pad=12*DPR; const r=Math.min(w,h)/2 - pad; return {cx:w/2, cy:h/2, r, DPR}; }
   function coverMinScale(){ const {r}=circleSpecs(); return Math.max((2*r)/img.width, (2*r)/img.height)*1.001; }
   function clampPan(){ const {cx,cy,r}=circleSpecs(); const w=img.width*scale, h=img.height*scale;
@@ -638,79 +633,67 @@
     if (offsetY + h < cy + r) offsetY = (cy + r) - h;
   }
   function drawCrop(){
-    const [cw,ch] = dprSize(cropStage);
-    if (cropCanvas.width !== cw || cropCanvas.height !== ch){ cropCanvas.width=cw; cropCanvas.height=ch; }
+    const [cw,ch]=dprSize(cropStage); if(cropCanvas.width!==cw||cropCanvas.height!==ch){ cropCanvas.width=cw; cropCanvas.height=ch; }
     ctx.clearRect(0,0,cw,ch);
-    const {cx,cy,r} = circleSpecs();
-    if (imgLoaded){ const w=img.width*scale, h=img.height*scale; ctx.drawImage(img, offsetX, offsetY, w, h); }
-    // overlay
+    const {cx,cy,r}=circleSpecs();
+    if(imgLoaded){ const w=img.width*scale, h=img.height*scale; ctx.drawImage(img, offsetX, offsetY, w, h); }
     ctx.save(); ctx.fillStyle='rgba(0,0,0,.55)'; ctx.beginPath(); ctx.rect(0,0,cw,ch); ctx.moveTo(cx+r, cy); ctx.arc(cx,cy,r,0,Math.PI*2,true); ctx.fill('evenodd'); ctx.restore();
-    // ring
-    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#4ee1a0'; ctx.lineWidth=Math.max(2, r*0.04); ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent-2')||'#4ee1a0'; ctx.lineWidth=Math.max(2,r*0.04); ctx.stroke(); ctx.restore();
   }
   function setZoomBySlider(val){ const t=val/100; scale=minScale+(maxScale-minScale)*t; zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); }
 
   function openCrop(playerId, existingAvatar=null){
-    cropPlayerId = playerId;
-    const useImage = (src)=>{ imgLoaded=false; img=new Image(); img.onload=()=>{
-        imgLoaded = true; minScale = coverMinScale(); maxScale = Math.max(minScale*4, minScale+0.01); scale = minScale * 1.05;
+    cropPlayerId=playerId;
+    const ensureShow=cb=>{ showModalWithLock(cropDlg); requestAnimationFrame(()=>{ drawCrop(); requestAnimationFrame(cb); }); };
+    const useImage=src=>{ imgLoaded=false; img=new Image(); img.onload=()=>{
+        imgLoaded=true; minScale=coverMinScale(); maxScale=Math.max(minScale*4, minScale+0.01); scale=minScale*1.05;
         const {cx,cy}=circleSpecs(); const w=img.width*scale, h=img.height*scale; offsetX=cx-w/2; offsetY=cy-h/2; clampPan();
-        const t = (scale - minScale)/(maxScale - minScale); zoomRange.value = Math.round(t*100); zoomOut.textContent = Math.round(scale/minScale*100)+'%';
-        drawCrop();
-      }; img.src = src; };
-
-    showModalWithLock(cropDlg);
-    requestAnimationFrame(()=>{ drawCrop(); requestAnimationFrame(()=>{
-      if (existingAvatar) useImage(existingAvatar);
-      else { photoInput.onchange = async () => { const f = photoInput.files[0]; if(!f) return;
-        const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-        useImage(dataUrl);
-      }; photoInput.click(); }
-    });});
+        const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%';
+        drawCrop(); cropDialog.scrollTop=0;
+      }; img.src=src; };
+    if (existingAvatar){ ensureShow(()=>useImage(existingAvatar)); }
+    else { photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
+        const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
+        ensureShow(()=>useImage(dataUrl)); }; photoInput.click(); }
   }
-
-  // pointer handlers (pan / pinch)
-  cropStage.addEventListener('pointerdown', (e)=>{ cropStage.setPointerCapture(e.pointerId); activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if (activeTouches.size===2){ const pts=[...activeTouches.values()]; pinchDist0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); scale0=scale; }
-    else if (activeTouches.size===1){ panning=true; startPanX=e.clientX - offsetX; startPanY=e.clientY - offsetY; } });
-  cropStage.addEventListener('pointermove', (e)=>{ if(!imgLoaded) return; if(!activeTouches.has(e.pointerId)) return; activeTouches.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if (activeTouches.size===2){ const pts=[...activeTouches.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-      if (pinchDist0 && scale0){ const ratio=dist/pinchDist0; scale=Math.min(maxScale, Math.max(minScale, scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
-    else if (panning){ offsetX=e.clientX-startPanX; offsetY=e.clientY-startPanY; clampPan(); drawCrop(); } }, {passive:false});
-  function endPointer(e){ activeTouches.delete(e.pointerId); if(activeTouches.size<2){ pinchDist0=null; scale0=null; } if(activeTouches.size===0){ panning=false; } }
-  cropStage.addEventListener('pointerup', endPointer); cropStage.addEventListener('pointercancel', endPointer); cropStage.addEventListener('pointerleave', endPointer);
-  zoomRange.addEventListener('input', (e)=> setZoomBySlider(+e.target.value));
-  $("#pickAnotherBtn").addEventListener('click', ()=>{ photoInput.onchange = async () => { const f=photoInput.files[0]; if(!f) return; try{
-      const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-      openCrop(cropPlayerId, dataUrl);
-    }catch{ toast('Photo load error'); } }; photoInput.click(); });
-  $("#applyCropBtn").addEventListener('click', ()=>{
-    if (!imgLoaded) { cropDlg.close(); return; }
-    const {cx, cy, r} = circleSpecs();
-    const ox = (cx - offsetX) / scale, oy = (cy - offsetY) / scale, or = r / scale;
-    const size = 512; const out = document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
+  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(touches.size===2){ const pts=[...touches.values()]; pinchDist0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); scale0=scale; }
+    else if(touches.size===1){ panning=true; startPanX=e.clientX-offsetX; startPanY=e.clientY-offsetY; } });
+  cropStage.addEventListener('pointermove',e=>{ if(!imgLoaded||!touches.has(e.pointerId)) return; touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(touches.size===2){ const pts=[...touches.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if(pinchDist0&&scale0){ const ratio=dist/pinchDist0; scale=Math.min(maxScale,Math.max(minScale,scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
+    else if(panning){ offsetX=e.clientX-startPanX; offsetY=e.clientY-startPanY; clampPan(); drawCrop(); } }, {passive:false});
+  function endPtr(e){ touches.delete(e.pointerId); if(touches.size<2){ pinchDist0=null; scale0=null; } if(touches.size===0){ panning=false; } }
+  cropStage.addEventListener('pointerup',endPtr); cropStage.addEventListener('pointercancel',endPtr); cropStage.addEventListener('pointerleave',endPtr);
+  zoomRange.addEventListener('input',e=>setZoomBySlider(+e.target.value));
+  $("#pickAnotherBtn").addEventListener('click',()=>{ photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
+      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
+      openCrop(cropPlayerId, dataUrl); }; photoInput.click(); });
+  $("#applyCropBtn").addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
+    const {cx,cy,r}=circleSpecs(); const ox=(cx-offsetX)/scale, oy=(cy-offsetY)/scale, or=r/scale;
+    const size=512; const out=document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
     octx.clearRect(0,0,size,size); octx.save(); octx.beginPath(); octx.arc(size/2,size/2,size/2,0,Math.PI*2); octx.clip();
-    const S = (size/2) / or; octx.setTransform(S,0,0,S, size/2 - ox*S, size/2 - oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
-    const dataOut = out.toDataURL('image/png', 0.95);
-    const p = players.find(x=>x.id===cropPlayerId);
-    if (p){ p.avatar = dataOut; refreshEditPreview(p.id); render(); }
-    cropDlg.close();
-  });
+    const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
+    const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* ===== Round dialog (cutter + reenganche @ limit+1) ===== */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), rErr=$("#roundError"), applyBtn=$("#applyRoundBtn"), cutGrid=$("#cutGrid");
-  let selectedCutterId = "";
+  /* ===== Round (with cutter / instant-win + reenganche >= limit+1) ===== */
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn"), cutGrid=$("#cutGrid"), rErr=$("#roundError");
+  let selectedCutterId="";
 
   function buildCutterGrid(){
-    cutGrid.innerHTML = "";
-    const mk = (id,label,checked=false)=>{ const w=document.createElement("label"); w.className="cut-opt"; const i=document.createElement("input"); i.type="radio"; i.name="cutter"; i.value=id; i.checked=checked; const s=document.createElement("span"); s.textContent=label; w.append(i,s); i.addEventListener('change', validateRound); return w; };
+    cutGrid.innerHTML="";
+    const mk=(id,label,checked=false)=>{ const w=document.createElement("label"); w.className="cut-opt";
+      const i=document.createElement("input"); i.type="radio"; i.name="cutter"; i.value=id; i.checked=checked;
+      const s=document.createElement("span"); s.textContent=label; w.append(i,s); i.addEventListener('change', validateRound); return w; };
+    mk("", "None", true); // helper for default
     cutGrid.appendChild(mk("", LANG==='es'?'Nadie':'None', true));
     players.forEach(p=> cutGrid.appendChild(mk(p.id, p.name)));
   }
 
-  const openRound=()=>{ if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
+  function openRound(){
+    if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
     rows.innerHTML=""; buildCutterGrid(); selectedCutterId="";
-    const frag = document.createDocumentFragment();
+    const frag=document.createDocumentFragment();
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
@@ -719,138 +702,125 @@
       r.append(name,inp,minus); frag.appendChild(r);
     });
     rows.appendChild(frag);
-    rErr.style.display="none"; applyBtn.disabled=false;
+    rErr.style.display="none";
     showModalWithLock(roundDlg);
-    requestAnimationFrame(()=>{ roundDlg.scrollTop=0; rows.scrollTop=0; /* don't auto-focus to avoid iOS jump */ });
-  };
+    requestAnimationFrame(()=>{ roundDlg.scrollTop=0; /* no autofocus to avoid iOS jump */ });
+  }
 
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
 
   function validateRound(){
-    const inputs = roundInputs(); const radios=document.querySelectorAll('input[name="cutter"]'); radios.forEach(r=>{ if(r.checked) selectedCutterId=r.value; });
-    if (!selectedCutterId){ rErr.style.display="none"; applyBtn.disabled=false; return; }
-    const cutter = players.find(p=>p.id===selectedCutterId); if(!cutter){ rErr.style.display="none"; applyBtn.disabled=false; return; }
+    const inputs = roundInputs();
+    const radios = document.querySelectorAll('input[name="cutter"]');
+    radios.forEach(r=>{ if(r.checked) selectedCutterId=r.value; });
+    if (!selectedCutterId){ rErr.style.display="none"; applyRoundBtn.disabled=false; return; }
+    const cutter = players.find(p=>p.id===selectedCutterId); if(!cutter){ rErr.style.display="none"; applyRoundBtn.disabled=false; return; }
     const projected = clampInt(cutter.score||0) + clampInt(inputs[cutter.id]||0);
-    if (projected > limit){ rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`; rErr.style.display="block"; applyBtn.disabled=true; }
-    else { rErr.style.display="none"; applyBtn.disabled=false; }
+    if (projected > limit){
+      rErr.textContent = LANG==='es' ? `El que corta no puede pasar de ${limit}. (serían ${projected})` : `Cutter cannot exceed ${limit}. (would be ${projected})`;
+      rErr.style.display="block"; applyRoundBtn.disabled=true;
+    } else { rErr.style.display="none"; applyRoundBtn.disabled=false; }
   }
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
   function applyRound(inputs){
-    const roundNo = roundCounter + 1;
-    const proj = {}; players.forEach(p => proj[p.id] = clampInt(p.score||0) + clampInt(inputs[p.id]||0));
+    const roundNo=roundCounter+1;
+    const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
 
+    // Instant-win logic if a cutter was chosen
     if (selectedCutterId){
       const cutterProj = proj[selectedCutterId] || 0;
-      if (cutterProj > limit){ validateRound(); return; }
+      if (cutterProj > limit){ validateRound(); return; } // guard
       const others = players.filter(p=>p.id!==selectedCutterId);
       const allOthersOver = others.every(p => proj[p.id] > limit);
-      const cutterEligible = cutterProj <= limit;
-      if (cutterEligible && allOthersOver){
+      if (cutterProj <= limit && allOthersOver){
         players.forEach(p=>{ p.score = proj[p.id]; });
         roundCounter += 1;
         rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId, instantWin:true});
-        gameOver=true;
-        showWinOverlay(players.find(p=>p.id===selectedCutterId));
-        render();
-        return;
+        gameOver=true; showWinOverlay(players.find(p=>p.id===selectedCutterId)); render(); return;
       }
     }
 
-    roundCounter += 1;
-    const REENG_THRESHOLD = limit + 1;
-    const under = players.filter(p => proj[p.id] <= limit);
-    const over  = players.filter(p => proj[p.id] >= REENG_THRESHOLD);
+    roundCounter+=1;
+    const REENG_THRESHOLD=limit+1; // reenganche only at exactly 101+ when limit=100
+    const under=players.filter(p=>proj[p.id]<=limit);
+    const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
-    if (under.length >= 2 && over.length > 0) {
-      const maxUnderVal = Math.max(...under.map(p => proj[p.id]));
-      over.forEach(p => { proj[p.id] = maxUnderVal; p.reenganches = (p.reenganches || 0) + 1; });
-    } else if (under.length === 0) {
-      players.forEach(p => { proj[p.id] = Math.min(proj[p.id], limit); });
+    if(under.length>=2 && over.length>0){
+      const maxUnderVal=Math.max(...under.map(p=>proj[p.id]));
+      over.forEach(p=>{ proj[p.id]=maxUnderVal; p.reenganches=(p.reenganches||0)+1; });
+    }else if(under.length===0){
+      players.forEach(p=>{ proj[p.id]=Math.min(proj[p.id],limit); });
       toast(LANG==="es"?"Todos excedieron - limitado":"All over limit - capped");
     }
 
     players.forEach(p=>{ p.score=proj[p.id]; });
 
-    if(autoAdvanceDealer && players.length > 0 && nextDealerId){ 
-      const i=players.findIndex(p=>p.id===nextDealerId); 
-      nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id; 
+    if(autoAdvanceDealer && players.length>0 && nextDealerId){
+      const i=players.findIndex(p=>p.id===nextDealerId);
+      nextDealerId=players[(i>=0&&i<players.length-1)?i+1:0].id;
     }
 
     rounds.push({round:roundNo, inputs:{...inputs}, totals:snapshotTotalsById(), timestamp:Date.now(), cutter:selectedCutterId||""});
     gameOver=false;
 
-    const alive = players.filter(p=>p.score<=limit);
+    const alive=players.filter(p=>p.score<=limit);
     if(alive.length===1){ gameOver=true; showWinOverlay(alive[0]); }
     render();
   }
-  $("#roundForm")?.addEventListener("submit", (e)=>{ e.preventDefault(); const inputs = roundInputs(); applyRound(inputs); roundDlg && roundDlg.close(); });
 
-  /* ===== History modal ===== */
+  on("#roundForm","submit",(e)=>{ e.preventDefault(); const inputs = roundInputs(); applyRound(inputs); roundDlg.close(); });
+
+  /* History */
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
-    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">${t("history")}</div><button class="btn" style="padding:6px 10px" data-i18n="close">${t("close")}</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
+    dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">History</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
     const twrap=dlg.querySelector('.table-wrap');
     const table=document.createElement('table'); const thead=document.createElement('thead'); const trh=document.createElement('tr');
-    trh.innerHTML = "<th>#</th>"+players.map(p=>`<th>${p.name} (Δ / Total)</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
+    trh.innerHTML="<th>#</th>"+players.map(p=>`<th>${p.name} (Δ / Total)</th>`).join(""); thead.appendChild(trh); table.appendChild(thead);
     const tbody=document.createElement('tbody');
-    rounds.forEach(r=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<th>${r.round}${r.instantWin?' ⭐':''}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join("");
-      tbody.appendChild(tr);
-    });
+    rounds.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<th>${r.round}${r.instantWin?' ⭐':''}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join(""); tbody.appendChild(tr); });
     table.appendChild(tbody); twrap.appendChild(table);
-    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); 
-    showModalWithLock(dlg);
+    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); showModalWithLock(dlg);
   }
 
-  /* ===== Wire-up ===== */
-  on("#openSettings","click", ()=> showModalWithLock($("#settingsDialog")));
-  on("#historyBtn","click", openRoundsTable);
-  on("#newRoundBtn","click", openRound);
-  on("#addPlayerBtn","click", ()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
-  on("#resetScoresBtn","click", ()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
-  on("#clearAllBtn","click", ()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players = defaultsPlayers(); limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false; rounds=[]; roundCounter=0; lockOrder=false; render(); }});
-  on("#lockToggle","click", ()=>{ lockOrder=!lockOrder; const sw=$("#lockOrderSwitch"); if(sw) sw.checked=lockOrder; render(); });
-  on("#lockOrderSwitch","change", e=>{ lockOrder=!!e.target.checked; render(); });
-  on("#limitInput","input", e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
-  on("#autoAdvance","change", e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
+  /* Wire-up */
+  on("#openSettings","click",()=>showModalWithLock($("#settingsDialog")));
+  on("#historyBtn","click",openRoundsTable);
+  on("#newRoundBtn","click",openRound);
+  on("#addPlayerBtn","click",()=>{ const name=prompt(LANG==="es"?"¿Nombre del jugador?":"Player name?"); if(name!==null){ addPlayer(String(name).trim()||undefined); } });
+  on("#resetScoresBtn","click",()=>{ if(players.length&&confirm(LANG==="es"?"¿Reiniciar puntajes y reenganches?":"Reset all scores and reenganches?")){ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; render(); } });
+  on("#clearAllBtn","click",()=>{ if(confirm(LANG==="es"?"¿Borrar todo?":"Clear all players and settings?")){ players=defaultsPlayers(); limit=100; nextDealerId=players[0].id; autoAdvanceDealer=true; gameOver=false; rounds=[]; roundCounter=0; lockOrder=false; render(); }});
+  on("#lockToggle","click",()=>{ lockOrder=!lockOrder; $("#lockOrderSwitch").checked=lockOrder; render(); });
+  on("#lockOrderSwitch","change",e=>{ lockOrder=!!e.target.checked; render(); });
+  on("#limitInput","input",e=>{ const v=clampInt(e.target.value,limit); limit=Math.max(1,v); render(); });
+  on("#autoAdvance","change",e=>{ autoAdvanceDealer=!!e.target.checked; render(); });
+  $("#pillEn")?.addEventListener("click",()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
+  $("#pillEs")?.addEventListener("click",()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
 
-  const addPlayer=(name="")=>{ const p={id:uid(), name:name||("Player "+(players.length+1)), score:0, reenganches:0, avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
+  const addPlayer=(name="")=>{ const p={id:uid(),name:name||("Player "+(players.length+1)),score:0,reenganches:0,avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* ===== Win overlay (fixed & robust) ===== */
-  let confettiRaf, lockedForWin=false, winScrollY=0;
-  function lockForWin(){ lockedForWin=true; winScrollY = window.scrollY || 0; document.body.style.position='fixed'; document.body.style.top=`-${winScrollY}px`; document.body.style.width='100%'; }
-  function unlockForWin(){ lockedForWin=false; document.body.style.position=''; document.body.style.top=''; document.body.style.width=''; window.scrollTo({top:winScrollY, behavior:'instant'}); }
+  /* Win overlay */
+  let confettiRaf;
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
-    $("#winName").textContent = winner?.name || 'Winner';
-    $("#winPhoto").src = winner?.avatar || '';
+    $("#winName").textContent=winner?.name||'Winner';
+    $("#winPhoto").src=winner?.avatar||'';
     ov.style.display='flex';
-    lockForWin();
     try{ $("#winSound").play().catch(()=>{});}catch{}
-    requestAnimationFrame(()=> startConfetti());
+    startConfetti();
   }
-  $("#winCloseBtn")?.addEventListener('click', ()=>{ $("#winOverlay").style.display='none'; stopConfetti(); unlockForWin(); });
-  $("#newGameBtn2")?.addEventListener('click', ()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); unlockForWin(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
-
-  function stopConfetti() { if (confettiRaf) cancelAnimationFrame(confettiRaf); }
+  $("#winCloseBtn")?.addEventListener('click',()=>{ $("#winOverlay").style.display='none'; stopConfetti(); });
+  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  function stopConfetti(){ if(confettiRaf) cancelAnimationFrame(confettiRaf); }
   function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
-    const card=$("#winCard"); const r=card.getBoundingClientRect(); const W=r.width, H=r.height; c.width=W*DPR; c.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
-    const N=90;
-    const pieces=Array.from({length:N},()=>({x:Math.random()*W, y:-10-Math.random()*H, r:2+Math.random()*4, vy:2+Math.random()*3, vx:-1+Math.random()*2, a:Math.random()*Math.PI*2, color: `hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
-    const tick=()=>{ ctx.clearRect(0,0,W,H);
-      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
-      confettiRaf=requestAnimationFrame(tick);
-    }; stopConfetti(); tick();
-    setTimeout(stopConfetti, 5000);
+    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
+    const N=80; const pieces=Array.from({length:N},()=>({x:Math.random()*W,y:-10-Math.random()*H,r:2+Math.random()*4,vy:2+Math.random()*3,vx:-1+Math.random()*2,a:Math.random()*Math.PI*2,color:`hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
+    const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); confettiRaf=requestAnimationFrame(tick); };
+    stopConfetti(); tick(); setTimeout(stopConfetti,5000);
   }
-
-  /* ===== Language toggles ===== */
-  $("#pillEn")?.addEventListener("click", ()=>{ LANG="en"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
-  $("#pillEs")?.addEventListener("click", ()=>{ LANG="es"; localStorage.setItem(storageLangKey,LANG); applyI18n(); render(); });
 
   // init
   load(); applyI18n(); render();
