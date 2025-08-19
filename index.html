@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.7.4</title>
+<title>Conga by Alanis — STAGE v3.7.5</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,17 +25,27 @@
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
-  }
-  .app{max-width:980px; margin:0 auto; padding:6px 12px 120px;}
 
-  /* ===== Header ===== */
+    /* NEW: lock page scroll — only inner panel scrolls */
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  /* App fills the viewport; top stays, center scrolls */
+  .app{
+    max-width:980px; margin:0 auto;
+    height:100%; min-height:100svh;
+    padding:6px 12px; /* bottom padding now handled by players pane */
+    display:flex; flex-direction:column;
+  }
+
+  /* ===== Header (non-scrolling) ===== */
   header{
     display:grid;
     grid-template-columns: 1fr auto auto;
     align-items:center;
     gap:10px;
     padding:6px 0 2px 0;
-    margin-bottom:8px;
   }
   .brand{display:flex; flex-direction:column; gap:2px}
   .title{font-weight:900; letter-spacing:.2px; font-size: clamp(18px, 5vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -45,9 +55,9 @@
   .lang-pill .active{opacity:1; text-decoration:underline}
   .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px}
 
-  /* ===== Card / tools ===== */
+  /* ===== Tools card (non-scrolling) ===== */
   .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
-    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:10px}
+    border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow); padding:10px; margin:8px 0}
   .tools{display:flex; gap:8px; align-items:center; white-space:nowrap}
   .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 12px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px dashed rgba(255,255,255,.22);
@@ -55,8 +65,18 @@
   .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
+  #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
 
-  /* ===== Players ===== */
+  /* ===== Players panel (ONLY this scrolls) ===== */
+  .players-pane{
+    flex:1 1 auto;
+    overflow:auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* breathing room above iOS bar */
+  }
+
+  /* Players list / rows */
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
   .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
   .row{
@@ -91,7 +111,7 @@
     opacity:.98;
   }
 
-  /* ===== Dialogs ===== */
+  /* ===== Dialogs / inputs / cropper (unchanged from 3.7.4) ===== */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); overflow:hidden }
@@ -105,7 +125,6 @@
   input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
   dialog .btn { border-style: solid; }
 
-  /* Switch */
   .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
   .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
   .switch .track { width: 40px; height: 20px; background: var(--muted); border-radius: 999px; transition: .15s; }
@@ -114,7 +133,6 @@
   .switch input:checked + .track + .thumb { transform: translateX(20px); }
   .switch .switch-label { font-size: 14px; color: var(--text); }
 
-  /* Round dialog rows */
   .grid-rows{ display:grid; gap:4px }
   .round-row{ display:grid; grid-template-columns: auto 100px 50px; gap:6px; align-items:center;
     padding:4px; border:1px dashed rgba(255,255,255,.15); border-radius:10px;
@@ -126,16 +144,6 @@
   .round-row .minus10{ width:100%; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
-
-  /* Win overlay */
-  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
-  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden}
-  .win-head{ display:flex; align-items:center; gap:12px}
-  .win-photo{ width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)}
-  .win-photo img{ width:100%; height:100%; object-fit:cover}
-  .win-name{ font-size:20px; font-weight:900}
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:-1; }
 
   /* Crop dialog */
   #cropDialog { width: min(460px, 92vw); }
@@ -163,10 +171,12 @@
 </head>
 <body>
 <div class="app" id="app">
+
+  <!-- Non-scrolling top -->
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.7.4</div>
+      <div class="ver" id="verLine">STAGE v3.7.5</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -177,19 +187,22 @@
     <button id="openSettings" class="iconbtn" aria-label="Settings">⚙️</button>
   </header>
 
-  <section class="card" style="padding:10px; margin-bottom:8px">
+  <section class="card">
     <div class="tools">
       <button id="lockToggle" class="btn" aria-label="Reorder">🔒 <span data-i18n="reorder">Reorder</span></button>
       <button id="historyBtn" class="btn"><span data-i18n="history">History</span></button>
       <button id="newRoundBtn" class="btn primary"><span data-i18n="newRound">New round</span></button>
     </div>
-    <div id="dealerLine" style="margin-top:6px; font-weight:800; color:var(--sub); font-size:12px"></div>
+    <div id="dealerLine"></div>
   </section>
 
-  <section class="players">
-    <header><div data-i18n="players">Players</div></header>
-    <div id="playersList" role="list" aria-live="polite"></div>
-    <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
+  <!-- Scrollable center -->
+  <section id="playersPane" class="players-pane">
+    <div class="players">
+      <header><div data-i18n="players">Players</div></header>
+      <div id="playersList" role="list" aria-live="polite"></div>
+      <button class="btn" id="addPlayerBtn" style="width:100%; margin-top:6px">+ <span data-i18n="addPlayer">Add player</span></button>
+    </div>
   </section>
 </div>
 
@@ -229,7 +242,7 @@
   </div>
 </dialog>
 
-<!-- Round dialog (no cutter / instant win block) -->
+<!-- Round dialog -->
 <dialog id="roundDialog" aria-labelledby="roundTitle" role="dialog" aria-modal="true">
   <div class="modal-head">
     <div style="flex:1; overflow:hidden;">
@@ -366,7 +379,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.4", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.7.5", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -416,8 +429,11 @@
   }
 
   /* render */
-  const list=$("#playersList"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
+  const list=$("#playersList"), playersPane=$("#playersPane"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
   function render(){
+    // preserve players pane scroll position across re-renders
+    const preserveScroll = playersPane ? playersPane.scrollTop : 0;
+
     $("#limitInput").value=limit; $("#autoAdvance").checked=autoAdvanceDealer; $("#lockOrderSwitch").checked=lockOrder;
     $("#lockToggle").innerHTML=(lockOrder?"🔒 ":"🔓 ")+t("reorder");
     if(dealerLine){ const d=players.find(p=>p.id===nextDealerId); dealerLine.textContent=d?`${LANG==='es'?'Próximo mano:':'Next dealer:'} ${d.name}`:""; }
@@ -447,6 +463,9 @@
       list.innerHTML=""; list.appendChild(frag);
     }
     applyI18n(); debounceSave();
+
+    // restore scroll
+    if(playersPane) playersPane.scrollTop = preserveScroll;
   }
 
   function attachLongPress(el, cb){
@@ -487,54 +506,25 @@
       // mount
       const parent = list;
       parent.insertBefore(ph, rowEl);
-      rowEl.remove(); // keep DOM clean while dragging
+      rowEl.remove();
       document.body.appendChild(ghost);
 
-      // prevent scroll bounce
-      const scrollLockPrev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-
-      // drag state
-      let lastY = clientY;
+      // keep scroll inside players pane
+      const pr = playersPane.getBoundingClientRect();
+      const edge = 36;
 
       const move = (cx, cy) => {
         ghost.style.transform = `translate3d(${cx - offsetX}px, ${cy - offsetY}px, 0)`;
-        lastY = cy;
 
-        // auto-scroll parent if near edges
-        const pr = parent.getBoundingClientRect();
-        const edge = 36;
-        if (cy < pr.top + edge) parent.scrollBy({top:-14, behavior:'auto'});
-        else if (cy > pr.bottom - edge) parent.scrollBy({top:14, behavior:'auto'});
+        // auto-scroll players pane near edges
+        if (cy < pr.top + edge) playersPane.scrollBy({top:-14, behavior:'auto'});
+        else if (cy > pr.bottom - edge) playersPane.scrollBy({top:14, behavior:'auto'});
 
         // re-position placeholder by ghost center
         const centerY = cy;
         const rows = Array.from(parent.querySelectorAll('.row')); // includes placeholder
         const target = rows.find(el => el !== ph && (centerY < el.getBoundingClientRect().top + el.offsetHeight/2));
         if (target) parent.insertBefore(ph, target); else parent.appendChild(ph);
-      };
-
-      const onPointerMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
-      const onTouchMove = ev => { const t=ev.touches[0]; if(!t) return; ev.preventDefault(); move(t.clientX, t.clientY); };
-      const onMouseMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
-
-      const end = () => {
-        // compute destination index
-        const kids = Array.from(parent.children);
-        const toIdx = kids.indexOf(ph);
-
-        // cleanup UI
-        ghost.remove(); ph.remove();
-        document.body.style.overflow = scrollLockPrev;
-
-        // apply reorder
-        if (Number.isInteger(startIdx) && Number.isInteger(toIdx) && startIdx !== toIdx) {
-          const arr = players.slice(); const keepDealer = nextDealerId;
-          const moving = arr.splice(startIdx,1)[0]; arr.splice(toIdx,0,moving);
-          players = arr; nextDealerId = keepDealer;
-        }
-        render();
-        detach();
       };
 
       const detach = () => {
@@ -545,6 +535,23 @@
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
       };
+
+      const end = () => {
+        const kids = Array.from(parent.children);
+        const toIdx = kids.indexOf(ph);
+        ghost.remove(); ph.remove();
+        if (Number.isInteger(startIdx) && Number.isInteger(toIdx) && startIdx !== toIdx) {
+          const arr = players.slice(); const keepDealer = nextDealerId;
+          const moving = arr.splice(startIdx,1)[0]; arr.splice(toIdx,0,moving);
+          players = arr; nextDealerId = keepDealer;
+        }
+        render();
+        detach();
+      };
+
+      const onPointerMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
+      const onTouchMove = ev => { const t=ev.touches[0]; if(!t) return; ev.preventDefault(); move(t.clientX, t.clientY); };
+      const onMouseMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
 
       const onPointerUp = ev => { ev.preventDefault(); end(); };
       const onTouchEnd = ev => { ev.preventDefault(); end(); };
@@ -592,7 +599,7 @@
     editDlg.close(); render();
   });
 
-  /* ===== Modern circular crop ===== */
+  /* ===== Circular cropper ===== */
   const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
         pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
   const ctx=cropCanvas.getContext('2d');
@@ -652,7 +659,7 @@
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* ===== Round (no cutter) ===== */
+  /* ===== Round ===== */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn");
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
@@ -678,7 +685,7 @@
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
 
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1;
+    const REENG_THRESHOLD=limit+1; // trigger at exactly 101 and higher if limit=100
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -705,7 +712,7 @@
     render();
   }
 
-  /* History */
+  /* History (same) */
   function openRoundsTable(){
     const dlg=document.createElement('dialog');
     dlg.innerHTML = `<div class="modal-head"><div style="font-weight:800">History</div><button class="btn" style="padding:6px 10px">Close</button></div><div class="modal-body"><div class="table-wrap"></div></div>`;
