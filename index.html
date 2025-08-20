@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest">
+<link id="manifest" rel="manifest" href="manifest.webmanifest">
 
 <style>
   :root{
@@ -25,13 +25,13 @@
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
-    min-height: 100svh;
-    overflow: hidden;                /* page never scrolls */
-    overscroll-behavior-y: none;
-  }
-  body.scroll-locked .players-pane{ overflow: hidden !important; }
-  body.scroll-locked{ touch-action:none; }
 
+    /* Page itself never scrolls; only Players pane can scroll */
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  /* Shell fills the viewport; header + tools stay, players scroll */
   .app{
     max-width:980px; margin:0 auto;
     height:100%; min-height:100svh;
@@ -39,9 +39,13 @@
     display:flex; flex-direction:column;
   }
 
-  /* Header / tools always visible */
+  /* ===== Header (fixed in layout) ===== */
   header{
-    display:grid; grid-template-columns: 1fr auto auto; align-items:center; gap:10px; padding:6px 0 2px 0;
+    display:grid;
+    grid-template-columns: 1fr auto auto;
+    align-items:center;
+    gap:10px;
+    padding:6px 0 2px 0;
   }
   .brand{display:flex; flex-direction:column; gap:2px}
   .title{font-weight:900; letter-spacing:.2px; font-size: clamp(18px, 5vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -51,6 +55,7 @@
   .lang-pill .active{opacity:1; text-decoration:underline}
   .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px}
 
+  /* ===== Tools card (fixed in layout) ===== */
   .card{
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
@@ -63,11 +68,9 @@
   .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
-  .btn.sm{ padding:6px 10px; font-size:14px; border-radius:10px; flex:0 0 auto; }
-
   #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
 
-  /* Players pane is the only scroller */
+  /* ===== Players panel (ONLY this scrolls) ===== */
   .players-pane{
     flex:1 1 auto;
     overflow:auto;
@@ -80,8 +83,8 @@
   .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
 
   .row{
-    display:grid; grid-template-columns: 28px 56px 1fr auto;
-    align-items:center; gap:10px; padding:10px; border-radius:14px;
+    display:grid; grid-template-columns: 28px 64px 1fr auto; /* bigger avatar slot */
+    align-items:center; gap:12px; padding:12px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
     margin-bottom:8px; position:relative
@@ -89,7 +92,7 @@
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset, 0 0 0 2px rgba(78,225,160,.15); }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub); touch-action:none; }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
-  .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:16px;}
+  .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:14px;}
   .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25), 0 0 12px rgba(78,225,160,.35); }
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .playerName{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1; font-size:20px; font-weight:900; }
@@ -98,10 +101,20 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  .row.placeholder{ background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px); border:2px dashed rgba(78,225,160,.55); box-shadow: inset 0 0 0 2px rgba(78,225,160,.25); }
-  .drag-ghost{ position:fixed; left:0; top:0; z-index:9999; pointer-events:none; transform: translate3d(0,0,0); box-shadow: 0 14px 30px rgba(0,0,0,.45); opacity:.98; }
+  /* Live drag visuals */
+  .row.placeholder{
+    background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px);
+    border:2px dashed rgba(78,225,160,.55);
+    box-shadow: inset 0 0 0 2px rgba(78,225,160,.25);
+  }
+  .drag-ghost{
+    position:fixed; left:0; top:0; z-index:9999; pointer-events:none;
+    transform: translate3d(0,0,0);
+    box-shadow: 0 14px 30px rgba(0,0,0,.45);
+    opacity:.98;
+  }
 
-  /* Dialogs */
+  /* Dialogs / inputs */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); overflow:hidden }
@@ -112,7 +125,7 @@
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
-  input, select, textarea, button { font-size:16px; } 
+  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
   dialog .btn { border-style: solid; }
 
   .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
@@ -123,15 +136,15 @@
   .switch input:checked + .track + .thumb { transform: translateX(20px); }
   .switch .switch-label { font-size: 14px; color: var(--text); }
 
-  .grid-rows{ display:grid; gap:4px }
-  .round-row{ display:grid; grid-template-columns: auto 100px 50px; gap:6px; align-items:center;
-    padding:4px; border:1px dashed rgba(255,255,255,.15); border-radius:10px;
+  .grid-rows{ display:grid; gap:6px }
+  .round-row{ display:grid; grid-template-columns: auto 110px 56px; gap:8px; align-items:center;
+    padding:6px; border:1px dashed rgba(255,255,255,.15); border-radius:10px;
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); }
   .round-row > div:first-child { display: flex; flex-direction: column; font-size: 14px; }
   .round-row strong { font-size: 16px; }
   .round-row .hint { font-size: 11px; color: var(--sub); }
-  .round-row input[type="number"]{ height:30px; padding:4px 8px; font-size:14px; }
-  .round-row .minus10{ width:100%; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.12);
+  .round-row input[type="number"]{ height:34px; padding:4px 8px; font-size:16px; }
+  .round-row .minus10{ width:100%; height:34px; border-radius:8px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
@@ -146,18 +159,30 @@
   .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
   .avatar-lg img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-  /* Win overlay */
-  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px }
-  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden }
+  /* Win modal (simple) */
+  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
+  .win-card{ width:min(420px,92vw); border-radius:18px; padding:14px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55) }
+  .win-head{ display:flex; align-items:center; gap:12px}
+  .win-photo{ width:48px; height:48px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0}
+  .win-photo img{ width:100%; height:100%; object-fit:cover}
+  .win-name{ font-size:18px; font-weight:900}
 
-  /* Polyfill backdrop (only used when dialog.showModal is missing) */
-  .dlg-backdrop{ position:fixed; inset:0; background: rgba(2,6,23,.55); z-index: 9998; }
+  @media (max-width: 410px){ .lang-pill{ display:none; } }
+  @media (max-width: 400px){
+    .modal-head { padding:8px 10px; gap:6px; }
+    .modal-body { padding:8px 10px; }
+    .modal-foot { padding:8px 10px; gap:6px; }
+    .round-row { grid-template-columns: auto 90px 46px; gap:6px; }
+    .round-row input[type="number"] { height:32px; font-size:14px; }
+    .round-row .minus10 { height:32px; font-size:13px; }
+  }
 </style>
 </head>
 <body>
 <div class="app" id="app">
 
+  <!-- Non-scrolling top -->
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
@@ -181,6 +206,7 @@
     <div id="dealerLine"></div>
   </section>
 
+  <!-- Scrollable center -->
   <section id="playersPane" class="players-pane">
     <div class="players">
       <header><div data-i18n="players">Players</div></header>
@@ -322,19 +348,19 @@
   </div>
 </dialog>
 
-<!-- Win overlay -->
-<div class="win-overlay" id="winOverlay" aria-live="polite" role="dialog" aria-modal="true">
-  <div class="win-card" id="winCard">
-    <div class="win-head" style="display:flex; align-items:center; gap:12px">
-      <div class="win-photo" style="width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)"><img id="winPhoto" alt=""></div>
+<!-- Win overlay (simple) -->
+<div class="win-overlay" id="winOverlay" aria-live="polite">
+  <div class="win-card">
+    <div class="win-head">
+      <div class="win-photo"><img id="winPhoto" alt=""></div>
       <div>
-        <div class="win-name" id="winName" style="font-size:20px; font-weight:900">Winner</div>
+        <div class="win-name" id="winName">Winner</div>
         <div class="win-sub" id="winSubtitle" data-i18n="winner">WINNER</div>
       </div>
     </div>
     <div class="win-actions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap">
-      <button class="btn sm" id="newGameBtn2" data-i18n="newGame">Start new game</button>
-      <button class="btn sm" id="winCloseBtn" data-i18n="close">Close</button>
+      <button class="btn success" id="newGameBtn2" data-i18n="newGame">Start new game</button>
+      <button class="btn" id="winCloseBtn" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -365,65 +391,30 @@
   const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.3", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
+  // cache-bust the manifest on each release
+  const m = document.getElementById('manifest'); if (m) m.href = m.href + (m.href.includes('?')?'&':'?') + 'v=' + APP.VERSION;
 
+  /* utils */
   const $ = s => document.querySelector(s);
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
   const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
   const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
   const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
-    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:10000;font-weight:800;letter-spacing:.2px";
+    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
-
-  /* ==== dialog polyfill (prevents “nothing works” on browsers w/o showModal) ==== */
-  function ensureDialogPolyfill(){
-    const supported = typeof HTMLDialogElement !== "undefined" && !!HTMLDialogElement.prototype.showModal;
-    if (supported) return;
-    document.querySelectorAll("dialog").forEach(d=>{
-      if (d.__polyfilled) return;
-      d.__polyfilled = true;
-      d.showModal = function(){
-        if (this.open) return;
-        this.setAttribute("open", "");
-        this.__backdrop = document.createElement("div");
-        this.__backdrop.className = "dlg-backdrop";
-        document.body.appendChild(this.__backdrop);
-        this.style.zIndex = 9999;
-      };
-      const origClose = d.close?.bind(d);
-      d.close = function(){
-        this.removeAttribute("open");
-        if (this.__backdrop) { this.__backdrop.remove(); this.__backdrop = null; }
-        this.dispatchEvent(new Event("close"));
-        if (origClose) try{ origClose(); }catch{}
-      };
-    });
-  }
-  ensureDialogPolyfill();
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
 
-  /* Modal helper: freeze players pane; restore scroll on close */
-  let paneScrollSnapshot = 0;
-  const playersPane = $("#playersPane");
-  const showModalWithLock = (dlg) => {
-    if (!dlg) return;
-    paneScrollSnapshot = playersPane ? playersPane.scrollTop : 0;
-    document.body.classList.add('scroll-locked');
-    dlg.addEventListener('close', () => {
-      document.body.classList.remove('scroll-locked');
-      if (playersPane) playersPane.scrollTop = paneScrollSnapshot;
-    }, {once:true});
-    dlg.showModal();
-    dlg.scrollTop = 0;
-  };
+  // Do NOT flip body overflow – page itself never scrolls (Players pane does).
+  const showModalWithLock = (dlg) => { if (dlg) { dlg.showModal(); dlg.scrollTop = 0; } };
 
   /* i18n */
   const STR = { en:{reorder:"Reorder",history:"History",newRound:"New round",players:"Players",addPlayer:"Add player",
       settings:"Settings",limitLabel:"Limit (default 100)",autoAdvance:"Auto-advance dealer after round",lockOrder:"Lock player reordering",
       resetScores:"Reset scores",clearAll:"Clear all",done:"Done",cancel:"Cancel",apply:"Apply",editPlayer:"Edit player",
       name:"Name",score:"Score",reenganches:"Reenganches",photo:"Photo",addPhoto:"Add photo",editPhoto:"Edit photo",removePhoto:"Remove photo",
-      setDealer:"Set as next dealer",deletePlayer:"Delete player",save:"Save",winner:"WINNER",close:"Close",newGame:"Start new game"},
+      setDealer:"Set as next dealer",deletePlayer:"Delete player",save:"Save",winner:"WINNER",close:"Close",newGame:"New game"},
     es:{reorder:"Reordenar",history:"Historial",newRound:"Nueva ronda",players:"Jugadores",addPlayer:"Agregar jugador",
       settings:"Ajustes",limitLabel:"Límite (por defecto 100)",autoAdvance:"Avanzar mano automáticamente",lockOrder:"Bloquear reordenamiento",
       resetScores:"Reiniciar puntajes",clearAll:"Borrar todo",done:"Listo",cancel:"Cancelar",apply:"Aplicar",editPlayer:"Editar jugador",
@@ -451,15 +442,13 @@
   }
 
   /* render */
-  const list=$("#playersList"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
+  const list=$("#playersList"), playersPane=$("#playersPane"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
   function render(){
+    // preserve players pane scroll position across re-renders
     const preserveScroll = playersPane ? playersPane.scrollTop : 0;
 
-    const limitInput=$("#limitInput"); if(limitInput) limitInput.value=limit;
-    const autoChk=$("#autoAdvance"); if(autoChk) autoChk.checked=autoAdvanceDealer;
-    const lockChk=$("#lockOrderSwitch"); if(lockChk) lockChk.checked=lockOrder;
-    const lockBtn=$("#lockToggle"); if(lockBtn) lockBtn.innerHTML=(lockOrder?"🔒 ":"🔓 ")+t("reorder");
-
+    $("#limitInput").value=limit; $("#autoAdvance").checked=autoAdvanceDealer; $("#lockOrderSwitch").checked=lockOrder;
+    $("#lockToggle").innerHTML=(lockOrder?"🔒 ":"🔓 ")+t("reorder");
     if(dealerLine){ const d=players.find(p=>p.id===nextDealerId); dealerLine.textContent=d?`${LANG==='es'?'Próximo mano:':'Next dealer:'} ${d.name}`:""; }
     if(list){
       const frag=document.createDocumentFragment();
@@ -467,8 +456,10 @@
         const n=rowTpl.content.firstElementChild.cloneNode(true);
         n.dataset.index=i; n.dataset.id=p.id;
 
+        /* edit only when locked */
         if(lockOrder) attachLongPress(n, ()=>openEdit(p.id));
 
+        /* live reorder when unlocked */
         const handle=n.querySelector('.drag');
         if(!lockOrder){ handle.classList.remove('locked'); enableLiveReorder(handle, n); }
         else { handle.classList.add('locked'); handle.onpointerdown=handle.ontouchstart=handle.onmousedown=null; }
@@ -486,6 +477,7 @@
     }
     applyI18n(); debounceSave();
 
+    // restore scroll
     if(playersPane) playersPane.scrollTop = preserveScroll;
   }
 
@@ -498,6 +490,7 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,end));
   }
 
+  /* ===== Live reorder (ghost + placeholder) ===== */
   function enableLiveReorder(handle, rowEl){
     const start=(e)=>{
       if(lockOrder) return;
@@ -508,33 +501,40 @@
       const rect = rowEl.getBoundingClientRect();
       const startIdx = +rowEl.dataset.index;
 
+      // placeholder
       const ph = document.createElement('div');
       ph.className = 'row placeholder';
       ph.style.height = rect.height + 'px';
 
+      // ghost
       const ghost = rowEl.cloneNode(true);
       ghost.classList.add('drag-ghost');
       ghost.style.width = rect.width + 'px';
       ghost.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
 
+      // offset
       const offsetX = clientX - rect.left;
       const offsetY = clientY - rect.top;
 
+      // mount
       const parent = list;
       parent.insertBefore(ph, rowEl);
       rowEl.remove();
       document.body.appendChild(ghost);
 
+      // keep scroll inside players pane
       const pr = playersPane.getBoundingClientRect();
       const edge = 36;
 
       const move = (cx, cy) => {
         ghost.style.transform = `translate3d(${cx - offsetX}px, ${cy - offsetY}px, 0)`;
+
         if (cy < pr.top + edge) playersPane.scrollBy({top:-14, behavior:'auto'});
         else if (cy > pr.bottom - edge) playersPane.scrollBy({top:14, behavior:'auto'});
 
+        // position placeholder by ghost center
         const centerY = cy;
-        const rows = Array.from(parent.querySelectorAll('.row'));
+        const rows = Array.from(parent.querySelectorAll('.row')); // includes placeholder
         const target = rows.find(el => el !== ph && (centerY < el.getBoundingClientRect().top + el.offsetHeight/2));
         if (target) parent.insertBefore(ph, target); else parent.appendChild(ph);
       };
@@ -585,7 +585,7 @@
     handle.onmousedown = start;
   }
 
-  /* Edit dialog */
+  /* ===== Edit dialog ===== */
   const editDlg=$("#editDialog"), editForm=$("#editForm");
   function refreshEditPreview(id){ const p=players.find(x=>x.id===id); const prev=$("#editAvatarPreview"), btn=$("#changePhotoBtn");
     if(prev){ prev.src=p?.avatar||""; prev.style.opacity=p?.avatar?"1":".35"; }
@@ -611,13 +611,12 @@
     editDlg.close(); render();
   });
 
-  /* Circular cropper */
-  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"),
-        zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
-        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInputEl=document.getElementById("photoInput");
+  /* ===== Circular cropper ===== */
+  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
+        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
   const ctx=cropCanvas.getContext('2d');
   let cropPlayerId=null, img=new Image(), imgLoaded=false, scale=1, minScale=1, maxScale=4, offsetX=0, offsetY=0;
-  let touches=null, pinchDist0=null, scale0=null, panning=false, panStartX=0, panStartY=0;
+  let pinchDist0=null, scale0=null; const touches=new Map(); let panning=false, startPanX=0, startPanY=0;
 
   function dprSize(el){ const DPR=window.devicePixelRatio||1; return [el.clientWidth*DPR, el.clientHeight*DPR, DPR]; }
   function circleSpecs(){ const w=cropCanvas.width, h=cropCanvas.height, DPR=window.devicePixelRatio||1, pad=12*DPR; const r=Math.min(w,h)/2 - pad; return {cx:w/2, cy:h/2, r, DPR}; }
@@ -645,36 +644,35 @@
         imgLoaded=true; minScale=coverMinScale(); maxScale=Math.max(minScale*4, minScale+0.01); scale=minScale*1.05;
         const {cx,cy}=circleSpecs(); const w=img.width*scale, h=img.height*scale; offsetX=cx-w/2; offsetY=cy-h/2; clampPan();
         const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%';
-        drawCrop(); cropDlg.scrollTop=0;
+        drawCrop(); cropDialog.scrollTop=0;
       }; img.src=src; };
     if (existingAvatar){ ensureShow(()=>useImage(existingAvatar)); }
-    else { photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
+    else { photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-        ensureShow(()=>useImage(dataUrl)); }; photoInputEl.click(); }
+        ensureShow(()=>useImage(dataUrl)); }; photoInput.click(); }
   }
-  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); if(!touches) touches=new Map(); touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(touches.size===2){ const pts=[...touches.values()]; pinchDist0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); scale0=scale; }
-    else if(touches.size===1){ panning=true; panStartX=e.clientX-offsetX; panStartY=e.clientY-offsetY; } });
-  cropStage.addEventListener('pointermove',e=>{ if(!imgLoaded||!touches||!touches.has(e.pointerId)) return; touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    else if(touches.size===1){ panning=true; startPanX=e.clientX-offsetX; startPanY=e.clientY-offsetY; } });
+  cropStage.addEventListener('pointermove',e=>{ if(!imgLoaded||!touches.has(e.pointerId)) return; touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(touches.size===2){ const pts=[...touches.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
       if(pinchDist0&&scale0){ const ratio=dist/pinchDist0; scale=Math.min(maxScale,Math.max(minScale,scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
-    else if(panning){ offsetX=e.clientX-panStartX; offsetY=e.clientY-panStartY; clampPan(); drawCrop(); } }, {passive:false});
-  function endPtr(e){ if(!touches) return; touches.delete(e.pointerId); if(touches.size<2){ pinchDist0=null; scale0=null; } if(touches.size===0){ panning=false; } }
+    else if(panning){ offsetX=e.clientX-startPanX; offsetY=e.clientY-startPanY; clampPan(); drawCrop(); } }, {passive:false});
+  function endPtr(e){ touches.delete(e.pointerId); if(touches.size<2){ pinchDist0=null; scale0=null; } if(touches.size===0){ panning=false; } }
   cropStage.addEventListener('pointerup',endPtr); cropStage.addEventListener('pointercancel',endPtr); cropStage.addEventListener('pointerleave',endPtr);
   zoomRange.addEventListener('input',e=>setZoomBySlider(+e.target.value));
-  pickAnotherBtn.addEventListener('click',()=>{ photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
+  $("#pickAnotherBtn").addEventListener('click',()=>{ photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-      openCrop(cropPlayerId, dataUrl); }; photoInputEl.click(); });
-  applyCropBtn.addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
+      openCrop(cropPlayerId, dataUrl); }; photoInput.click(); });
+  $("#applyCropBtn").addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
     const {cx,cy,r}=circleSpecs(); const ox=(cx-offsetX)/scale, oy=(cy-offsetY)/scale, or=r/scale;
     const size=512; const out=document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
     octx.clearRect(0,0,size,size); octx.save(); octx.beginPath(); octx.arc(size/2,size/2,size/2,0,Math.PI*2); octx.clip();
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* Round dialog */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows");
-  let _pendingRoundInputs = null;
+  /* ===== Round ===== */
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn"), roundForm=$("#roundForm");
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
     rows.innerHTML="";
@@ -687,17 +685,19 @@
     });
     rows.appendChild(frag);
     showModalWithLock(roundDlg);
+    requestAnimationFrame(()=>{ roundDlg.scrollTop=0; rows.querySelector('input')?.focus({preventScroll:true}); });
   }
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
-  on("#roundForm","submit",(e)=>{ e.preventDefault(); _pendingRoundInputs = roundInputs(); roundDlg.close(); });
-  roundDlg.addEventListener('close', ()=>{ if(_pendingRoundInputs){ const inputs=_pendingRoundInputs; _pendingRoundInputs=null; requestAnimationFrame(()=>applyRound(inputs)); } });
+  roundForm.addEventListener('submit',(e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg.close(); });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
+
   function applyRound(inputs){
     const roundNo=roundCounter+1;
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
+
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1;     // reenganche at exactly 101 and higher when limit=100
+    const REENG_THRESHOLD=limit+1; // trigger only at 101+
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -734,7 +734,7 @@
     const tbody=document.createElement('tbody');
     rounds.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join(""); tbody.appendChild(tr); });
     table.appendChild(tbody); twrap.appendChild(table);
-    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); ensureDialogPolyfill(); showModalWithLock(dlg);
+    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); showModalWithLock(dlg);
   }
 
   /* Wire-up */
@@ -754,20 +754,16 @@
   const addPlayer=(name="")=>{ const p={id:uid(),name:name||("Player "+(players.length+1)),score:0,reenganches:0,avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* Win overlay */
+  /* Win overlay (simple) */
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
-    $("#winName").textContent=winner?.name || 'Winner';
-    const img = $("#winPhoto"); if (img) img.src = winner?.avatar || '';
+    $("#winName").textContent=winner?.name||'Winner';
+    $("#winPhoto").src=winner?.avatar||'';
     ov.style.display='flex';
     try{ $("#winSound").play().catch(()=>{});}catch{}
   }
-  function closeWin(){ const ov=$("#winOverlay"); if(!ov) return; ov.style.display='none'; }
-
-  on("#winCloseBtn","click", closeWin);
-  $("#winOverlay")?.addEventListener('click', (e)=>{ if(e.target.id==="winOverlay") closeWin(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==="Escape" && $("#winOverlay").style.display==='flex') closeWin(); });
-  on("#newGameBtn2","click",()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; closeWin(); render(); });
+  $("#winCloseBtn")?.addEventListener('click',()=>{ $("#winOverlay").style.display='none'; });
+  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; render(); });
 
   // init
   load(); applyI18n(); render();
