@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.8.0</title>
+<title>Conga by Alanis — STAGE v3.8.1</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,18 +25,13 @@
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
-
-    /* Page never scrolls; only the players pane does */
     min-height: 100svh;
     overflow: hidden;
     overscroll-behavior-y: none;
   }
-
-  /* Freeze the players pane while a dialog is open (prevents jump) */
   body.scroll-locked .players-pane{ overflow: hidden !important; }
   body.scroll-locked{ touch-action:none; }
 
-  /* App shell: header + tools stay visible; players pane is the only scroller */
   .app{
     max-width:980px; margin:0 auto;
     height:100%; min-height:100svh;
@@ -44,13 +39,9 @@
     display:flex; flex-direction:column;
   }
 
-  /* ===== Header (always visible) ===== */
+  /* Header / tools always visible */
   header{
-    display:grid;
-    grid-template-columns: 1fr auto auto;
-    align-items:center;
-    gap:10px;
-    padding:6px 0 2px 0;
+    display:grid; grid-template-columns: 1fr auto auto; align-items:center; gap:10px; padding:6px 0 2px 0;
   }
   .brand{display:flex; flex-direction:column; gap:2px}
   .title{font-weight:900; letter-spacing:.2px; font-size: clamp(18px, 5vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -60,7 +51,6 @@
   .lang-pill .active{opacity:1; text-decoration:underline}
   .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px}
 
-  /* ===== Tools card (always visible) ===== */
   .card{
     background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
@@ -75,7 +65,7 @@
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
   #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
 
-  /* ===== Players panel (ONLY this scrolls) ===== */
+  /* Players pane is the only scroller */
   .players-pane{
     flex:1 1 auto;
     overflow:auto;
@@ -88,8 +78,7 @@
   .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
 
   .row{
-    display:grid;
-    grid-template-columns: 28px 56px 1fr auto;   /* larger avatar column */
+    display:grid; grid-template-columns: 28px 56px 1fr auto;
     align-items:center; gap:10px; padding:10px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
@@ -98,8 +87,6 @@
   .row.dealer{ border-color: rgba(78,225,160,.6); box-shadow: 0 0 0 2px rgba(78,225,160,.25) inset, 0 0 0 2px rgba(78,225,160,.15); }
   .drag{ cursor:grab; text-align:center; font-size:18px; color:var(--sub); touch-action:none; }
   .drag.locked{ filter:grayscale(1); opacity:.5; cursor:not-allowed }
-
-  /* Bigger avatar */
   .avatar{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:#0f1428; border:1px solid rgba(255,255,255,.14); overflow:hidden; font-weight:800; font-size:16px;}
   .row.dealer .avatar{ box-shadow: 0 0 0 3px #4ee1a0, 0 0 0 6px rgba(78,225,160,.25), 0 0 12px rgba(78,225,160,.35); }
   .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
@@ -109,20 +96,10 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  /* Live drag visuals */
-  .row.placeholder{
-    background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px);
-    border:2px dashed rgba(78,225,160,.55);
-    box-shadow: inset 0 0 0 2px rgba(78,225,160,.25);
-  }
-  .drag-ghost{
-    position:fixed; left:0; top:0; z-index:9999; pointer-events:none;
-    transform: translate3d(0,0,0);
-    box-shadow: 0 14px 30px rgba(0,0,0,.45);
-    opacity:.98;
-  }
+  .row.placeholder{ background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px); border:2px dashed rgba(78,225,160,.55); box-shadow: inset 0 0 0 2px rgba(78,225,160,.25); }
+  .drag-ghost{ position:fixed; left:0; top:0; z-index:9999; pointer-events:none; transform: translate3d(0,0,0); box-shadow: 0 14px 30px rgba(0,0,0,.45); opacity:.98; }
 
-  /* ===== Dialogs / inputs ===== */
+  /* Dialogs */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); overflow:hidden }
@@ -133,7 +110,7 @@
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
-  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
+  input, select, textarea, button { font-size:16px; } 
   dialog .btn { border-style: solid; }
 
   .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
@@ -167,6 +144,13 @@
   .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
   .avatar-lg img{ width:100%; height:100%; object-fit:cover; display:block; }
 
+  /* ---- Win overlay ---- */
+  .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px }
+  .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden }
+  #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:0; }   /* BEHIND the UI */
+  .win-head, .win-actions{ position:relative; z-index:1; }                       /* ABOVE the canvas */
+
   @media (max-width: 410px){ .lang-pill{ display:none; } }
   @media (max-width: 400px){
     .modal-head { padding:8px 10px; gap:6px; }
@@ -183,11 +167,10 @@
 <body>
 <div class="app" id="app">
 
-  <!-- Non-scrolling top -->
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.8.0</div>
+      <div class="ver" id="verLine">STAGE v3.8.1</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -207,7 +190,6 @@
     <div id="dealerLine"></div>
   </section>
 
-  <!-- Scrollable center -->
   <section id="playersPane" class="players-pane">
     <div class="players">
       <header><div data-i18n="players">Players</div></header>
@@ -328,30 +310,9 @@
   </form>
 </dialog>
 
-<!-- Crop dialog -->
-<dialog id="cropDialog" aria-labelledby="cropTitle" role="dialog" aria-modal="true">
-  <div class="modal-head">
-    <div id="cropTitle" style="font-weight:800">Crop Photo</div>
-    <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
-  </div>
-  <div class="modal-body">
-    <div id="cropStage"><canvas id="cropCanvas"></canvas></div>
-    <div class="crop-controls">
-      <div class="zoom-row">
-        <input id="zoomRange" type="range" min="0" max="100" value="0" step="1" aria-label="Zoom">
-        <output id="zoomOut" style="text-align:right; font-variant-numeric:tabular-nums">100%</output>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap">
-        <button class="btn" id="pickAnotherBtn">Choose photo</button>
-        <button class="btn success" id="applyCropBtn">Apply</button>
-      </div>
-    </div>
-  </div>
-</dialog>
-
 <!-- Win overlay -->
-<div class="win-overlay" id="winOverlay" aria-live="polite" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px">
-  <div class="win-card" style="width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden">
+<div class="win-overlay" id="winOverlay" aria-live="polite" role="dialog" aria-modal="true">
+  <div class="win-card" id="winCard">
     <canvas id="confettiCanvas"></canvas>
     <div class="win-head" style="display:flex; align-items:center; gap:12px">
       <div class="win-photo" style="width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)"><img id="winPhoto" alt=""></div>
@@ -390,23 +351,22 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.0", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.1", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
-  /* utils */
   const $ = s => document.querySelector(s);
   const on = (sel, ev, fn, opt) => { const el = $(sel); if (el) el.addEventListener(ev, fn, opt||false); };
   const uid=()=> "p"+Math.random().toString(36).slice(2)+Date.now().toString(36);
   const clampInt=(v,d=0)=>Number.isFinite(+v)?Math.trunc(+v):d;
   const initials=(n)=> (n||" ").trim().split(/\s+/).map(s=>s[0]).join("").slice(0,2).toUpperCase();
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
-    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:99999;font-weight:800;letter-spacing:.2px";
+    t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:10000;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
 
-  /* === Modal helper: lock the players pane and restore its scroll on close === */
+  /* Modal helper: freeze players pane; restore scroll on close */
   let paneScrollSnapshot = 0;
   const playersPane = $("#playersPane");
   const showModalWithLock = (dlg) => {
@@ -467,10 +427,8 @@
         const n=rowTpl.content.firstElementChild.cloneNode(true);
         n.dataset.index=i; n.dataset.id=p.id;
 
-        /* edit only when locked */
         if(lockOrder) attachLongPress(n, ()=>openEdit(p.id));
 
-        /* live reorder when unlocked */
         const handle=n.querySelector('.drag');
         if(!lockOrder){ handle.classList.remove('locked'); enableLiveReorder(handle, n); }
         else { handle.classList.add('locked'); handle.onpointerdown=handle.ontouchstart=handle.onmousedown=null; }
@@ -500,7 +458,6 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,end));
   }
 
-  /* ===== Live reorder (ghost + placeholder) ===== */
   function enableLiveReorder(handle, rowEl){
     const start=(e)=>{
       if(lockOrder) return;
@@ -511,41 +468,33 @@
       const rect = rowEl.getBoundingClientRect();
       const startIdx = +rowEl.dataset.index;
 
-      // placeholder
       const ph = document.createElement('div');
       ph.className = 'row placeholder';
       ph.style.height = rect.height + 'px';
 
-      // ghost
       const ghost = rowEl.cloneNode(true);
       ghost.classList.add('drag-ghost');
       ghost.style.width = rect.width + 'px';
       ghost.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
 
-      // offset
       const offsetX = clientX - rect.left;
       const offsetY = clientY - rect.top;
 
-      // mount
       const parent = list;
       parent.insertBefore(ph, rowEl);
       rowEl.remove();
       document.body.appendChild(ghost);
 
-      // keep scroll inside players pane
       const pr = playersPane.getBoundingClientRect();
       const edge = 36;
 
       const move = (cx, cy) => {
         ghost.style.transform = `translate3d(${cx - offsetX}px, ${cy - offsetY}px, 0)`;
-
-        // auto-scroll players pane near edges
         if (cy < pr.top + edge) playersPane.scrollBy({top:-14, behavior:'auto'});
         else if (cy > pr.bottom - edge) playersPane.scrollBy({top:14, behavior:'auto'});
 
-        // re-position placeholder by ghost center
         const centerY = cy;
-        const rows = Array.from(parent.querySelectorAll('.row')); // includes placeholder
+        const rows = Array.from(parent.querySelectorAll('.row'));
         const target = rows.find(el => el !== ph && (centerY < el.getBoundingClientRect().top + el.offsetHeight/2));
         if (target) parent.insertBefore(ph, target); else parent.appendChild(ph);
       };
@@ -596,7 +545,7 @@
     handle.onmousedown = start;
   }
 
-  /* ===== Edit dialog ===== */
+  /* Edit dialog */
   const editDlg=$("#editDialog"), editForm=$("#editForm");
   function refreshEditPreview(id){ const p=players.find(x=>x.id===id); const prev=$("#editAvatarPreview"), btn=$("#changePhotoBtn");
     if(prev){ prev.src=p?.avatar||""; prev.style.opacity=p?.avatar?"1":".35"; }
@@ -622,9 +571,11 @@
     editDlg.close(); render();
   });
 
-  /* ===== Circular cropper ===== */
+  /* Circular cropper */
   const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
-        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
+        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput($("#photoInput"));
+  function photoInput(id){ return document.getElementById('photoInput'); } // tiny helper to avoid shadowing above
+
   const ctx=cropCanvas.getContext('2d');
   let cropPlayerId=null, img=new Image(), imgLoaded=false, scale=1, minScale=1, maxScale=4, offsetX=0, offsetY=0;
 
@@ -657,9 +608,9 @@
         drawCrop(); cropDialog.scrollTop=0;
       }; img.src=src; };
     if (existingAvatar){ ensureShow(()=>useImage(existingAvatar)); }
-    else { photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
+    else { photoInput().onchange=async()=>{ const f=photoInput().files[0]; if(!f) return;
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-        ensureShow(()=>useImage(dataUrl)); }; photoInput.click(); }
+        ensureShow(()=>useImage(dataUrl)); }; photoInput().click(); }
   }
   cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); window.__t = window.__t || new Map(); window.__t.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(window.__t.size===2){ const pts=[...window.__t.values()]; window.__pinch0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); window.__scale0=scale; }
@@ -671,9 +622,9 @@
   function endPtr(e){ const T=window.__t; if(T){ T.delete(e.pointerId); if(T.size<2){ window.__pinch0=null; window.__scale0=null; } if(T.size===0){ window.__panning=false; } } }
   cropStage.addEventListener('pointerup',endPtr); cropStage.addEventListener('pointercancel',endPtr); cropStage.addEventListener('pointerleave',endPtr);
   document.getElementById('zoomRange').addEventListener('input',e=>setZoomBySlider(+e.target.value));
-  document.getElementById('pickAnotherBtn').addEventListener('click',()=>{ photoInput.onchange=async()=>{ const f=photoInput.files[0]; if(!f) return;
+  document.getElementById('pickAnotherBtn').addEventListener('click',()=>{ photoInput().onchange=async()=>{ const f=photoInput().files[0]; if(!f) return;
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-      openCrop(cropPlayerId, dataUrl); }; photoInput.click(); });
+      openCrop(cropPlayerId, dataUrl); }; photoInput().click(); });
   document.getElementById('applyCropBtn').addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
     const {cx,cy,r}=circleSpecs(); const ox=(cx-offsetX)/scale, oy=(cy-offsetY)/scale, or=r/scale;
     const size=512; const out=document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
@@ -681,9 +632,9 @@
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* ===== Round ===== */
+  /* Round dialog (Apply after close to avoid scroll jump) */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows");
-  let _pendingRoundInputs = null;   // <-- collected, applied after dialog closes
+  let _pendingRoundInputs = null;
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
     rows.innerHTML="";
@@ -700,21 +651,14 @@
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
   on("#roundForm","submit",(e)=>{ e.preventDefault(); _pendingRoundInputs = roundInputs(); roundDlg.close(); });
   on("#applyRoundBtn","click",(e)=>{ e.preventDefault(); _pendingRoundInputs = roundInputs(); roundDlg.close(); });
-  roundDlg.addEventListener('close', ()=>{
-    if(_pendingRoundInputs){ const inputs=_pendingRoundInputs; _pendingRoundInputs=null;
-      // Apply AFTER scroll restore
-      requestAnimationFrame(()=>applyRound(inputs));
-    }
-  });
+  roundDlg.addEventListener('close', ()=>{ if(_pendingRoundInputs){ const inputs=_pendingRoundInputs; _pendingRoundInputs=null; requestAnimationFrame(()=>applyRound(inputs)); } });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
-
   function applyRound(inputs){
     const roundNo=roundCounter+1;
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
-
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1; // 101+ triggers reenganche when limit=100
+    const REENG_THRESHOLD=limit+1;
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -771,24 +715,42 @@
   const addPlayer=(name="")=>{ const p={id:uid(),name:name||("Player "+(players.length+1)),score:0,reenganches:0,avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* Win overlay */
+  /* Win overlay (fixed layering + easy exits) */
   let confettiRaf;
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
-    $("#winName").textContent=winner?.name||'Winner';
-    $("#winPhoto").src=winner?.avatar||'';
+    $("#winName").textContent=winner?.name || 'Winner';
+    const img = $("#winPhoto"); if (img) img.src = winner?.avatar || '';
     ov.style.display='flex';
     try{ $("#winSound").play().catch(()=>{});}catch{}
     startConfetti();
   }
-  $("#winCloseBtn")?.addEventListener('click',()=>{ $("#winOverlay").style.display='none'; stopConfetti(); });
-  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; $("#winOverlay").style.display='none'; stopConfetti(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
+  function closeWin(){ const ov=$("#winOverlay"); if(!ov) return; ov.style.display='none'; stopConfetti(); }
+
+  $("#winCloseBtn")?.addEventListener('click', closeWin);
+  $("#winOverlay")?.addEventListener('click', (e)=>{ if(e.target.id==="winOverlay") closeWin(); }); // click the dim background to close
+  document.addEventListener('keydown', (e)=>{ if(e.key==="Escape" && $("#winOverlay").style.display==='flex') closeWin(); });
+
+  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; closeWin(); render(); });
+
   function stopConfetti(){ if(confettiRaf) cancelAnimationFrame(confettiRaf); }
-  function startConfetti(){ const c=$("#confettiCanvas"); if(!c) return; const ctx=c.getContext('2d'); const DPR=window.devicePixelRatio||1;
-    const W=c.parentElement.clientWidth, H=c.parentElement.clientHeight; c.width=W*DPR; c.height=H*DPR; ctx.scale(DPR,DPR);
-    const N=80; const pieces=Array.from({length:N},()=>({x:Math.random()*W,y:-10-Math.random()*H,r:2+Math.random()*4,vy:2+Math.random()*3,vx:-1+Math.random()*2,a:Math.random()*Math.PI*2,color:`hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
-    const tick=()=>{ ctx.clearRect(0,0,W,H); pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); }); confettiRaf=requestAnimationFrame(tick); };
-    stopConfetti(); tick(); setTimeout(stopConfetti,5000);
+  function startConfetti(){
+    const c=$("#confettiCanvas"); if(!c) return;
+    const ctx=c.getContext('2d');
+    const DPR=window.devicePixelRatio||1;
+    const card=$("#winCard");
+    const W=card.clientWidth, H=card.clientHeight;
+    c.width=W*DPR; c.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+
+    const N=80;
+    const pieces=Array.from({length:N},()=>({x:Math.random()*W,y:-10-Math.random()*H,r:2+Math.random()*4,vy:2+Math.random()*3,vx:-1+Math.random()*2,a:Math.random()*Math.PI*2,color:`hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
+
+    const tick=()=>{ ctx.clearRect(0,0,W,H);
+      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
+      confettiRaf=requestAnimationFrame(tick);
+    };
+    stopConfetti(); tick();
+    setTimeout(stopConfetti, 5000);
   }
 
   // init
