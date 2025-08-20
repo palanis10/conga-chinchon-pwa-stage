@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.8.2</title>
+<title>Conga by Alanis — STAGE v3.8.3</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,7 +26,7 @@
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
     min-height: 100svh;
-    overflow: hidden;
+    overflow: hidden;                /* page never scrolls */
     overscroll-behavior-y: none;
   }
   body.scroll-locked .players-pane{ overflow: hidden !important; }
@@ -63,7 +63,6 @@
   .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
-  /* small button for win modal */
   .btn.sm{ padding:6px 10px; font-size:14px; border-radius:10px; flex:0 0 auto; }
 
   #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
@@ -147,22 +146,13 @@
   .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
   .avatar-lg img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-  /* ---- Win overlay ---- */
+  /* Win overlay */
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px }
   .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden }
 
-  @media (max-width: 410px){ .lang-pill{ display:none; } }
-  @media (max-width: 400px){
-    .modal-head { padding:8px 10px; gap:6px; }
-    .modal-body { padding:8px 10px; }
-    .modal-foot { padding:8px 10px; gap:6px; }
-    .round-row { grid-template-columns: auto 80px 40px; gap:4px; font-size:12px; }
-    .round-row strong { font-size:14px; }
-    .round-row .hint { font-size:10px; }
-    .round-row input[type="number"] { height:28px; padding:2px 6px; font-size:12px; }
-    .round-row .minus10 { height:28px; font-size:12px; padding:0; }
-  }
+  /* Polyfill backdrop (only used when dialog.showModal is missing) */
+  .dlg-backdrop{ position:fixed; inset:0; background: rgba(2,6,23,.55); z-index: 9998; }
 </style>
 </head>
 <body>
@@ -171,7 +161,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.8.2</div>
+      <div class="ver" id="verLine">STAGE v3.8.3</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -311,6 +301,27 @@
   </form>
 </dialog>
 
+<!-- Crop dialog -->
+<dialog id="cropDialog" aria-labelledby="cropTitle" role="dialog" aria-modal="true">
+  <div class="modal-head">
+    <div id="cropTitle" style="font-weight:800">Crop Photo</div>
+    <button class="btn" onclick="cropDialog.close()" style="padding:6px 10px" data-i18n="close">Close</button>
+  </div>
+  <div class="modal-body">
+    <div id="cropStage"><canvas id="cropCanvas"></canvas></div>
+    <div class="crop-controls">
+      <div class="zoom-row">
+        <input id="zoomRange" type="range" min="0" max="100" value="0" step="1" aria-label="Zoom">
+        <output id="zoomOut" style="text-align:right; font-variant-numeric:tabular-nums">100%</output>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn" id="pickAnotherBtn">Choose photo</button>
+        <button class="btn success" id="applyCropBtn">Apply</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <!-- Win overlay -->
 <div class="win-overlay" id="winOverlay" aria-live="polite" role="dialog" aria-modal="true">
   <div class="win-card" id="winCard">
@@ -351,7 +362,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.2", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.3", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -363,6 +374,32 @@
   const toast = (m)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent=m;
     t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:#111827;color:#e5e7eb;padding:10px 14px;border-radius:10px;border:1px solid #374151;z-index:10000;font-weight:800;letter-spacing:.2px";
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
+
+  /* ==== dialog polyfill (prevents “nothing works” on browsers w/o showModal) ==== */
+  function ensureDialogPolyfill(){
+    const supported = typeof HTMLDialogElement !== "undefined" && !!HTMLDialogElement.prototype.showModal;
+    if (supported) return;
+    document.querySelectorAll("dialog").forEach(d=>{
+      if (d.__polyfilled) return;
+      d.__polyfilled = true;
+      d.showModal = function(){
+        if (this.open) return;
+        this.setAttribute("open", "");
+        this.__backdrop = document.createElement("div");
+        this.__backdrop.className = "dlg-backdrop";
+        document.body.appendChild(this.__backdrop);
+        this.style.zIndex = 9999;
+      };
+      const origClose = d.close?.bind(d);
+      d.close = function(){
+        this.removeAttribute("open");
+        if (this.__backdrop) { this.__backdrop.remove(); this.__backdrop = null; }
+        this.dispatchEvent(new Event("close"));
+        if (origClose) try{ origClose(); }catch{}
+      };
+    });
+  }
+  ensureDialogPolyfill();
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
 
@@ -418,8 +455,11 @@
   function render(){
     const preserveScroll = playersPane ? playersPane.scrollTop : 0;
 
-    $("#limitInput").value=limit; $("#autoAdvance").checked=autoAdvanceDealer; $("#lockOrderSwitch").checked=lockOrder;
-    $("#lockToggle").innerHTML=(lockOrder?"🔒 ":"🔓 ")+t("reorder");
+    const limitInput=$("#limitInput"); if(limitInput) limitInput.value=limit;
+    const autoChk=$("#autoAdvance"); if(autoChk) autoChk.checked=autoAdvanceDealer;
+    const lockChk=$("#lockOrderSwitch"); if(lockChk) lockChk.checked=lockOrder;
+    const lockBtn=$("#lockToggle"); if(lockBtn) lockBtn.innerHTML=(lockOrder?"🔒 ":"🔓 ")+t("reorder");
+
     if(dealerLine){ const d=players.find(p=>p.id===nextDealerId); dealerLine.textContent=d?`${LANG==='es'?'Próximo mano:':'Next dealer:'} ${d.name}`:""; }
     if(list){
       const frag=document.createDocumentFragment();
@@ -572,10 +612,12 @@
   });
 
   /* Circular cropper */
-  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
+  const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"),
+        zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
         pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInputEl=document.getElementById("photoInput");
   const ctx=cropCanvas.getContext('2d');
   let cropPlayerId=null, img=new Image(), imgLoaded=false, scale=1, minScale=1, maxScale=4, offsetX=0, offsetY=0;
+  let touches=null, pinchDist0=null, scale0=null, panning=false, panStartX=0, panStartY=0;
 
   function dprSize(el){ const DPR=window.devicePixelRatio||1; return [el.clientWidth*DPR, el.clientHeight*DPR, DPR]; }
   function circleSpecs(){ const w=cropCanvas.width, h=cropCanvas.height, DPR=window.devicePixelRatio||1, pad=12*DPR; const r=Math.min(w,h)/2 - pad; return {cx:w/2, cy:h/2, r, DPR}; }
@@ -603,34 +645,34 @@
         imgLoaded=true; minScale=coverMinScale(); maxScale=Math.max(minScale*4, minScale+0.01); scale=minScale*1.05;
         const {cx,cy}=circleSpecs(); const w=img.width*scale, h=img.height*scale; offsetX=cx-w/2; offsetY=cy-h/2; clampPan();
         const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%';
-        drawCrop(); cropDialog.scrollTop=0;
+        drawCrop(); cropDlg.scrollTop=0;
       }; img.src=src; };
     if (existingAvatar){ ensureShow(()=>useImage(existingAvatar)); }
     else { photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
         ensureShow(()=>useImage(dataUrl)); }; photoInputEl.click(); }
   }
-  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); window.__t = window.__t || new Map(); window.__t.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(window.__t.size===2){ const pts=[...window.__t.values()]; window.__pinch0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); window.__scale0=scale; }
-    else if(window.__t.size===1){ window.__panning=true; window.__panStartX=e.clientX-offsetX; window.__panStartY=e.clientY-offsetY; } });
-  cropStage.addEventListener('pointermove',e=>{ const T=window.__t; if(!imgLoaded||!T||!T.has(e.pointerId)) return; T.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(T.size===2){ const pts=[...T.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
-      if(window.__pinch0&&window.__scale0){ const ratio=dist/window.__pinch0; scale=Math.min(maxScale,Math.max(minScale,window.__scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); document.getElementById('zoomRange').value=Math.round(t*100); document.getElementById('zoomOut').textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
-    else if(window.__panning){ offsetX=e.clientX-window.__panStartX; offsetY=e.clientY-window.__panStartY; clampPan(); drawCrop(); } }, {passive:false});
-  function endPtr(e){ const T=window.__t; if(T){ T.delete(e.pointerId); if(T.size<2){ window.__pinch0=null; window.__scale0=null; } if(T.size===0){ window.__panning=false; } } }
+  cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); if(!touches) touches=new Map(); touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(touches.size===2){ const pts=[...touches.values()]; pinchDist0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); scale0=scale; }
+    else if(touches.size===1){ panning=true; panStartX=e.clientX-offsetX; panStartY=e.clientY-offsetY; } });
+  cropStage.addEventListener('pointermove',e=>{ if(!imgLoaded||!touches||!touches.has(e.pointerId)) return; touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(touches.size===2){ const pts=[...touches.values()]; const dist=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+      if(pinchDist0&&scale0){ const ratio=dist/pinchDist0; scale=Math.min(maxScale,Math.max(minScale,scale0*ratio)); const t=(scale-minScale)/(maxScale-minScale); zoomRange.value=Math.round(t*100); zoomOut.textContent=Math.round(scale/minScale*100)+'%'; clampPan(); drawCrop(); } }
+    else if(panning){ offsetX=e.clientX-panStartX; offsetY=e.clientY-panStartY; clampPan(); drawCrop(); } }, {passive:false});
+  function endPtr(e){ if(!touches) return; touches.delete(e.pointerId); if(touches.size<2){ pinchDist0=null; scale0=null; } if(touches.size===0){ panning=false; } }
   cropStage.addEventListener('pointerup',endPtr); cropStage.addEventListener('pointercancel',endPtr); cropStage.addEventListener('pointerleave',endPtr);
-  document.getElementById('zoomRange').addEventListener('input',e=>setZoomBySlider(+e.target.value));
-  document.getElementById('pickAnotherBtn').addEventListener('click',()=>{ photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
+  zoomRange.addEventListener('input',e=>setZoomBySlider(+e.target.value));
+  pickAnotherBtn.addEventListener('click',()=>{ photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
       openCrop(cropPlayerId, dataUrl); }; photoInputEl.click(); });
-  document.getElementById('applyCropBtn').addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
+  applyCropBtn.addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
     const {cx,cy,r}=circleSpecs(); const ox=(cx-offsetX)/scale, oy=(cy-offsetY)/scale, or=r/scale;
     const size=512; const out=document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
     octx.clearRect(0,0,size,size); octx.save(); octx.beginPath(); octx.arc(size/2,size/2,size/2,0,Math.PI*2); octx.clip();
     const S=(size/2)/or; octx.setTransform(S,0,0,S, size/2-ox*S, size/2-oy*S); octx.imageSmoothingQuality='high'; octx.drawImage(img,0,0); octx.restore();
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
-  /* Round dialog (Apply after close to avoid scroll jump) */
+  /* Round dialog */
   const roundDlg=$("#roundDialog"), rows=$("#roundRows");
   let _pendingRoundInputs = null;
   function openRound(){
@@ -655,7 +697,7 @@
     const roundNo=roundCounter+1;
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1;
+    const REENG_THRESHOLD=limit+1;     // reenganche at exactly 101 and higher when limit=100
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -692,7 +734,7 @@
     const tbody=document.createElement('tbody');
     rounds.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<th>${r.round}</th>`+players.map(p=>`<td>${(r.inputs&&r.inputs[p.id]!=null)?r.inputs[p.id]:"0"} / ${(r.totals&&r.totals[p.id]!=null)?r.totals[p.id]:"0"}</td>`).join(""); tbody.appendChild(tr); });
     table.appendChild(tbody); twrap.appendChild(table);
-    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); showModalWithLock(dlg);
+    dlg.querySelector("button").onclick=()=>dlg.close(); document.body.appendChild(dlg); ensureDialogPolyfill(); showModalWithLock(dlg);
   }
 
   /* Wire-up */
@@ -722,10 +764,10 @@
   }
   function closeWin(){ const ov=$("#winOverlay"); if(!ov) return; ov.style.display='none'; }
 
-  $("#winCloseBtn")?.addEventListener('click', closeWin);
+  on("#winCloseBtn","click", closeWin);
   $("#winOverlay")?.addEventListener('click', (e)=>{ if(e.target.id==="winOverlay") closeWin(); });
   document.addEventListener('keydown', (e)=>{ if(e.key==="Escape" && $("#winOverlay").style.display==='flex') closeWin(); });
-  $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; closeWin(); render(); });
+  on("#newGameBtn2","click",()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; closeWin(); render(); });
 
   // init
   load(); applyI18n(); render();
