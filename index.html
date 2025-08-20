@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.8.1</title>
+<title>Conga by Alanis — STAGE v3.8.2</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -63,6 +63,9 @@
   .btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
   .btn.primary{background: linear-gradient(135deg, var(--accent), #9f7cff); color:#0b0f1f; border-style:solid}
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
+  /* small button for win modal */
+  .btn.sm{ padding:6px 10px; font-size:14px; border-radius:10px; flex:0 0 auto; }
+
   #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
 
   /* Players pane is the only scroller */
@@ -148,8 +151,6 @@
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px }
   .win-card{ width:min(520px,94vw); border-radius:20px; padding:14px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55); position:relative; overflow:hidden }
-  #confettiCanvas{ position:absolute; inset:0; pointer-events:none; z-index:0; }   /* BEHIND the UI */
-  .win-head, .win-actions{ position:relative; z-index:1; }                       /* ABOVE the canvas */
 
   @media (max-width: 410px){ .lang-pill{ display:none; } }
   @media (max-width: 400px){
@@ -170,7 +171,7 @@
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.8.1</div>
+      <div class="ver" id="verLine">STAGE v3.8.2</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -313,7 +314,6 @@
 <!-- Win overlay -->
 <div class="win-overlay" id="winOverlay" aria-live="polite" role="dialog" aria-modal="true">
   <div class="win-card" id="winCard">
-    <canvas id="confettiCanvas"></canvas>
     <div class="win-head" style="display:flex; align-items:center; gap:12px">
       <div class="win-photo" style="width:56px; height:56px; border-radius:50%; overflow:hidden; border:2px solid #4ee1a0; box-shadow:0 0 0 4px rgba(78,225,160,.25)"><img id="winPhoto" alt=""></div>
       <div>
@@ -322,8 +322,8 @@
       </div>
     </div>
     <div class="win-actions" style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px; flex-wrap:wrap">
-      <button class="btn success" id="newGameBtn2" data-i18n="newGame">New game</button>
-      <button class="btn" id="winCloseBtn" data-i18n="close">Close</button>
+      <button class="btn sm" id="newGameBtn2" data-i18n="newGame">Start new game</button>
+      <button class="btn sm" id="winCloseBtn" data-i18n="close">Close</button>
     </div>
   </div>
 </div>
@@ -351,7 +351,7 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.1", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.2", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
 
@@ -386,7 +386,7 @@
       settings:"Settings",limitLabel:"Limit (default 100)",autoAdvance:"Auto-advance dealer after round",lockOrder:"Lock player reordering",
       resetScores:"Reset scores",clearAll:"Clear all",done:"Done",cancel:"Cancel",apply:"Apply",editPlayer:"Edit player",
       name:"Name",score:"Score",reenganches:"Reenganches",photo:"Photo",addPhoto:"Add photo",editPhoto:"Edit photo",removePhoto:"Remove photo",
-      setDealer:"Set as next dealer",deletePlayer:"Delete player",save:"Save",winner:"WINNER",close:"Close",newGame:"New game"},
+      setDealer:"Set as next dealer",deletePlayer:"Delete player",save:"Save",winner:"WINNER",close:"Close",newGame:"Start new game"},
     es:{reorder:"Reordenar",history:"Historial",newRound:"Nueva ronda",players:"Jugadores",addPlayer:"Agregar jugador",
       settings:"Ajustes",limitLabel:"Límite (por defecto 100)",autoAdvance:"Avanzar mano automáticamente",lockOrder:"Bloquear reordenamiento",
       resetScores:"Reiniciar puntajes",clearAll:"Borrar todo",done:"Listo",cancel:"Cancelar",apply:"Aplicar",editPlayer:"Editar jugador",
@@ -573,9 +573,7 @@
 
   /* Circular cropper */
   const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
-        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput($("#photoInput"));
-  function photoInput(id){ return document.getElementById('photoInput'); } // tiny helper to avoid shadowing above
-
+        pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInputEl=document.getElementById("photoInput");
   const ctx=cropCanvas.getContext('2d');
   let cropPlayerId=null, img=new Image(), imgLoaded=false, scale=1, minScale=1, maxScale=4, offsetX=0, offsetY=0;
 
@@ -608,9 +606,9 @@
         drawCrop(); cropDialog.scrollTop=0;
       }; img.src=src; };
     if (existingAvatar){ ensureShow(()=>useImage(existingAvatar)); }
-    else { photoInput().onchange=async()=>{ const f=photoInput().files[0]; if(!f) return;
+    else { photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-        ensureShow(()=>useImage(dataUrl)); }; photoInput().click(); }
+        ensureShow(()=>useImage(dataUrl)); }; photoInputEl.click(); }
   }
   cropStage.addEventListener('pointerdown',e=>{ cropStage.setPointerCapture(e.pointerId); window.__t = window.__t || new Map(); window.__t.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(window.__t.size===2){ const pts=[...window.__t.values()]; window.__pinch0=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y); window.__scale0=scale; }
@@ -622,9 +620,9 @@
   function endPtr(e){ const T=window.__t; if(T){ T.delete(e.pointerId); if(T.size<2){ window.__pinch0=null; window.__scale0=null; } if(T.size===0){ window.__panning=false; } } }
   cropStage.addEventListener('pointerup',endPtr); cropStage.addEventListener('pointercancel',endPtr); cropStage.addEventListener('pointerleave',endPtr);
   document.getElementById('zoomRange').addEventListener('input',e=>setZoomBySlider(+e.target.value));
-  document.getElementById('pickAnotherBtn').addEventListener('click',()=>{ photoInput().onchange=async()=>{ const f=photoInput().files[0]; if(!f) return;
+  document.getElementById('pickAnotherBtn').addEventListener('click',()=>{ photoInputEl.onchange=async()=>{ const f=photoInputEl.files[0]; if(!f) return;
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
-      openCrop(cropPlayerId, dataUrl); }; photoInput().click(); });
+      openCrop(cropPlayerId, dataUrl); }; photoInputEl.click(); });
   document.getElementById('applyCropBtn').addEventListener('click',()=>{ if(!imgLoaded){ cropDlg.close(); return; }
     const {cx,cy,r}=circleSpecs(); const ox=(cx-offsetX)/scale, oy=(cy-offsetY)/scale, or=r/scale;
     const size=512; const out=document.createElement('canvas'); out.width=size; out.height=size; const octx=out.getContext('2d');
@@ -650,7 +648,6 @@
   }
   function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
   on("#roundForm","submit",(e)=>{ e.preventDefault(); _pendingRoundInputs = roundInputs(); roundDlg.close(); });
-  on("#applyRoundBtn","click",(e)=>{ e.preventDefault(); _pendingRoundInputs = roundInputs(); roundDlg.close(); });
   roundDlg.addEventListener('close', ()=>{ if(_pendingRoundInputs){ const inputs=_pendingRoundInputs; _pendingRoundInputs=null; requestAnimationFrame(()=>applyRound(inputs)); } });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
@@ -715,43 +712,20 @@
   const addPlayer=(name="")=>{ const p={id:uid(),name:name||("Player "+(players.length+1)),score:0,reenganches:0,avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* Win overlay (fixed layering + easy exits) */
-  let confettiRaf;
+  /* Win overlay */
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
     $("#winName").textContent=winner?.name || 'Winner';
     const img = $("#winPhoto"); if (img) img.src = winner?.avatar || '';
     ov.style.display='flex';
     try{ $("#winSound").play().catch(()=>{});}catch{}
-    startConfetti();
   }
-  function closeWin(){ const ov=$("#winOverlay"); if(!ov) return; ov.style.display='none'; stopConfetti(); }
+  function closeWin(){ const ov=$("#winOverlay"); if(!ov) return; ov.style.display='none'; }
 
   $("#winCloseBtn")?.addEventListener('click', closeWin);
-  $("#winOverlay")?.addEventListener('click', (e)=>{ if(e.target.id==="winOverlay") closeWin(); }); // click the dim background to close
+  $("#winOverlay")?.addEventListener('click', (e)=>{ if(e.target.id==="winOverlay") closeWin(); });
   document.addEventListener('keydown', (e)=>{ if(e.key==="Escape" && $("#winOverlay").style.display==='flex') closeWin(); });
-
   $("#newGameBtn2")?.addEventListener('click',()=>{ players.forEach(p=>{p.score=0;p.reenganches=0;}); gameOver=false; rounds=[]; roundCounter=0; closeWin(); render(); });
-
-  function stopConfetti(){ if(confettiRaf) cancelAnimationFrame(confettiRaf); }
-  function startConfetti(){
-    const c=$("#confettiCanvas"); if(!c) return;
-    const ctx=c.getContext('2d');
-    const DPR=window.devicePixelRatio||1;
-    const card=$("#winCard");
-    const W=card.clientWidth, H=card.clientHeight;
-    c.width=W*DPR; c.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
-
-    const N=80;
-    const pieces=Array.from({length:N},()=>({x:Math.random()*W,y:-10-Math.random()*H,r:2+Math.random()*4,vy:2+Math.random()*3,vx:-1+Math.random()*2,a:Math.random()*Math.PI*2,color:`hsl(${Math.floor(Math.random()*360)},90%,60%)`}));
-
-    const tick=()=>{ ctx.clearRect(0,0,W,H);
-      pieces.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a+=0.1; if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; } ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.color; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore(); });
-      confettiRaf=requestAnimationFrame(tick);
-    };
-    stopConfetti(); tick();
-    setTimeout(stopConfetti, 5000);
-  }
 
   // init
   load(); applyI18n(); render();
