@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Conga by Alanis — STAGE v3.8.3</title>
+<title>Conga by Alanis — STAGE v3.8.4</title>
 <meta name="theme-color" content="#0f1220" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,28 +25,14 @@
     -webkit-font-smoothing:antialiased;
     line-height:1.35;
     -webkit-tap-highlight-color: transparent;
-
-    /* Page itself never scrolls; only Players pane can scroll */
     min-height: 100svh;
-    overflow: hidden;
+    overflow: hidden; /* only players pane scrolls */
   }
 
-  /* Shell fills the viewport; header + tools stay, players scroll */
-  .app{
-    max-width:980px; margin:0 auto;
-    height:100%; min-height:100svh;
-    padding:6px 12px;
-    display:flex; flex-direction:column;
-  }
+  .app{ max-width:980px; margin:0 auto; height:100%; min-height:100svh; padding:6px 12px; display:flex; flex-direction:column; }
 
-  /* ===== Header (fixed in layout) ===== */
-  header{
-    display:grid;
-    grid-template-columns: 1fr auto auto;
-    align-items:center;
-    gap:10px;
-    padding:6px 0 2px 0;
-  }
+  /* Header / Tools are fixed in the layout */
+  header{ display:grid; grid-template-columns: 1fr auto auto; align-items:center; gap:10px; padding:6px 0 2px 0; }
   .brand{display:flex; flex-direction:column; gap:2px}
   .title{font-weight:900; letter-spacing:.2px; font-size: clamp(18px, 5vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .ver{font-weight:800; font-size:12px; color:var(--sub); opacity:.9}
@@ -55,12 +41,9 @@
   .lang-pill .active{opacity:1; text-decoration:underline}
   .iconbtn{width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0f1428; color:var(--text); cursor:pointer; font-size:18px}
 
-  /* ===== Tools card (fixed in layout) ===== */
-  .card{
-    background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0)) , var(--card);
     border:1px solid rgba(255,255,255,.06); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding:10px; margin:8px 0;
-  }
+    padding:10px; margin:8px 0; }
   .tools{display:flex; gap:8px; align-items:center; white-space:nowrap}
   .btn{appearance:none; border:0; cursor:pointer; user-select:none; padding:10px 12px; border-radius:12px;
     background: linear-gradient(135deg, #1a2344, #121a34); border:1px dashed rgba(255,255,255,.22);
@@ -70,20 +53,13 @@
   .btn.success{background: linear-gradient(135deg, var(--accent-2), #9cffc8); color:#001c12; border-style:solid}
   #dealerLine{margin-top:6px; font-weight:800; color:var(--sub); font-size:12px}
 
-  /* ===== Players panel (ONLY this scrolls) ===== */
-  .players-pane{
-    flex:1 1 auto;
-    overflow:auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
-  }
-
+  /* Players list scrolls */
+  .players-pane{ flex:1 1 auto; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
   .players header{ margin:6px 0 6px 2px; color:var(--sub); font-size:12px; }
   .players, .players *{ user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
 
   .row{
-    display:grid; grid-template-columns: 28px 64px 1fr auto; /* bigger avatar slot */
+    display:grid; grid-template-columns: 28px 64px 1fr auto;
     align-items:center; gap:12px; padding:12px; border-radius:14px;
     border:1px solid rgba(255,255,255,.06);
     background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
@@ -101,7 +77,6 @@
   .score{ font-variant-numeric: tabular-nums; font-weight:900; text-align:right; font-size:22px; }
   .score.over{ color:var(--danger) }
 
-  /* Live drag visuals */
   .row.placeholder{
     background: repeating-linear-gradient(-45deg, rgba(78,225,160,.12), rgba(78,225,160,.12) 6px, transparent 6px, transparent 12px);
     border:2px dashed rgba(78,225,160,.55);
@@ -114,7 +89,6 @@
     opacity:.98;
   }
 
-  /* Dialogs / inputs */
   dialog{ width:min(720px, 96vw); border-radius:16px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)) , #0f1428; color:var(--text);
     box-shadow: 0 24px 64px rgba(0,0,0,.55); overflow:hidden }
@@ -125,7 +99,7 @@
   label{font-size:12px; color:var(--sub); display:block; margin-bottom:6px}
   input[type="number"], input[type="text"], select{width:100%; background:#0f1428; border:1px solid var(--muted);
     color:var(--text); padding:9px 10px; border-radius:12px; outline:none; height:38px;}
-  input, select, textarea, button { font-size:16px; } /* iOS zoom guard */
+  input, select, textarea, button { font-size:16px; }
   dialog .btn { border-style: solid; }
 
   .switch { position: relative; display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
@@ -148,7 +122,7 @@
     background:linear-gradient(135deg, #1c243e, #121a34); color:var(--text); font-weight:800; padding:0 2px; font-size:14px; }
   .error{ color:var(--danger); font-weight:700; margin-right:auto }
 
-  /* Circular cropper */
+  /* Cropper */
   #cropDialog { width: min(460px, 92vw); }
   #cropStage { position: relative; width: 100%; height: 360px; border-radius: 16px; background:#0b0f20; border:1px solid rgba(255,255,255,.1); overflow:hidden; touch-action:none; }
   #cropCanvas { position:absolute; inset:0; width:100%; height:100%; }
@@ -159,7 +133,6 @@
   .avatar-lg{ width:64px; height:64px; border-radius:50%; overflow:hidden; border:1px solid rgba(255,255,255,.14); background:#0f1428; }
   .avatar-lg img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-  /* Win modal (simple) */
   .win-overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,.55); z-index:9999; padding:16px}
   .win-card{ width:min(420px,92vw); border-radius:18px; padding:14px; border:1px solid rgba(255,255,255,.12);
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), #0f1428; box-shadow:0 24px 64px rgba(0,0,0,.55) }
@@ -182,11 +155,10 @@
 <body>
 <div class="app" id="app">
 
-  <!-- Non-scrolling top -->
   <header>
     <div class="brand">
       <div class="title" id="appTitle">Conga by Alanis</div>
-      <div class="ver" id="verLine">STAGE v3.8.3</div>
+      <div class="ver" id="verLine">STAGE v3.8.4</div>
     </div>
 
     <div class="lang-pill" id="langPill" aria-label="Language">
@@ -206,7 +178,6 @@
     <div id="dealerLine"></div>
   </section>
 
-  <!-- Scrollable center -->
   <section id="playersPane" class="players-pane">
     <div class="players">
       <header><div data-i18n="players">Players</div></header>
@@ -388,10 +359,9 @@
 (() => {
   "use strict";
 
-  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.3", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
+  const APP = { NAME:"Conga by Alanis", CHANNEL:"STAGE", VERSION:"3.8.4", STORAGE_KEY:"conga_state_v2", SCHEMA:2 };
   document.title = `${APP.NAME} — ${APP.CHANNEL} v${APP.VERSION}`;
   const verLineEl = document.getElementById("verLine"); if (verLineEl) verLineEl.textContent = `${APP.CHANNEL} v${APP.VERSION}`;
-  // cache-bust the manifest on each release
   const m = document.getElementById('manifest'); if (m) m.href = m.href + (m.href.includes('?')?'&':'?') + 'v=' + APP.VERSION;
 
   /* utils */
@@ -405,8 +375,6 @@
     document.body.appendChild(t); setTimeout(()=>t.remove(),1400); };
 
   let saveTimer; const debounceSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 300); };
-
-  // Do NOT flip body overflow – page itself never scrolls (Players pane does).
   const showModalWithLock = (dlg) => { if (dlg) { dlg.showModal(); dlg.scrollTop = 0; } };
 
   /* i18n */
@@ -427,7 +395,6 @@
   /* state */
   let players=[], limit=100, nextDealerId=null, autoAdvanceDealer=true, gameOver=false;
   let roundCounter=0; let rounds=[]; let lockOrder=false; let schema=APP.SCHEMA;
-
   const defaultsPlayers = ()=>[{id:uid(),name:"Player 1",score:0,reenganches:0,avatar:null},{id:uid(),name:"Player 2",score:0,reenganches:0,avatar:null}];
 
   const save=()=>localStorage.setItem(APP.STORAGE_KEY, JSON.stringify({schema,players,limit,nextDealerId,autoAdvanceDealer,gameOver,roundCounter,rounds,lockOrder,app:{version:APP.VERSION}}));
@@ -444,7 +411,6 @@
   /* render */
   const list=$("#playersList"), playersPane=$("#playersPane"), rowTpl=$("#playerRowTpl"), dealerLine=$("#dealerLine");
   function render(){
-    // preserve players pane scroll position across re-renders
     const preserveScroll = playersPane ? playersPane.scrollTop : 0;
 
     $("#limitInput").value=limit; $("#autoAdvance").checked=autoAdvanceDealer; $("#lockOrderSwitch").checked=lockOrder;
@@ -456,10 +422,8 @@
         const n=rowTpl.content.firstElementChild.cloneNode(true);
         n.dataset.index=i; n.dataset.id=p.id;
 
-        /* edit only when locked */
         if(lockOrder) attachLongPress(n, ()=>openEdit(p.id));
 
-        /* live reorder when unlocked */
         const handle=n.querySelector('.drag');
         if(!lockOrder){ handle.classList.remove('locked'); enableLiveReorder(handle, n); }
         else { handle.classList.add('locked'); handle.onpointerdown=handle.ontouchstart=handle.onmousedown=null; }
@@ -477,7 +441,6 @@
     }
     applyI18n(); debounceSave();
 
-    // restore scroll
     if(playersPane) playersPane.scrollTop = preserveScroll;
   }
 
@@ -490,7 +453,6 @@
     ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=>el.addEventListener(ev,end));
   }
 
-  /* ===== Live reorder (ghost + placeholder) ===== */
   function enableLiveReorder(handle, rowEl){
     const start=(e)=>{
       if(lockOrder) return;
@@ -501,40 +463,32 @@
       const rect = rowEl.getBoundingClientRect();
       const startIdx = +rowEl.dataset.index;
 
-      // placeholder
       const ph = document.createElement('div');
       ph.className = 'row placeholder';
       ph.style.height = rect.height + 'px';
 
-      // ghost
       const ghost = rowEl.cloneNode(true);
       ghost.classList.add('drag-ghost');
       ghost.style.width = rect.width + 'px';
       ghost.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
 
-      // offset
       const offsetX = clientX - rect.left;
       const offsetY = clientY - rect.top;
 
-      // mount
       const parent = list;
       parent.insertBefore(ph, rowEl);
       rowEl.remove();
       document.body.appendChild(ghost);
 
-      // keep scroll inside players pane
       const pr = playersPane.getBoundingClientRect();
       const edge = 36;
 
       const move = (cx, cy) => {
         ghost.style.transform = `translate3d(${cx - offsetX}px, ${cy - offsetY}px, 0)`;
-
         if (cy < pr.top + edge) playersPane.scrollBy({top:-14, behavior:'auto'});
         else if (cy > pr.bottom - edge) playersPane.scrollBy({top:14, behavior:'auto'});
-
-        // position placeholder by ghost center
         const centerY = cy;
-        const rows = Array.from(parent.querySelectorAll('.row')); // includes placeholder
+        const rows = Array.from(parent.querySelectorAll('.row'));
         const target = rows.find(el => el !== ph && (centerY < el.getBoundingClientRect().top + el.offsetHeight/2));
         if (target) parent.insertBefore(ph, target); else parent.appendChild(ph);
       };
@@ -557,8 +511,7 @@
           const moving = arr.splice(startIdx,1)[0]; arr.splice(toIdx,0,moving);
           players = arr; nextDealerId = keepDealer;
         }
-        render();
-        detach();
+        render(); detach();
       };
 
       const onPointerMove = ev => { ev.preventDefault(); move(ev.clientX, ev.clientY); };
@@ -611,7 +564,7 @@
     editDlg.close(); render();
   });
 
-  /* ===== Circular cropper ===== */
+  /* ===== Cropper ===== */
   const cropDlg=$("#cropDialog"), cropStage=$("#cropStage"), cropCanvas=$("#cropCanvas"), zoomRange=$("#zoomRange"), zoomOut=$("#zoomOut"),
         pickAnotherBtn=$("#pickAnotherBtn"), applyCropBtn=$("#applyCropBtn"), photoInput=$("#photoInput");
   const ctx=cropCanvas.getContext('2d');
@@ -672,23 +625,74 @@
     const dataOut=out.toDataURL('image/png',0.95); const p=players.find(x=>x.id===cropPlayerId); if(p){ p.avatar=dataOut; refreshEditPreview(p.id); render(); } cropDlg.close(); });
 
   /* ===== Round ===== */
-  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), applyRoundBtn=$("#applyRoundBtn"), roundForm=$("#roundForm");
+  const roundDlg=$("#roundDialog"), rows=$("#roundRows"), roundForm=$("#roundForm");
+  const roundErrEl=$("#roundError"), applyBtn=$("#applyRoundBtn");
+
   function openRound(){
     if(players.length===0){ toast(LANG==="es"?"Agrega jugadores primero":"Add players first"); return; }
     rows.innerHTML="";
     const frag=document.createDocumentFragment();
+
     players.forEach(p=>{ const r=document.createElement("div"); r.className="round-row";
       const name=document.createElement("div"); name.innerHTML=`<strong>${p.name}</strong><div class="hint">${t("score")}: ${p.score||0}</div>`;
       const inp=document.createElement("input"); inp.id="rr_"+p.id; inp.type="number"; inp.step="1"; inp.inputMode="numeric"; inp.placeholder="0"; inp.dataset.pid=p.id;
-      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10"; minus.onclick=()=>{ inp.value=clampInt((inp.value===""?0:+inp.value)-10); };
+      const minus=document.createElement("button"); minus.type="button"; minus.className="minus10"; minus.textContent="-10";
+      minus.onclick=()=>{                   /* give -10 to THIS player and clear negatives elsewhere */
+        rows.querySelectorAll('input').forEach(el=>{ if(el!==inp && +el.value<0) el.value = 0; });
+        inp.value = (+inp.value === -10) ? 0 : -10;
+        enforceRoundRule();
+      };
+      inp.addEventListener('input',()=>{ /* clamp int */ 
+        if (inp.value === "") { enforceRoundRule(); return; }
+        let v = clampInt(inp.value, 0);
+        if (isNaN(v)) v = 0;
+        inp.value = String(v);
+        enforceRoundRule();
+      });
       r.append(name,inp,minus); frag.appendChild(r);
     });
+
     rows.appendChild(frag);
     showModalWithLock(roundDlg);
     requestAnimationFrame(()=>{ roundDlg.scrollTop=0; rows.querySelector('input')?.focus({preventScroll:true}); });
+    enforceRoundRule(); // initial state
   }
-  function roundInputs(){ const m={}; for(const p of players){ const el=$("#rr_"+p.id); m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);} return m; }
-  roundForm.addEventListener('submit',(e)=>{ e.preventDefault(); applyRound(roundInputs()); roundDlg.close(); });
+
+  function roundInputs(){
+    const m={};
+    for(const p of players){
+      const el=$("#rr_"+p.id);
+      m[p.id]=clampInt(el && el.value!=="" ? el.value : 0,0);
+    }
+    return m;
+  }
+
+  function enforceRoundRule(){
+    let negatives = 0;
+    let invalid = false;
+    rows.querySelectorAll('input').forEach(inp=>{
+      const v = clampInt(inp.value,0);
+      if (v < 0) {
+        if (v !== -10) invalid = true; /* must be exactly -10 */
+        negatives++;
+      }
+    });
+
+    let msg = "";
+    if (invalid) msg = LANG==="es" ? "Si baja, debe ser -10" : "If negative, it must be -10";
+    if (negatives > 1) msg = LANG==="es" ? "Solo un jugador puede -10" : "Only one player may be -10";
+    roundErrEl.style.display = msg ? "block" : "none";
+    roundErrEl.textContent = msg;
+    applyBtn.disabled = !!msg;
+    return !!msg;
+  }
+
+  roundForm.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    if (enforceRoundRule()) return; // block until valid
+    applyRound(roundInputs());
+    roundDlg.close();
+  });
 
   function snapshotTotalsById(){ const o={}; for(const p of players) o[p.id]=clampInt(p.score||0); return o; }
 
@@ -697,7 +701,9 @@
     const proj={}; players.forEach(p=>proj[p.id]=clampInt(p.score||0)+clampInt(inputs[p.id]||0));
 
     roundCounter+=1;
-    const REENG_THRESHOLD=limit+1; // trigger only at 101+
+
+    // Reenganche ONLY at limit+1 or higher
+    const REENG_THRESHOLD=limit+1;
     const under=players.filter(p=>proj[p.id]<=limit);
     const over=players.filter(p=>proj[p.id]>=REENG_THRESHOLD);
 
@@ -754,7 +760,7 @@
   const addPlayer=(name="")=>{ const p={id:uid(),name:name||("Player "+(players.length+1)),score:0,reenganches:0,avatar:null}; players.push(p); if(!nextDealerId && players[0]) nextDealerId=players[0].id; gameOver=false; render(); };
   const removePlayer=id=>{ const i=players.findIndex(p=>p.id===id); if(i<0) return; const was=players[i].id===nextDealerId; players.splice(i,1); if(!players.length) nextDealerId=null; else if(was) nextDealerId=players[Math.min(i,players.length-1)].id; render(); };
 
-  /* Win overlay (simple) */
+  /* Win overlay */
   function showWinOverlay(winner){
     const ov=$("#winOverlay"); if(!ov) return;
     $("#winName").textContent=winner?.name||'Winner';
